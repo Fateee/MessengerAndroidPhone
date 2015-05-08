@@ -701,7 +701,7 @@ public class DisAddActivity extends BaseActivity implements /*ReceiveReqIQCallBa
 							return;
 						}
 						int mSumUser = mNewAddUserList.size()+ mOldUserList.size();                                                                                                                                          
-						if (mSumUser > mMaxMemberNum) {
+						if (mSumUser > mMaxMemberNum-1) {
 							mHandler.sendEmptyMessage(OVER_FLOW_MAX_MEMBERS);
 							return;
 						}

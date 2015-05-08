@@ -286,7 +286,7 @@ public class DisCreateActivity extends BaseActivity{
 			ClientInitConfig mClientInitConfig = mContactOrgDao.getClientInitInfo();
 			if (mClientInitConfig != null) {
 				int maxUsers = Integer.parseInt(mClientInitConfig.getDisgroup_max_user());
-				if (mNewAddUserList.size() > maxUsers) {
+				if (mNewAddUserList.size() > (maxUsers-1)) {
 					ToastUtil.toastAlerMessage(this, "成员数量超过上限", Toast.LENGTH_SHORT);
 					return;
 				}
@@ -670,7 +670,7 @@ public class DisCreateActivity extends BaseActivity{
 							return;
 						}
 						int mSumUser = mNewAddUserList.size();                                                                                                                                          
-						if (mSumUser > mMaxMemberNum) {
+						if (mSumUser > mMaxMemberNum-1) {
 							mHandler.sendEmptyMessage(OVER_FLOW_MAX_MEMBERS);
 							return;
 						}

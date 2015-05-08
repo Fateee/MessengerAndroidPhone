@@ -873,8 +873,12 @@ public class GroupChatActivity extends BaseActivity implements OnClickListener, 
 			if (entity.getMessage() != null) { 
 				MessageBodyEntity body = JSON.parseObject(entity.getMessage(),
 						MessageBodyEntity.class);
-				SpannableString spannableString = FaceConversionUtil.getInstace()
-						.getExpressionString(context, body.getContent());
+//				SpannableString spannableString = FaceConversionUtil.getInstace()
+//						.getExpressionString(context, body.getContent());
+				// 对内容做处理
+				SpannableString spannableString = FaceConversionUtil
+						.getInstace().handlerContent(this.context,viewHolder.tvContent,
+						body.getContent());
 				viewHolder.tvContent.setText(spannableString);
 			}
 			return convertView;

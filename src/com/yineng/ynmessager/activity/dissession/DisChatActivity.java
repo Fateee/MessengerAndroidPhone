@@ -1,29 +1,37 @@
 package com.yineng.ynmessager.activity.dissession;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import org.jivesoftware.smack.packet.Message;
 import org.jivesoftware.smack.packet.Message.Type;
 
-import android.app.Activity;
 import android.app.AlarmManager;
 import android.app.PendingIntent;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.os.Bundle;
 import android.os.Handler;
+import android.text.Spannable;
 import android.text.SpannableString;
+import android.text.SpannableStringBuilder;
+import android.text.style.ImageSpan;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
+import android.view.animation.Animation;
 import android.widget.AbsListView;
 import android.widget.AbsListView.OnScrollListener;
 import android.widget.AdapterView;
@@ -44,8 +52,6 @@ import com.handmark.pulltorefresh.library.PullToRefreshBase.OnRefreshListener;
 import com.handmark.pulltorefresh.library.PullToRefreshListView;
 import com.yineng.ynmessager.R;
 import com.yineng.ynmessager.activity.BaseActivity;
-import com.yineng.ynmessager.activity.groupsession.GroupChatActivity;
-import com.yineng.ynmessager.activity.groupsession.GroupInfoActivity;
 import com.yineng.ynmessager.activity.p2psession.P2PChatMsgEntity;
 import com.yineng.ynmessager.activity.session.FaceConversionUtil;
 import com.yineng.ynmessager.app.Const;
@@ -56,7 +62,6 @@ import com.yineng.ynmessager.bean.groupsession.GroupChatMsgEntity;
 import com.yineng.ynmessager.bean.p2psession.MessageBodyEntity;
 import com.yineng.ynmessager.db.ContactOrgDao;
 import com.yineng.ynmessager.db.dao.DisGroupChatDao;
-import com.yineng.ynmessager.db.dao.GroupChatDao;
 import com.yineng.ynmessager.db.dao.RecentChatDao;
 import com.yineng.ynmessager.imageloader.ImageLoaderActivity;
 import com.yineng.ynmessager.manager.NoticesManager;
@@ -71,6 +76,8 @@ import com.yineng.ynmessager.smack.ReqIQResult;
 import com.yineng.ynmessager.util.JIDUtil;
 import com.yineng.ynmessager.util.L;
 import com.yineng.ynmessager.util.TimeUtil;
+import com.yineng.ynmessager.view.face.gif.AnimatedGifDrawable;
+import com.yineng.ynmessager.view.face.gif.AnimatedImageSpan;
 
 /**
  * 
@@ -866,9 +873,13 @@ public class DisChatActivity extends BaseActivity implements OnClickListener,
 				L.i(TAG, "entity:   " + entity.getMessage());
 				MessageBodyEntity body = JSON.parseObject(entity.getMessage(),
 						MessageBodyEntity.class);
+//				SpannableString spannableString = FaceConversionUtil
+//						.getInstace().getExpressionString(context,
+//								body.getContent());
+				// 对内容做处理
 				SpannableString spannableString = FaceConversionUtil
-						.getInstace().getExpressionString(context,
-								body.getContent());
+						.getInstace().handlerContent(this.context,viewHolder.tvContent,
+						body.getContent());
 				viewHolder.tvContent.setText(spannableString);
 			}
 			return convertView;
@@ -891,5 +902,4 @@ public class DisChatActivity extends BaseActivity implements OnClickListener,
 	public void receivedMessage(P2PChatMsgEntity msg) {
 
 	}
-
 }

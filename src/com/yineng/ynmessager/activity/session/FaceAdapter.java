@@ -1,8 +1,11 @@
 package com.yineng.ynmessager.activity.session;
 
+import java.io.IOException;
 import java.util.List;
 
 import android.content.Context;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -24,10 +27,13 @@ public class FaceAdapter extends BaseAdapter {
 
     private int mSize=0;
 
+	private Context mContext;
+
     public FaceAdapter(Context context, List<ChatEmoji> list) {
         this.mInflater=LayoutInflater.from(context);
         this.mData=list;
         this.mSize=list.size();
+        this.mContext = context;
     }
 
     @Override
@@ -65,7 +71,13 @@ public class FaceAdapter extends BaseAdapter {
             viewHolder.iv_face.setImageDrawable(null);
         } else {
             viewHolder.iv_face.setTag(emoji);
-            viewHolder.iv_face.setImageResource(emoji.getId());
+            try {
+				Bitmap mBitmap = BitmapFactory.decodeStream(mContext.getAssets().open("face/gif/" + emoji.getFaceName()+".gif"));
+				viewHolder.iv_face.setImageBitmap(mBitmap);
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+//            viewHolder.iv_face.setImageResource(emoji.getId());
         }
 
         return convertView;

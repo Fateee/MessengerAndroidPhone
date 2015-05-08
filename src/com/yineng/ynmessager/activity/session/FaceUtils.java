@@ -22,14 +22,20 @@ public class FaceUtils {
 	public static List<String> getEmojiFile(Context context) {
 		try {
 			List<String> list = new ArrayList<String>();
-			InputStream in = context.getResources().getAssets().open("emoji");// 读取文件emoji中的数据
-			BufferedReader br = new BufferedReader(new InputStreamReader(in,
-					"UTF-8"));
-			String str = null;
-			while ((str = br.readLine()) != null) {
-				list.add(str);
+//			InputStream in = context.getResources().getAssets().open("emoji");// 读取文件emoji中的数据
+//			BufferedReader br = new BufferedReader(new InputStreamReader(in,
+//					"UTF-8"));
+//			String str = null;
+//			while ((str = br.readLine()) != null) {
+//				list.add(str);
+//			}
+			
+			String[] faces = context.getAssets().list("face/gif");
+			//将Assets中的表情名称转为字符串一一添加进list
+			for (int i = 0; i < faces.length; i++) {
+				list.add(faces[i]);
 			}
-
+			
 			return list;
 		} catch (IOException e) {
 			e.printStackTrace();

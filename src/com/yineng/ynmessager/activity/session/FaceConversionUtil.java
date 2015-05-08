@@ -1,5 +1,7 @@
 package com.yineng.ynmessager.activity.session;
 
+import java.io.IOException;
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -11,12 +13,16 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.text.Spannable;
 import android.text.SpannableString;
+import android.text.SpannableStringBuilder;
 import android.text.TextUtils;
 import android.text.style.ImageSpan;
 import android.util.Log;
+import android.widget.TextView;
 
 import com.yineng.ynmessager.R;
 import com.yineng.ynmessager.bean.ChatEmoji;
+import com.yineng.ynmessager.view.face.gif.AnimatedGifDrawable;
+import com.yineng.ynmessager.view.face.gif.AnimatedImageSpan;
 
 /**
  * 
@@ -83,8 +89,15 @@ public final class FaceConversionUtil {
 		if (TextUtils.isEmpty(spannableString)) {
 			return null;
 		}
-		Bitmap bitmap = BitmapFactory.decodeResource(context.getResources(),
-				imgId);
+//		Bitmap bitmap = BitmapFactory.decodeResource(context.getResources(),
+//				imgId);
+		Bitmap bitmap = null;
+		try {
+			bitmap = BitmapFactory.decodeStream(context.getAssets().open("face/gif/" + imgId+".gif"));
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 		bitmap = Bitmap.createScaledBitmap(bitmap, 35, 35, true);
 		ImageSpan imageSpan = new ImageSpan(context, bitmap);
 		SpannableString spannable = new SpannableString(spannableString);
@@ -116,28 +129,42 @@ public final class FaceConversionUtil {
 			if (TextUtils.isEmpty(value)) {
 				continue;
 			}
-			int resId = context.getResources().getIdentifier(value, "drawable",
-					context.getPackageName());
-			// 通过上面匹配得到的字符串来生成图片资源id
-			// Field field=R.drawable.class.getDeclaredField(value);
-			// int resId=Integer.parseInt(field.get(null).toString());
-			if (resId != 0) {
-				Bitmap bitmap = BitmapFactory.decodeResource(
-						context.getResources(), resId);
-				bitmap = Bitmap.createScaledBitmap(bitmap, 50, 50, true);
-				// 通过图片资源id来得到bitmap，用一个ImageSpan来包装
-				ImageSpan imageSpan = new ImageSpan(bitmap);
-				// 计算该图片名字的长度，也就是要替换的字符串的长度
-				int end = matcher.start() + key.length();
-				// 将该图片替换字符串中规定的位置中
-				spannableString.setSpan(imageSpan, matcher.start(), end,
-						Spannable.SPAN_INCLUSIVE_EXCLUSIVE);
-				if (end < spannableString.length()) {
-					// 如果整个字符串还未验证完，则继续。。
-					dealExpression(context, spannableString, patten, end);
-				}
-				break;
+			Bitmap mBitmap = BitmapFactory.decodeStream(context.getAssets().open("face/gif/" + value));
+			// 通过图片资源id来得到bitmap，用一个ImageSpan来包装
+			ImageSpan imageSpan = new ImageSpan(mBitmap);
+			// 计算该图片名字的长度，也就是要替换的字符串的长度
+			int end = matcher.start() + key.length();
+			// 将该图片替换字符串中规定的位置中
+			spannableString.setSpan(imageSpan, matcher.start(), end,
+					Spannable.SPAN_INCLUSIVE_EXCLUSIVE);
+			if (end < spannableString.length()) {
+				// 如果整个字符串还未验证完，则继续。。
+				dealExpression(context, spannableString, patten, end);
 			}
+			break;
+			
+//			int resId = context.getResources().getIdentifier(value, "drawable",
+//					context.getPackageName());
+//			// 通过上面匹配得到的字符串来生成图片资源id
+//			// Field field=R.drawable.class.getDeclaredField(value);
+//			// int resId=Integer.parseInt(field.get(null).toString());
+//			if (resId != 0) {
+//				Bitmap bitmap = BitmapFactory.decodeResource(
+//						context.getResources(), resId);
+//				bitmap = Bitmap.createScaledBitmap(bitmap, 50, 50, true);
+//				// 通过图片资源id来得到bitmap，用一个ImageSpan来包装
+//				ImageSpan imageSpan = new ImageSpan(bitmap);
+//				// 计算该图片名字的长度，也就是要替换的字符串的长度
+//				int end = matcher.start() + key.length();
+//				// 将该图片替换字符串中规定的位置中
+//				spannableString.setSpan(imageSpan, matcher.start(), end,
+//						Spannable.SPAN_INCLUSIVE_EXCLUSIVE);
+//				if (end < spannableString.length()) {
+//					// 如果整个字符串还未验证完，则继续。。
+//					dealExpression(context, spannableString, patten, end);
+//				}
+//				break;
+//			}
 		}
 	}
 
@@ -157,22 +184,36 @@ public final class FaceConversionUtil {
 		ChatEmoji emojEentry;
 		try {
 			for (String str : data) {
-				String[] text = str.split(",");
-				String fileName = text[0]
-						.substring(0, text[0].lastIndexOf("."));
-				mEmojiMap.put(text[1], fileName);
+//				String[] text = str.split(",");
+//				String fileName = text[0]
+//						.substring(0, text[0].lastIndexOf("."));
+//				mEmojiMap.put(text[1], fileName);
+//				
+//				//根据文件名获得资源ID
+//				int resID = context.getResources().getIdentifier(fileName,
+//						"drawable", context.getPackageName());
+//
+//				if (resID != 0) {
+//					emojEentry = new ChatEmoji();
+//					emojEentry.setId(resID);
+//					emojEentry.setCharacter(text[1]);
+//					emojEentry.setFaceName(fileName);
+//					mEmojiList.add(emojEentry);
+//				}
+				String[] fileTexts = str.split("\\.");
+				String faceId = "[/"+fileTexts[0]+"]";//eg:[/18]
+				String fileName = fileTexts[0];//eg:18
+				mEmojiMap.put(faceId, str); //key:[/18] value:18.gif
 				
-				//根据文件名获得资源ID
-				int resID = context.getResources().getIdentifier(fileName,
-						"drawable", context.getPackageName());
+//				//根据文件名获得资源ID
+//				int resID = context.getResources().getIdentifier(fileName,
+//						"drawable", context.getPackageName());
 
-				if (resID != 0) {
-					emojEentry = new ChatEmoji();
-					emojEentry.setId(resID);
-					emojEentry.setCharacter(text[1]);
-					emojEentry.setFaceName(fileName);
-					mEmojiList.add(emojEentry);
-				}
+				emojEentry = new ChatEmoji();
+				emojEentry.setId(Integer.parseInt(fileName));
+				emojEentry.setCharacter(faceId);
+				emojEentry.setFaceName(fileName);
+				mEmojiList.add(emojEentry);
 			}
 			int pageCount = (int) Math.ceil(mEmojiList.size() / 20 + 0.1);
 
@@ -212,5 +253,95 @@ public final class FaceConversionUtil {
 			list.add(object);
 		}
 		return list;
+	}
+
+	/**
+	 * 处理消息文本
+	 * @param tvContent
+	 * @param content
+	 * @return
+	 */
+	public SpannableString handlerContent(Context mContext,TextView gifTextView, String content) {
+		SpannableString sb = new SpannableString(content);
+		String regex = "(\\[\\/\\d{1,2}\\])";
+		Pattern p = Pattern.compile(regex);
+		Matcher m = p.matcher(content);
+		if (handlerCount(content) < 10) {
+			showGifFace(true,m,sb,gifTextView,mContext);
+			
+		} else {
+			showGifFace(false,m,sb,gifTextView,mContext);
+		}
+		
+		return sb;
+	}
+	
+	/**
+	 * 处理消息文本
+	 * @param gifTextView 
+	 * @param sb 
+	 * @param m 
+	 * @param mContext 
+	 * @param b
+	 */
+	private void showGifFace(boolean show, Matcher m, SpannableString sb, final TextView gifTextView, Context mContext) {
+		InputStream is = null;
+		while (m.find()) {
+			String tempText = m.group();
+			try {
+				String num = tempText.substring("[/".length(), tempText.length()- "]".length());
+				String gif = "face/gif/" + num + ".gif";
+				/**
+				 * 如果open这里不抛异常说明存在gif，则显示对应的gif
+				 * 否则说明gif找不到，则显示png
+				 * */
+				is = mContext.getAssets().open(gif);
+				
+				if (show) {/**显示gif**/
+					sb.setSpan(new AnimatedImageSpan(new AnimatedGifDrawable(is,new AnimatedGifDrawable.UpdateListener() {
+						@Override
+						public void update() {
+							gifTextView.postInvalidate();
+						}
+					})), m.start(), m.end(),
+					Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+				} else {/**显示静态pic**/
+					Bitmap mBitmap = BitmapFactory.decodeStream(is);
+					// 通过图片资源id来得到bitmap，用一个ImageSpan来包装
+					ImageSpan imageSpan = new ImageSpan(mBitmap);
+					sb.setSpan(imageSpan, m.start(), m.end(),Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+				}
+
+			} catch (Exception e) {
+//				String png = tempText.substring("#[".length(),tempText.length() - "]#".length());
+//				try {
+//					sb.setSpan(new ImageSpan(mContext, BitmapFactory.decodeStream(mContext.getAssets().open(png))), m.start(), m.end(),Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+//				} catch (IOException e1) {
+//					// TODO Auto-generated catch block
+//					e1.printStackTrace();
+//				}
+				e.printStackTrace();
+			}
+		}
+		if (is != null) {
+			try {
+				is.close();
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		}
+	}
+
+	// 统计gif个数
+	private int handlerCount(String content) {
+		int number = 0;
+		String regex = "(\\[\\/\\d{1,2}\\])";
+		Pattern p = Pattern.compile(regex);
+		Matcher m = p.matcher(content);
+		while (m.find()) {
+			number++;
+		}
+		return number;
 	}
 }

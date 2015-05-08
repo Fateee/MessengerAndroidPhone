@@ -440,8 +440,12 @@ public class SearchChatRecordEditText extends Dialog implements
 			if (mChatContent != null) { 
 				MessageBodyEntity body = JSON.parseObject(mChatContent,
 						MessageBodyEntity.class);
-				SpannableString spannableString = FaceConversionUtil.getInstace()
-						.getExpressionString(nContext, body.getContent());
+//				SpannableString spannableString = FaceConversionUtil.getInstace()
+//						.getExpressionString(nContext, body.getContent());
+				// 对内容做处理
+				SpannableString spannableString = FaceConversionUtil
+						.getInstace().handlerContent(nContext,mViewHolder.mFindChatRecordMsgContentTV,
+						body.getContent());
 				mViewHolder.mFindChatRecordMsgContentTV.setText(spannableString);
 			}
 			return convertView;
