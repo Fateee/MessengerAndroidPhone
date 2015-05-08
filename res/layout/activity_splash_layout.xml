@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:gravity="center_horizontal"
+    android:orientation="vertical" >
+
+    <ImageView
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:scaleType="centerCrop"
+        android:src="@drawable/splash_bg" />
+    
+    <TextView 
+        android:id="@+id/tv_splash_version"
+        android:layout_width="wrap_content"
+	    android:layout_height="wrap_content"	   
+	   	android:text="YNedut V%s / Design for Android"
+	    android:layout_centerHorizontal="true"
+	    android:textSize="@dimen/common_text_size"
+	    android:textColor="#1c8548"/>
+    <!--  android:text="@string/splash_title" -->
+    
+    
+	<ProgressBar 
+	    android:layout_below="@id/tv_splash_version"
+	    android:layout_width="20dp"
+	    android:layout_height="20dp"
+	    android:indeterminateDrawable="@drawable/title_bar_loading"
+	    android:layout_centerHorizontal="true"
+	    android:layout_marginTop="10dp"/>	
+    
+</RelativeLayout>

@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent"
+    android:background="#404040"
+    android:orientation="vertical"
+    android:layout_gravity="center_horizontal"
+    android:padding="8dp" >
+
+    <TextView
+        android:id="@+id/tv_contact_title_jump_my_org"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:clickable="true"
+        android:gravity="center"
+        android:onClick="onTurnToMyOrgListener"
+        android:padding="5dp"
+        android:text="跳转到我的机构"
+        android:textColor="@android:color/white" />
+
+    <LinearLayout
+        android:layout_width="fill_parent"
+        android:layout_height="30dp"
+        android:gravity="center_vertical"
+        android:orientation="horizontal" >
+
+        <View
+            android:layout_width="0dp"
+            android:layout_height="1px"
+            android:layout_gravity="center_vertical"
+            android:layout_weight="1"
+            android:background="#777777" />
+
+        <TextView
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="3"
+            android:gravity="center"
+            android:paddingLeft="2dp"
+            android:paddingRight="2dp"
+            android:text="当前路径" />
+
+        <View
+            android:layout_width="0dp"
+            android:layout_height="1px"
+            android:layout_gravity="center_vertical"
+            android:layout_weight="6"
+            android:background="#777777" />
+    </LinearLayout>
+
+    <ListView
+        android:id="@+id/lv_contact_title_current_path"
+        android:layout_width="fill_parent"
+        android:layout_height="fill_parent"
+        android:listSelector="@null"
+        android:divider="@null" />
+
+</LinearLayout>

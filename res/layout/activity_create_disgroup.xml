@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/common_background_color"
+    android:orientation="vertical" >
+
+    <RelativeLayout
+        android:layout_width="fill_parent"
+        android:layout_height="48dp"
+        android:background="@color/common_black_overlay" >
+
+        <TextView
+            android:id="@+id/tv_create_disgroup_title"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:layout_centerInParent="true"
+            android:gravity="center"
+            android:text="选择联系人"
+            android:textColor="#ffffff" />
+
+        <ImageView
+            android:id="@+id/iv_create_disgroup_back"
+            android:layout_width="60dp"
+            android:layout_height="60dp"
+            android:layout_centerVertical="true"
+            android:onClick="back"
+            android:scaleType="center"
+            android:src="@drawable/face_del_ico_dafeult" />
+    </RelativeLayout>
+
+    <EditText
+        android:id="@+id/et_create_disgroup_search"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:ems="10"
+        android:hint="搜索" >
+    </EditText>
+
+    <View
+        android:layout_width="wrap_content"
+        android:layout_height="1px"
+        android:background="@color/common_gray_line_color" />
+
+    <View
+        android:layout_width="wrap_content"
+        android:layout_height="1px"
+        android:background="@color/common_gray_line_color" />
+
+    <ListView
+        android:id="@+id/lv_create_disgroup_listview"
+        android:layout_width="fill_parent"
+        android:layout_height="1dp"
+        android:layout_weight="1" >
+    </ListView>
+
+    <LinearLayout
+        android:id="@+id/ll_create_disgroup_thumbnail_layout_"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal" >
+
+        <com.yineng.ynmessager.view.HorizontalListView
+            android:id="@+id/gl_create_disgroup_horizontallistView"
+            android:layout_width="1dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1" >
+        </com.yineng.ynmessager.view.HorizontalListView>
+
+        <Button
+            android:id="@+id/btn_create_disgroup_createbtn"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="完成" />
+    </LinearLayout>
+
+</LinearLayout>

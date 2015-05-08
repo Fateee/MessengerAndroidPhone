@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/ll_session_broadcast_item_layout"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@drawable/session_broadcastchat_item_shape"
+    android:orientation="vertical" >
+
+    <!-- 总体的容器 -->   
+        <!-- 会话项主布局 -->       
+        <RelativeLayout
+            android:id="@+id/ll_session_broadcast_item_top"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content" >
+
+            <ImageView
+                android:id="@+id/iv_session_broadcast_item_headicon"
+                android:layout_width="40dp"
+                android:layout_height="40dp"
+                android:layout_alignParentLeft="true"
+                android:layout_alignParentTop="true"
+                android:layout_marginLeft="10dp"
+                android:layout_marginTop="5dp"
+                android:src="@color/common_blue" />
+
+            <TextView
+                android:id="@+id/tv_session_broadcast_item_sendername"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignTop="@id/iv_session_broadcast_item_headicon"
+                android:layout_marginLeft="10dp"
+                android:layout_toRightOf="@id/iv_session_broadcast_item_headicon"
+                android:singleLine="true"
+                android:text="发送者："
+                android:textSize="@dimen/common_text_size" />
+
+            <TextView
+                android:id="@+id/tv_session_broadcast_item_title"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignBottom="@id/iv_session_broadcast_item_headicon"
+                android:layout_marginLeft="10dp"
+                android:layout_marginTop="10dp"
+                android:layout_toRightOf="@id/iv_session_broadcast_item_headicon"
+                android:singleLine="true"
+                android:text="标题" />
+
+            <TextView
+                android:id="@+id/tv_session_broadcast_item_datetime"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentRight="true"
+                android:layout_alignTop="@id/iv_session_broadcast_item_headicon"
+                android:layout_marginRight="10dp"
+                android:singleLine="true"
+                android:text="2011-11-11"
+                android:textSize="12sp" />
+
+            <TextView
+                android:id="@+id/tv_session_broadcast_item_isread"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignBottom="@id/iv_session_broadcast_item_headicon"
+                android:layout_alignParentRight="true"
+                android:layout_marginRight="10dp"
+                android:background="@drawable/score_num_bg_first"
+                android:gravity="center"               
+                android:textSize="12sp" />
+        </RelativeLayout>
+    <TextView
+        android:id="@+id/tv_session_broadcast_item_content"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+         android:layout_marginTop="10dp"
+        android:paddingRight="10dp"
+        android:paddingLeft="10dp"       
+        android:lines="3"
+        android:text="广播内容。。。。。。。。。。。。"
+        android:textSize="12sp" />
+</LinearLayout>

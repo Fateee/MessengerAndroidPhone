@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical" >
+
+    <RelativeLayout
+        android:id="@+id/rl_chat_person_info_titlelayout"
+        android:layout_width="fill_parent"
+        android:layout_height="48dp"
+        android:layout_alignParentTop="true"
+        android:background="@color/common_black_overlay" >
+
+        <TextView
+            android:id="@+id/tv_chat_person_infop_title"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:layout_centerInParent="true"
+            android:gravity="center"
+            android:text="聊天信息"
+            android:textColor="#ffffff" />
+
+        <TextView
+            android:id="@+id/iv_chat_person_info_back"
+            android:layout_width="60dp"
+            android:layout_height="60dp"
+            android:background="@drawable/face_del_ico_dafeult"
+            android:clickable="true"
+            android:gravity="center"
+            android:onClick="onClickListener"
+            android:padding="3dp"
+            android:text="聊天消息" />
+    </RelativeLayout>
+
+    <LinearLayout
+        android:id="@+id/ll_chat_person_hlist_view_layout"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+		android:layout_margin="10dp"
+        android:layout_below="@id/rl_chat_person_info_titlelayout"
+        android:background="@drawable/group_info_add_bg"
+        android:orientation="horizontal" >
+
+        <com.yineng.ynmessager.view.HorizontalListView
+            android:id="@+id/hl_chat_person_member_list"
+            android:layout_width="20dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1" >
+        </com.yineng.ynmessager.view.HorizontalListView>
+
+        <Button
+            android:id="@+id/btn_chat_person_add_btn"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:onClick="onClickListener"
+            android:text="添加" />
+    </LinearLayout>
+
+    <Button
+        android:id="@+id/btn_chat_person_find_chat_record_btn"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/ll_chat_person_hlist_view_layout"
+        android:gravity="center"
+        android:onClick="onClickListener"
+        android:text="查找聊天记录" />
+
+</RelativeLayout>

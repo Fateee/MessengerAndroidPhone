@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/ll_find_chat_record_frame"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical" >
+
+    <RelativeLayout
+        android:id="@+id/rl_group_info_titlelayout"
+        android:layout_width="fill_parent"
+        android:layout_height="48dp"
+        android:background="@color/common_black_overlay" >
+
+        <TextView
+            android:id="@+id/tv_find_chat_record_title_back"
+            android:layout_width="wrap_content"
+            android:layout_height="fill_parent"
+            android:drawableLeft="@drawable/titlebar_back"
+            android:gravity="center_vertical"
+            android:text="返回"
+            android:clickable="true"
+            android:onClick="back" />
+
+        <TextView
+            android:id="@+id/tv_group_infop_title"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:layout_centerInParent="true"
+            android:gravity="center"
+            android:text="聊天记录"
+            android:textColor="#ffffff" />
+    </RelativeLayout>
+
+    <EditText
+        android:id="@+id/et_find_chat_record_edittext"
+        android:layout_width="fill_parent"
+        android:layout_height="35dp"
+        android:layout_marginBottom="5dip"
+        android:layout_marginLeft="15dp"
+        android:layout_marginRight="30dp"
+        android:layout_marginTop="5dip"
+        android:background="@drawable/acm_inputbox"
+        android:drawableLeft="@drawable/search"
+        android:focusable="false"
+        android:hint="@string/org_search"
+        android:paddingLeft="5dp"
+        android:singleLine="true"
+        android:textSize="15.0dip" />
+
+    <com.handmark.pulltorefresh.library.PullToRefreshListView
+        android:id="@+id/ptrl_chat_pull_refresh_list"
+        android:layout_width="fill_parent"
+        android:layout_height="fill_parent"
+        android:cacheColorHint="#00000000"
+        android:fadingEdge="none"
+        android:fastScrollEnabled="false"
+        android:footerDividersEnabled="false"
+        android:headerDividersEnabled="false"
+        android:smoothScrollbar="true" />
+
+</LinearLayout>

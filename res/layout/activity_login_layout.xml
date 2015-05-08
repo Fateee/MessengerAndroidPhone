@@ -1,0 +1,213 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- 登陆界面配置 -->
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/sv_login_view"
+    android:layout_width="fill_parent"
+    android:layout_height="wrap_content"
+    android:background="@color/common_background_color" >
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@color/common_background_color" >
+
+        <ImageView
+            android:id="@+id/iv_login_logo"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentRight="true"
+            android:layout_marginLeft="@dimen/login_right_left_padding"
+            android:layout_marginRight="@dimen/login_right_left_padding"
+            android:layout_marginTop="@dimen/login_titleicon_paddingtop"
+            android:src="@drawable/login_logo" />
+
+        <LinearLayout
+            android:id="@+id/ll_login_edittop"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/iv_login_logo"
+            android:layout_marginLeft="@dimen/login_right_left_padding"
+            android:layout_marginRight="@dimen/login_right_left_padding"
+            android:layout_marginTop="@dimen/login_editer_up_paddingtop"
+            android:background="@color/common_white_color"
+            android:orientation="vertical" >
+
+            <!-- 用户名 -->
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="@dimen/login_editer_height"
+                android:gravity="center_vertical"
+                android:orientation="horizontal" >
+
+                <ImageView
+                    android:layout_width="@dimen/login_editeicon_width"
+                    android:layout_height="@dimen/login_editeicon_height"
+                    android:layout_marginLeft="@dimen/login_editeicon_margin_left"
+                    android:layout_marginRight="@dimen/login_editeicon_margin_right"
+                    android:src="@drawable/login_username" />
+
+                <EditText
+                    android:id="@+id/ev_login_useraccount"
+                    android:layout_width="match_parent"
+                    android:layout_height="fill_parent"
+                    android:layout_weight="1"
+                    android:background="@null"
+                    android:gravity="center_vertical"
+                    android:hint="@string/login_evtext_username"
+                    android:inputType="text"
+                    android:maxLines="1"
+                    android:singleLine="true"
+                    android:text="t00081"
+                    android:textSize="@dimen/login_editer_textsize" />
+
+                <!--
+                     <Spinner
+                    android:id="@+id/sp_login_select_account"
+                    android:layout_width="fill_parent"
+                    android:layout_height="match_parent"
+                    android:layout_weight="4"
+                    android:spinnerMode="dialog"
+                    android:visibility="gone" />
+                -->
+
+                <ImageButton
+                    android:id="@+id/ib_login_select_account"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:background="@drawable/common_dropdown_button" />
+            </LinearLayout>
+
+            <View
+                android:layout_width="fill_parent"
+                android:layout_height="1dp"
+                android:background="#E8E8E8" />
+            <!-- 用户密码 -->
+
+            <LinearLayout
+                android:layout_width="fill_parent"
+                android:layout_height="@dimen/login_editer_height"
+                android:gravity="center_vertical" >
+
+                <ImageView
+                    android:layout_width="@dimen/login_editeicon_width"
+                    android:layout_height="@dimen/login_editeicon_height"
+                    android:layout_marginLeft="@dimen/login_editeicon_margin_left"
+                    android:layout_marginRight="@dimen/login_editeicon_margin_right"
+                    android:src="@drawable/login_password" />
+
+                <EditText
+                    android:id="@+id/ev_login_userpassword"
+                    android:layout_width="match_parent"
+                    android:layout_height="fill_parent"
+                    android:background="@null"
+                    android:gravity="center_vertical"
+                    android:hint="@string/login_evtext_passowrd"
+                    android:inputType="textPassword"
+                    android:maxLines="1"
+                    android:singleLine="true"
+                    android:text="123456"
+                    android:textSize="@dimen/login_editer_textsize" />
+            </LinearLayout>
+        </LinearLayout>
+        <!-- 显示隐藏服务器 -->
+
+        <LinearLayout
+            android:id="@+id/ll_login_serverstatus"
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/login_editer_height"
+            android:layout_below="@id/ll_login_edittop"
+            android:layout_marginLeft="@dimen/login_right_left_padding"
+            android:layout_marginRight="@dimen/login_right_left_padding"
+            android:layout_marginTop="@dimen/login_serversstatus_paddingtop"
+            android:gravity="center_vertical" >
+
+            <TextView
+                android:id="@+id/tv_login_addressstatus"
+                android:layout_width="wrap_content"
+                android:layout_height="fill_parent"
+                android:layout_marginLeft="2dp"
+                android:gravity="center_vertical"
+                android:text="@string/login_tvtext_hidserviceaddress"
+                android:textColor="#666666"
+                android:textSize="@dimen/login_server_address_label_text_size" />
+
+            <ImageView
+                android:id="@+id/iv_login_addressstatus"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="7dp"
+                android:src="@drawable/login_server_up" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/ll_server_address"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/ll_login_serverstatus"
+            android:layout_marginLeft="@dimen/login_right_left_padding"
+            android:layout_marginRight="@dimen/login_right_left_padding"
+            android:background="@color/common_background_color"
+            android:orientation="vertical" >
+
+            <!-- 服务器地址 -->
+
+            <LinearLayout
+                android:id="@+id/ll_login_servers"
+                android:layout_width="fill_parent"
+                android:layout_height="@dimen/login_editer_height"
+                android:background="@color/common_white_color"
+                android:gravity="center_vertical"
+                android:orientation="horizontal" >
+
+                <ImageView
+                    android:layout_width="@dimen/login_editeicon_width"
+                    android:layout_height="@dimen/login_editeicon_height"
+                    android:layout_marginLeft="@dimen/login_editeicon_margin_left"
+                    android:layout_marginRight="@dimen/login_editeicon_margin_right"
+                    android:src="@drawable/login_server_icon" />
+
+                <EditText
+                    android:id="@+id/ev_login_serviceaddress"
+                    android:layout_width="fill_parent"
+                    android:layout_height="match_parent"
+                    android:layout_weight="1"
+                    android:background="@null"
+                    android:gravity="center_vertical"
+                    android:hint="@string/login_evtext_serviceaddress"
+                    android:inputType="text"
+                    android:maxLines="1"
+                    android:singleLine="true"
+                    android:text="10.6.24.133"
+                    android:textSize="@dimen/login_editer_textsize" />
+
+                <!--
+                     <Spinner
+                    android:id="@+id/sp_login_select_address"
+                    android:layout_width="fill_parent"
+                    android:layout_height="match_parent"
+                    android:layout_weight="4"
+                    android:spinnerMode="dialog"
+                    android:visibility="visible" />
+                -->
+            </LinearLayout>
+            <!-- 下拉按钮 -->
+
+        </LinearLayout>
+
+        <Button
+            android:id="@+id/bt_login_login"
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/login_editer_height"
+            android:layout_below="@id/ll_server_address"
+            android:layout_gravity="center"
+            android:layout_marginLeft="@dimen/login_right_left_padding"
+            android:layout_marginRight="@dimen/login_right_left_padding"
+            android:layout_marginTop="@dimen/login_loginbt_paddingtop"
+            android:background="@drawable/login_button_bg_selector"
+            android:text="@string/login_bttext"
+            android:textColor="@color/common_white_color"
+            android:textSize="@dimen/common_text_size" />
+    </RelativeLayout>
+
+</ScrollView>

@@ -1,0 +1,19 @@
+1，service轮询当前用户登录状态须优化（使用连接监听器）
+
+1、根据登录名获取唯一标识
+2、C/S数据变更后的同步：  增删改机构，  增删人员  
+  这个是服务器主动推送的有数据变更通知。
+<iq type="result" id="tV95mrmA" to="xiognshihui@m.com" from="admin@m.com">
+  <notice xmlns="com:yineng:notice">
+    <type>orgUpdate</type>
+  </notice>
+</iq>
+
+3、发送消息的回执中增加SendTime节点
+4、获取某些用户string[uid]的状态
+5、根据用户string[uid]获取详细信息
+6、上传用户个性化头像
+7、下载用户个性化头像  
+8、在发送消息前先申请图片ID, 变更为：客户端自行生成文件ID
+9、2人文件接收后，不立即删除文件
+10、获取组织机构数据接口，变更：移除用户状态数据

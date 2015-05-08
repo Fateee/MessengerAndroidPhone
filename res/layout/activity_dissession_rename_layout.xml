@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent"
+    android:orientation="vertical" >
+
+    <RelativeLayout
+        android:layout_width="fill_parent"
+        android:layout_height="48dp"
+        android:background="@color/common_black_overlay" >
+
+        <TextView
+            android:id="@+id/tv_disgroup_rename_title_back"
+            android:layout_width="wrap_content"
+            android:layout_height="fill_parent"
+            android:clickable="true"
+            android:drawableLeft="@drawable/titlebar_back"
+            android:gravity="center_vertical"
+            android:onClick="onTitleViewClickListener"
+            android:text="资料" />
+
+        <TextView
+            android:id="@+id/chat_common_title_view_name"
+            android:layout_width="fill_parent"
+            android:layout_height="fill_parent"
+            android:ellipsize="middle"
+            android:gravity="center"
+            android:singleLine="true"
+            android:text="修改名称"
+            android:textColor="#ffffff" />
+    </RelativeLayout>
+
+    <EditText
+        android:id="@+id/et_disgroup_rename_edit_text"
+        android:layout_width="fill_parent"
+        android:layout_height="70dp"
+        android:layout_marginTop="30dp"
+        android:ellipsize="middle"
+        android:singleLine="true"
+        android:maxLength="23" />
+
+</LinearLayout>

@@ -1,0 +1,38 @@
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".activity.settings.GroupMsgNotifySettingActivity" >
+
+    <RelativeLayout
+        android:id="@+id/groupMsgNotifySetting_rel_actionBar"
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/common_actionbar_height"
+        android:background="#CCCCCC" >
+
+        <ImageButton
+            android:id="@+id/groupMsgNotifySetting_imgb_previous"
+            android:layout_width="@dimen/common_actionbar_backKey_width"
+            android:layout_height="match_parent"
+            android:background="@null"
+            android:gravity="center"
+            android:paddingLeft="@dimen/common_actionbar_backKey_paddingLeft"
+            android:scaleType="centerInside"
+            android:src="@drawable/back_key" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerInParent="true"
+            android:text="@string/groupMsgNotifySetting_title"
+            android:textSize="@dimen/common_actionbar_title_textSize" />
+    </RelativeLayout>
+
+    <ListView
+        android:id="@+id/groupMsgNotifySetting_lst_content"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_below="@id/groupMsgNotifySetting_rel_actionBar" >
+    </ListView>
+
+</RelativeLayout>

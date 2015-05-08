@@ -1,0 +1,135 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical" >
+
+    <RelativeLayout
+        android:id="@+id/rl_disgroup_info_titlelayout"
+        android:layout_width="fill_parent"
+        android:layout_height="48dp"
+        android:layout_alignParentTop="true"
+        android:background="@color/common_black_overlay" >
+
+        <TextView
+            android:id="@+id/tv_disgroup_infop_title"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:layout_centerInParent="true"
+            android:gravity="center"
+            android:text="讨论组资料"
+            android:textColor="#ffffff" />
+
+        <ImageView
+            android:id="@+id/iv_disgroup_info_back"
+            android:layout_width="60dp"
+            android:layout_height="60dp"
+            android:layout_centerVertical="true"
+            android:onClick="back"
+            android:scaleType="center"
+            android:src="@drawable/face_del_ico_dafeult" />
+    </RelativeLayout>
+
+    <RelativeLayout
+        android:id="@+id/rl_disgroup_info_namelayout"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/rl_disgroup_info_titlelayout" >
+
+        <TextView
+            android:id="@+id/tv_disgroup_info_name_tag"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:padding="5dp"
+            android:text="名称" />
+
+        <TextView
+            android:id="@+id/tv_disgroup_info_name"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignRight="@id/tv_disgroup_info_name_tag"
+            android:layout_alignParentRight="true"
+            android:drawableRight="@drawable/contact_right_arrow"
+            android:drawablePadding="8dp"
+            android:gravity="center"
+            android:padding="5dp"
+            android:text="项目经理与部门经理" />
+    </RelativeLayout>
+
+    <View
+        android:id="@+id/v_disgroup_info_line1"
+        android:layout_width="fill_parent"
+        android:layout_height="1dp"
+        android:layout_below="@id/rl_disgroup_info_namelayout"
+        android:background="@color/common_focus_item" />
+
+    <RelativeLayout
+        android:id="@+id/rl_disgroup_info_addlayout"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/v_disgroup_info_line1" >
+
+        <RelativeLayout
+            android:id="@+id/rl_disgroup_info_sum_layout"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="20dp"
+            android:layout_marginTop="20dp" >
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:gravity="center"
+                android:padding="5dp"
+                android:text="讨论组成员" />
+
+            <TextView
+                android:id="@+id/tv_disgroup_info_personsum"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentRight="true"
+                android:gravity="center"
+                android:padding="5dp" />
+        </RelativeLayout>
+
+        <LinearLayout
+            android:id="@+id/ll_disgroup_info_gallarylayout"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/rl_disgroup_info_sum_layout"
+            android:orientation="horizontal" >
+
+            <com.yineng.ynmessager.view.HorizontalListView
+                android:id="@+id/gl_disgroup_info_HorizontalListView"
+                android:layout_width="20dp"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:scrollbars="horizontal" />
+
+            <Button
+                android:id="@+id/btn_disgroup_info_add_btn"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:gravity="center"
+                android:text="添加" />
+        </LinearLayout>
+    </RelativeLayout>
+
+    <Button
+        android:id="@+id/btn_disgroup_info_chat_record_btn"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/rl_disgroup_info_addlayout"
+        android:gravity="center"
+        android:text="查找聊天记录" />
+
+    <Button
+        android:id="@+id/btn_disgroup_info_logout_group_btn"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:gravity="center"
+        android:text="退出讨论组" />
+
+</RelativeLayout>

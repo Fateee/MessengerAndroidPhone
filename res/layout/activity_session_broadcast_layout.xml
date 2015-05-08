@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"   
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/common_background_color"
+    android:orientation="vertical" >
+
+    <TextView
+        android:id="@+id/tv_session_broadcast_title"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@android:color/darker_gray"
+        android:gravity="center"
+        android:paddingBottom="15dp"
+        android:paddingTop="15dp"
+        android:text="广播"
+        android:textSize="20sp" />
+
+    <LinearLayout
+        android:id="@+id/ll_session_broadcast_alertlayer"
+        android:layout_width="fill_parent"
+        android:layout_height="@dimen/login_editer_height"
+        android:background="@color/common_black_overlay"
+        android:orientation="horizontal"
+        android:visibility="gone" >
+
+        <TextView
+            android:id="@+id/tv_session_broadcast_alert_text"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_vertical"
+            android:layout_marginLeft="@dimen/login_editeicon_margin_left"
+            android:layout_marginRight="@dimen/login_editeicon_margin_right"
+            android:layout_weight="5"
+            android:ellipsize="end"
+            android:gravity="center|center_vertical"
+            android:singleLine="true"
+            android:text="断网了"
+            android:textColor="#333333" />
+
+        <ImageView
+            android:id="@+id/iv_session_broadcast_alert_button"
+            android:layout_width="@dimen/login_editeicon_width"
+            android:layout_height="@dimen/login_editeicon_height"
+            android:layout_gravity="center_vertical"
+            android:layout_marginLeft="@dimen/login_editeicon_margin_left"
+            android:layout_marginRight="@dimen/login_editeicon_margin_right"
+            android:layout_weight="1"
+            android:src="@drawable/enter_right" />
+    </LinearLayout>
+
+    <com.handmark.pulltorefresh.library.PullToRefreshListView
+        android:id="@+id/lv_session_broadcast_refresh"
+        android:layout_width="fill_parent"
+        android:layout_height="fill_parent" />
+    <LinearLayout
+        android:id="@+id/ll_session_broadcast_empty"
+        android:layout_width="fill_parent"
+        android:layout_height="match_parent"
+        android:gravity="center"
+        android:orientation="vertical" >
+
+        <TextView           
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"            
+            android:gravity="center_horizontal"
+            android:text="没有广播记录！"
+            android:textColor="#999999"
+            />
+    </LinearLayout>
+
+</LinearLayout>

@@ -1,0 +1,140 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- 广播内容界面布局 -->
+
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/rl_broadcastchat_content_body"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical" >
+
+    <RelativeLayout
+        android:id="@+id/rl_titleBar" 
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@color/common_black_overlay"
+        android:orientation="horizontal" >
+
+        <!-- 顶部布局 -->
+
+        <ImageView
+            android:id="@+id/iv_broadcastchat_content_return_button"
+            android:layout_width="@dimen/common_title_bar_icon_with"
+            android:layout_height="@dimen/common_title_bar_icon_height"
+            android:layout_alignParentLeft="true"
+            android:layout_centerVertical="true"
+            android:background="@drawable/title_bar_button_selector"
+            android:clickable="true"
+            android:onClick="cancel"
+            android:scaleType="center"
+            android:src="@drawable/titlebar_back" />
+
+        <ImageView
+            android:id="@+id/iv_broadcastchat_content_next_button"
+            android:layout_width="@dimen/common_title_bar_icon_with"
+            android:layout_height="@dimen/common_title_bar_icon_height"
+            android:layout_alignParentRight="true"
+            android:layout_centerVertical="true"
+            android:background="@drawable/title_bar_button_selector"
+            android:clickable="true"
+            android:onClick="next"
+            android:scaleType="center"
+            android:src="@drawable/common_title_bar_next_selector" />
+
+        <ImageView
+            android:id="@+id/iv_broadcastchat_content_pre_button"
+            android:layout_width="@dimen/common_title_bar_icon_with"
+            android:layout_height="@dimen/common_title_bar_icon_height"
+            android:layout_centerVertical="true"
+            android:layout_toLeftOf="@+id/broadcastchat_content_line1"
+            android:background="@drawable/title_bar_button_selector"
+            android:clickable="true"
+            android:onClick="previous"
+            android:scaleType="center"
+            android:src="@drawable/common_title_bar_pre_selector" />
+
+        <ImageView
+            android:id="@+id/broadcastchat_content_line1"
+            android:layout_width="wrap_content"
+            android:layout_height="@dimen/common_title_bar_icon_height"
+            android:layout_toLeftOf="@+id/iv_broadcastchat_content_next_button"
+            android:src="@drawable/common_vertical_line" />
+    </RelativeLayout>
+
+    <LinearLayout
+        android:id="@+id/ll_broadcastchat_info"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/rl_titleBar"
+        android:background="@color/common_white_color"
+        android:orientation="vertical" >
+
+        <TextView
+            android:id="@+id/tv_broadcastchat_content_title"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="@dimen/login_right_left_padding"
+            android:layout_marginTop="@dimen/login_serversstatus_paddingtop"
+            android:ellipsize="end"
+            android:singleLine="false"
+            android:text="总结评估《国土资源人才规划》"
+            android:textColor="#333333"
+            android:textSize="@dimen/common_text_size" />
+
+       <!--  <TextView
+            android:id="@+id/tv_broadcastchat_content_createusername"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="@dimen/login_right_left_padding"
+            android:singleLine="false"
+            android:text="发送人：张老师"
+            android:textColor="#666666" /> -->
+
+        <LinearLayout
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal" >
+
+            <TextView
+                android:id="@+id/tv_broadcastchat_content_sendername"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="@dimen/login_right_left_padding"
+                android:layout_weight="2"
+                android:drawablePadding="4dp"
+                android:singleLine="true"
+                android:text="发送人：张老师"
+                android:textColor="#666666" />
+
+            <TextView
+                android:id="@+id/tv_broadcastchat_content_datetime"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginRight="@dimen/login_right_left_padding"
+                android:layout_weight="1"
+                android:gravity="right"
+                android:singleLine="true"
+                android:text="2014-03-05"
+                android:textColor="#999999" />
+        </LinearLayout>
+    </LinearLayout>
+
+    <WebView
+        android:id="@+id/wv_broadcastchat_content_detail"
+        android:layout_width="fill_parent"
+        android:layout_height="fill_parent"
+        android:layout_below="@id/ll_broadcastchat_info"
+        android:layout_marginTop="@dimen/login_right_left_padding"
+        android:padding="20dp"
+        android:scrollbarStyle="outsideOverlay" />
+
+    <LinearLayout
+        android:id="@+id/ll_broadcastchat_content_attachment"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:background="#000000"
+        android:gravity="center_vertical"
+        android:orientation="vertical" >
+    </LinearLayout>
+
+</RelativeLayout>

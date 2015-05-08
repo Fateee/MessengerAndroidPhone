@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:alpha="0.9" >
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_margin="10dp"
+        android:background="@drawable/personinfo_phone_pop_bg"
+        android:orientation="vertical" >
+
+        <TextView
+            android:id="@+id/tv_personinfo_pop_add_contact"
+            android:layout_width="match_parent"
+            android:layout_height="45dp"
+            android:gravity="center"
+            android:text="@string/personinfo_pop_add_contact"
+            android:textColor="@color/common_blue"
+            android:textSize="16sp"
+            android:clickable="true"
+            android:onClick="onClickListener" />
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="0.5dp"
+            android:alpha="0.5"
+            android:background="@color/devide_line" />
+
+        <TextView
+            android:id="@+id/tv_personinfo_pop_call_contact"
+            android:layout_width="match_parent"
+            android:layout_height="45dp"
+            android:gravity="center"
+            android:text="@string/personinfo_pop_call_contact"
+            android:textColor="@color/common_blue"
+            android:textSize="16sp"
+            android:clickable="true"
+            android:onClick="onClickListener" />
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="0.5dp"
+            android:alpha="0.5"
+            android:background="@color/devide_line" />
+
+        <TextView
+            android:id="@+id/tv_personinfo_pop_sent_sms"
+            android:layout_width="match_parent"
+            android:layout_height="45dp"
+            android:gravity="center"
+            android:text="@string/personinfo_pop_sent_sms"
+            android:textColor="@color/common_blue"
+            android:textSize="16sp"
+            android:clickable="true"
+            android:onClick="onClickListener" />
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="0.5dp"
+            android:alpha="0.5"
+            android:background="@color/devide_line" />
+
+        <TextView
+            android:id="@+id/tv_personinfo_pop_cancle_pop"
+            android:layout_width="match_parent"
+            android:layout_height="45dp"
+            android:gravity="center"
+            android:text="@string/personinfo_pop_cancle_pop"
+            android:textColor="@color/common_blue"
+            android:textSize="16sp"
+            android:clickable="true"
+            android:onClick="onClickListener" />
+    </LinearLayout>
+
+</RelativeLayout>

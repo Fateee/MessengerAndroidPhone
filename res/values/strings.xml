@@ -1,0 +1,141 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <!-- app -->
+    <string name="app_name">Amessager</string>
+
+    <!-- 公共文字 -->
+    <string name="common_offline_notice_title">下线通知</string>
+    <string name="common_offline_notice_msg">您的账号已在其他手机上登录，如非本人操作，则密码可能已泄露，建议请尽快在PC端YNmessenger设置中修改密码。</string>
+    <!-- main界面 -->
+    <string name="main_tabitem_home">主页</string>
+    <string name="main_tabitem_organization">联系人</string>
+    <string name="main_tabitem_notice">通知</string>
+    <string name="main_tabitem_setting">设置</string>
+    <string name="main_tabitem_session">会话</string>
+    <string name="title_activity_main">主页</string>
+    <string name="splash_logo">依能科技</string>
+    <string name="org_search">请输入关键字</string>
+    <string name="main_darkMode">夜间模式</string>
+    <string name="main_mySettings">我的设置</string>
+    <string name="main_logout">退出登录</string>
+
+    <!-- login界面 -->
+    <string name="login_title">掌上YNedut</string>
+    <string name="login_bttext">登陆</string>
+    <string name="login_evtext_username">用户名</string>
+    <string name="login_evtext_passowrd">密码</string>
+    <string name="login_evtext_serviceaddress">服务器地址</string>
+    <string name="login_tvtext_showserviceaddress">显示服务器地址</string>
+    <string name="login_tvtext_hidserviceaddress">隐藏服务器地址</string>
+    <string name="login_errortext_emptyusername">用户名不能为空</string>
+    <string name="login_errortext_emptypassowrd">密码不能为空</string>
+    <string name="login_errortext_emptyserviceaddress">服务器地址不能为空</string>
+    <string name="login_errortext_jsondata">数据解析出错</string>
+    <string name="login_errortext_neterror">网络连接出错</string>
+    <string name="login_errorformat_serviceaddress">服务器地址格式不正确</string>
+
+    <!-- session界面 -->
+    <string name="session_title">消息</string>
+    <string name="session_errortext_network">! 没有网，怎么任性</string>
+    <string name="session_serach_hint">搜索</string>
+    <string name="session_notifyModeAlarm">提醒</string>
+    <string name="session_notifyModeNoAlarm">不提醒</string>
+    <string name="session_clearListDone">已完成清除消息列表</string>
+    <string name="session_clearAllChatMsgDone">已完成清除所有聊天记录</string>
+    <string name="session_clearCacheDone">已完成清除缓存</string>
+    <string name="pull_to_refresh_pull_label">下拉刷新</string>
+    <string name="pull_to_refresh_release_label">松开加载</string>
+    <string name="pull_to_refresh_refreshing_label">正在载入</string>
+    
+    <!--
+    <string name="pull_to_refresh_pull_label">Pull to refresh…</string>
+    <string name="pull_to_refresh_release_label">Release to refresh…</string>
+    <string name="pull_to_refresh_refreshing_label">Loading…</string>
+    -->
+
+
+    <!-- Just use standard Pull Down String when pulling up. These can be set for languages which require it -->
+    <string name="pull_to_refresh_from_bottom_pull_label">@string/pull_to_refresh_pull_label</string>
+    <string name="pull_to_refresh_from_bottom_release_label">@string/pull_to_refresh_release_label</string>
+    <string name="pull_to_refresh_from_bottom_refreshing_label">@string/pull_to_refresh_refreshing_label</string>
+
+    <!-- 个人资料页弹出框界面 -->
+    <string name="personinfo_pop_add_contact">添加到手机通讯录</string>
+    <string name="personinfo_pop_call_contact">拨打号码</string>
+    <string name="personinfo_pop_sent_sms">发送短信</string>
+    <string name="personinfo_pop_cancle_pop">取消</string>
+
+    <!-- Setting Activity 设置主界面 -->
+    <string name="setting_title">我的设置</string>
+    <string name="setting_previous">返回</string>
+    <string name="setting_msgNotify">消息提醒</string>
+    <string name="setting_viewSetting">浏览设置</string>
+    <string name="setting_additionalFunction">辅助功能</string>
+    <string name="setting_downloadedFiles">查看已下载的文件</string>
+    <string name="setting_about">关于 YNedut</string>
+    <string name="setting_logout">退出当前账号</string>
+
+    <!-- MsgNotifySetting Activity 消息提醒 -->
+    <string name="msgNotifySetting_title">消息提醒</string>
+    <string name="msgNotifySetting_distractionFree">免打扰</string>
+    <string name="msgNotifySetting_timeSetting">免打扰时间设置</string>
+    <string name="msgNotifySetting_timeDisplay">%1$s:%2$s-%3$s:%4$s</string>
+    <string name="msgNotifySetting_audio">声音</string>
+    <string name="msgNotifySetting_groupMsgNotifySetting">群/讨论组消息设置</string>
+    <string name="msgNotifySetting_notifyWhenExit">退出后仍接收消息</string>
+
+    <!-- DistractionFreeSettingActivity 免打扰时段设置界面 -->
+    <string name="distractionFreeSetting_title">免打扰设置</string>
+    <string name="distractionFreeSetting_beginTime">开始时间</string>
+    <string name="distractionFreeSetting_beginTimeDisplay">%1$s:%2$s</string>
+    <string name="distractionFreeSetting_endTime">结束时间</string>
+    <string name="distractionFreeSetting_endTimeDisplay">%1$s:%2$s</string>
+
+    <!-- ViewSettingActivity 浏览设置界面 -->
+    <string name="viewSetting_title">浏览设置</string>
+    <string name="viewSetting_fontSize">字体大小</string>
+    <string name="viewSetting_backgroundSkin">背景皮肤</string>
+    <string name="viewSetting_autoRecImg">在2G/3G/4G环境下自动接收图片</string>
+
+    <!-- FontSizeSettingActivity 字体设置界面 -->
+    <string name="fontSizeSetting_title">字体大小</string>
+    <string name="fontSizeSetting_small">小</string>
+    <string name="fontSizeSetting_medium">中</string>
+    <string name="fontSizeSetting_huge">大</string>
+    <string name="fontSizeSetting_xhuge">特大</string>
+
+    <!-- AdditionalFunctionActivity 辅助功能设置界面 -->
+    <string name="additionalFunction_title">辅助功能</string>
+    <string name="additionalFunction_clearChatMsgList">清除消息列表</string>
+    <string name="additionalFunction_clearAllChatMsg">清除所有聊天记录</string>
+    <string name="additionalFunction_clearCache">清除缓存</string>
+    <string name="additionalFunction_deleteConfirm">确定要删除么？</string>
+    <string name="additionalFunction_confirmYes">确定</string>
+    <string name="additionalFunction_confirmNo">取消</string>
+    <string name="additionalFunction_clearSuccessfully">清除完成！</string>
+
+    <!-- AboutActivity 关于界面 -->
+    <string name="about_title">关于YNedut</string>
+    <string name="about_update">版本更新</string>
+    <string name="about_intro">功能介绍</string>
+    <string name="about_helpAndFeedback">帮助与反馈</string>
+    <string name="about_currentVersionName">当前版本：%1$s</string>
+
+    <!-- AudioSettingActivity 声音 设置界面 -->
+    <string name="audioSetting_title">声音</string>
+    <string name="audioSetting_isAlarm">声音</string>
+    <string name="audioSetting_groupIsAlarm">群/讨论组声音</string>
+    <string name="audioSetting_isVibrate">震动</string>
+    <string name="audioSetting_groupIsVibrate">群/讨论组震动</string>
+    
+    <!-- GroupMsgNotifySetting 群讨论组消息提醒设置界面 -->
+    <string name="groupMsgNotifySetting_title">群讨论组消息设置</string>
+    <string name="groupMsgNotifySetting_receiveNotify">接收并提醒</string>
+    <string name="groupMsgNotifySetting_receiveWithoutNotify">接收但不提醒</string>
+    
+    <string name="hello_world">Hello world!</string>
+    <string name="action_settings">Settings</string>
+    
+
+</resources>

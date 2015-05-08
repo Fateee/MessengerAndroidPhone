@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/ll_contact_main_org"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical" >
+
+    <TextView
+        android:id="@+id/tv_contactlist_common_item_tag"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:background="#F7F7F7"
+        android:clickable="true"
+        android:paddingBottom="1.5dp"
+        android:paddingLeft="10dp"
+        android:paddingTop="1.5dp"
+        android:text="部门"
+        android:textColor="#6A6A6A"
+        android:textSize="@dimen/common_text_size"
+        android:visibility="gone" />
+
+    <LinearLayout
+        android:id="@+id/ll_contactlist_common_item_org"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:visibility="gone" >
+
+        <TextView
+            android:id="@+id/tv_contactlist_common_item_orgname"
+            style="@style/contactItem"
+            android:text="组织机构" />
+
+        <TextView
+            android:id="@+id/tv_contactlist_common_item_personcount"
+            android:layout_width="0dp"
+            android:layout_height="50dp"
+            android:layout_weight="1.5"
+            android:background="@drawable/contact_listitem_bg_selector"
+            android:drawableRight="@drawable/contact_right_arrow"
+            android:gravity="center"
+            android:paddingRight="5dp"
+            android:text="3" />
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/ll_contactlist_common_item_person"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:background="@drawable/contact_listitem_bg_selector"
+        android:visibility="gone" >
+
+        <CheckBox
+            android:id="@+id/cb_contactlist_common_item_checkBox"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:visibility="gone" />
+
+        <ImageView
+            android:id="@+id/iv_contactlist_common_item_personicon"
+            android:layout_width="wrap_content"
+            android:layout_height="50dp"
+            android:background="@drawable/contact_listitem_bg_selector"
+            android:padding="10dp"
+            android:src="@drawable/main_contact_unselect" />
+
+        <TextView
+            android:id="@+id/tv_contactlist_common_item_personname"
+            style="@style/contactItem"
+            android:drawableLeft="@null"
+            android:text="依能" />
+        
+        <TextView
+            android:id="@+id/tv_contactlist_common_item_postname"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="7"
+            android:layout_gravity="center_vertical|right"
+            android:gravity="center_vertical"
+            android:paddingBottom="10dip"
+            android:paddingTop="10dip"
+            android:text="hhhh"
+            android:visibility="gone" />
+    </LinearLayout>
+
+</LinearLayout>

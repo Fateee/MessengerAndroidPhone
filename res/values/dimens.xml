@@ -1,0 +1,103 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <dimen name="activity_horizontal_margin">16dp</dimen>
+    <dimen name="activity_vertical_margin">16dp</dimen>
+    <dimen name="common_actionbar_height">48dp</dimen>
+    <dimen name="common_actionbar_title_textSize">18sp</dimen>
+    <dimen name="common_actionbar_backKey_width">36dp</dimen>
+    <dimen name="common_actionbar_backKey_height">30dp</dimen>
+    <dimen name="common_actionbar_backKey_paddingLeft">4dp</dimen>
+    <dimen name="common_text_size">16sp</dimen>
+    
+    <!-- PullToRefreshListView -->
+    <dimen name="indicator_right_padding">10dp</dimen>
+    <dimen name="indicator_corner_radius">12dp</dimen>
+    <dimen name="indicator_internal_padding">4dp</dimen>
+    <dimen name="header_footer_left_right_padding">24dp</dimen>
+    <dimen name="header_footer_top_bottom_padding">12dp</dimen>
+
+    <!-- 主界面 -->
+    <dimen name="main_item_icon_height">20dp</dimen>
+    <dimen name="main_item_icon_width">24dp</dimen>
+    <dimen name="main_item_margin_top">8dp</dimen>
+    <dimen name="main_item_margin_bottom">5dp</dimen>
+    <dimen name="main_item_title_text_size">11dp</dimen>
+    <dimen name="main_divider_height">18dp</dimen>
+    <dimen name="main_avatar_imgSize">80dp</dimen>
+    <dimen name="main_avatar_borderWidth">2dp</dimen>
+    <dimen name="main_textSize">18sp</dimen>
+    
+    <!-- login activity  320X480 -->
+    <dimen name="login_right_left_padding">14dp</dimen>
+    <dimen name="login_titleicon_paddingtop">42dp</dimen>
+    <dimen name="login_editer_height">42dp</dimen>
+    <dimen name="login_editer_textsize">16sp</dimen>
+    <dimen name="login_server_address_label_text_size">14sp</dimen>
+    <dimen name="login_editer_up_paddingtop">20dp</dimen>
+    <dimen name="login_editeicon_margin_left">16dp</dimen>
+    <dimen name="login_editeicon_margin_right">10dp</dimen>
+    <dimen name="login_editeicon_width">15dp</dimen>
+    <dimen name="login_editeicon_height">19dp</dimen>
+    <dimen name="login_serversstatus_paddingtop">12dp</dimen>
+    <dimen name="login_loginbt_paddingtop">30dp</dimen>
+    <dimen name="slidingmenu_offset">120dp</dimen>
+    <dimen name="list_padding">10dp</dimen>
+    <dimen name="shadow_width">15dp</dimen>
+    <dimen name="common_title_bar_icon_height">48dp</dimen>
+    <dimen name="common_title_bar_icon_with">48dp</dimen>
+    <dimen name="notice_list_item_publishdate_text_size">12sp</dimen>
+
+    <integer name="num_cols">1</integer>
+    
+    <!-- Setting Activity 设置主界面-->
+	<dimen name="setting_divideLine_height">1dp</dimen>
+	<dimen name="setting_divideLine_verMargin">16dp</dimen>
+	<dimen name="setting_btn_shape_padding">14dp</dimen>
+	<dimen name="setting_btn_shape_stroke_width">1dp</dimen>
+	<dimen name="setting_downloadedFiles_marginTop">50dp</dimen>
+	<dimen name="setting_logout_marginTop">14dp</dimen>
+	
+	<!-- MsgNotifyActivity 消息提醒设置界面 -->
+	<dimen name="msgNotifySetting_divideLine_verMargin">16dp</dimen>
+	<dimen name="msgNotifySetting_arrowRight_size">16dp</dimen>
+	<dimen name="msgNotifySetting_2edArea_marginTop">20dp</dimen>
+	<dimen name="msgNotifySetting_3rdArea_marginTop">20dp</dimen>
+
+	<!-- DistractionFreeSettingActivity 免打扰时段设置界面 -->
+	<dimen name="distractionFreeSetting_arrowRight_size">16dp</dimen>
+	<dimen name="distractionFreeSetting_divideLine_verMargin">16dp</dimen>
+	
+	<!-- ViewSettingActivity 浏览设置界面 -->
+	<dimen name="viewSetting_arrowRight_size">16dp</dimen>
+	<dimen name="viewSetting_divideLine_verMargin">16dp</dimen>
+	<dimen name="viewSetting_toggleBtn_width">80dp</dimen>
+	<dimen name="viewSetting_toggleBtn_height">32dp</dimen>
+	<dimen name="viewSetting_toggleBtn_marginLeft">18dp</dimen>
+	
+	<!-- FontSizeSettingActivity 字体大小设置界面 -->
+	<dimen name="fontSizeSetting_divideLine_verMargin">16dp</dimen>
+	
+	<!-- AdditionalFunctionActivity 辅助功能设置界面 -->
+	<dimen name="additionalFunction_arrowRight_size">16dp</dimen>
+	<dimen name="additionalFunction_divideLine_verMargin">16dp</dimen>
+	<dimen name="additionalFunction_popupwindow_button_Padding">18dp</dimen>
+	<dimen name="additionalFunction_popupwindow_title_textSize">16sp</dimen>
+	<dimen name="additionalFunction_popupwindow_divideLine_height">1dp</dimen>
+	
+	<!-- AboutActivity 关于界面 -->
+	<dimen name="about_arrowRight_size">16dp</dimen>
+	<dimen name="about_divideLine_verMargin">16dp</dimen>
+	<dimen name="about_qrcode_imgSize">140dp</dimen>
+	<dimen name="about_currentVersionName_marginTop">16dp</dimen>
+	<dimen name="about_mainArea_marginTop">8dp</dimen>
+	
+	<!-- AudioSettingActivity 声音 设置界面 -->
+	<dimen name="audioSetting_divideLine_verMargin">16dp</dimen>
+	<dimen name="audioSetting_arrowRight_size">16dp</dimen>
+	<dimen name="audioSetting_2edArea_marginTop">20dp</dimen>
+	
+	<!-- GroupMsgNotifySettingActivity 群讨论组消息设置界面 -->
+	<dimen name="groupMsgNotifySetting_listItem_padding">12dp</dimen>
+	<dimen name="groupMsgNotifySetting_listItem_title_textSize">20sp</dimen>
+</resources>

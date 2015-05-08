@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical" >
+
+    <EditText
+        android:id="@+id/et_group_search"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:ems="10"
+        android:hint="搜索" >
+    </EditText>
+
+    <FrameLayout
+        android:layout_width="fill_parent"
+        android:layout_height="fill_parent"
+        android:background="@color/common_white_color" >
+
+        <ListView
+            android:id="@+id/lv_group_list"
+            android:layout_width="fill_parent"
+            android:layout_height="fill_parent"
+            android:layout_gravity="center"
+            android:listSelector="@android:color/transparent"
+            android:paddingRight="20dp"
+            android:scrollbars="none" />
+
+        <TextView
+            android:id="@+id/tv_group_dialog"
+            android:layout_width="80.0dip"
+            android:layout_height="80.0dip"
+            android:layout_gravity="center"
+            android:background="@drawable/show_head_toast_bg"
+            android:gravity="center"
+            android:textColor="#ffffffff"
+            android:textSize="30.0dip"
+            android:visibility="invisible" />
+
+        <com.yineng.ynmessager.view.SideBar
+            android:id="@+id/sb_group_sidrbar"
+            android:layout_width="20dp"
+            android:layout_height="fill_parent"
+            android:layout_gravity="right|center"
+            android:layout_marginBottom="5dp"
+            android:layout_marginTop="5dp" />
+    </FrameLayout>
+
+</LinearLayout>

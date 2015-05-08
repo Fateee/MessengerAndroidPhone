@@ -1,0 +1,281 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical" >
+
+    <RelativeLayout
+        android:id="@+id/rl_group_info_titlelayout"
+        android:layout_width="fill_parent"
+        android:layout_height="48dp"
+        android:layout_alignParentTop="true"
+        android:background="@color/common_black_overlay" >
+
+        <TextView
+            android:id="@+id/tv_group_infop_title"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:layout_centerInParent="true"
+            android:gravity="center"
+            android:text="群资料"
+            android:textColor="#ffffff" />
+
+        <TextView
+            android:id="@+id/iv_group_info_back"
+            android:layout_width="60dp"
+            android:layout_height="60dp"
+            android:background="@drawable/face_del_ico_dafeult"
+            android:clickable="true"
+            android:gravity="center"
+            android:onClick="back"
+            android:padding="3dp"
+            android:text="聊天消息" />
+    </RelativeLayout>
+
+<!--     <RelativeLayout
+        android:id="@+id/rl_group_info_namelayout"
+        android:layout_width="match_parent"
+        android:layout_height="50dp"
+        android:layout_below="@+id/rl_group_info_titlelayout"
+        android:layout_margin="10dp" >
+
+        <ImageView
+            android:id="@+id/iv_group_info_head_icon"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:layout_centerVertical="true"
+            android:layout_marginLeft="10dp"
+            android:contentDescription="@string/app_name"
+            android:src="@drawable/main_contact_unselect" />
+
+        <TextView
+            android:id="@+id/tv_group_info_name"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerVertical="true"
+            android:layout_marginLeft="10dp"
+            android:layout_toRightOf="@id/iv_group_info_head_icon"
+            android:text="群名称" />
+    </RelativeLayout> -->
+    
+    <RelativeLayout
+        android:id="@+id/rl_group_info_namelayout"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:onClick="onClickListener"
+        android:layout_below="@+id/rl_group_info_titlelayout" >
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:padding="5dp"
+            android:text="名称" />
+
+        <TextView
+            android:id="@+id/tv_group_info_name"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentRight="true"
+            android:drawablePadding="8dp"
+            android:drawableRight="@drawable/contact_right_arrow"
+            android:gravity="center"
+            android:padding="5dp"
+            android:text="项目经理与部门经理" />
+
+    </RelativeLayout>
+
+    <LinearLayout
+        android:id="@+id/ll_group_info_addlayout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/rl_group_info_namelayout"
+        android:layout_margin="10dp"
+        android:background="@drawable/group_info_add_bg"
+        android:orientation="vertical" >
+
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="50dp" >
+
+            <ImageView
+                android:id="@+id/iv_group_info_share_icon"
+                android:layout_width="40dp"
+                android:layout_height="40dp"
+                android:layout_centerVertical="true"
+                android:layout_marginLeft="10dp"
+                android:contentDescription="@string/app_name"
+                android:src="@drawable/main_contact_unselect" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_centerVertical="true"
+                android:layout_marginLeft="10dp"
+                android:layout_toRightOf="@id/iv_group_info_share_icon"
+                android:text="群共享" />
+
+            <ImageView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentRight="true"
+                android:layout_centerVertical="true"
+                android:layout_marginRight="10dp"
+                android:contentDescription="@string/app_name"
+                android:scaleType="fitXY"
+                android:src="@drawable/contact_right_arrow" />
+        </RelativeLayout>
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="0.5dp"
+            android:background="@color/common_focus_item" />
+
+        <RelativeLayout
+            android:id="@+id/rl_group_member_layout"
+            android:layout_width="match_parent"
+            android:layout_height="50dp"
+            android:layout_marginLeft="1dp"
+            android:layout_marginRight="1dp"
+            android:background="@drawable/contact_listitem_bg_selector"
+            android:onClick="onClickListener" >
+
+            <ImageView
+                android:id="@+id/iv_group_info_member_icon"
+                android:layout_width="40dp"
+                android:layout_height="40dp"
+                android:layout_centerVertical="true"
+                android:layout_marginLeft="10dp"
+                android:contentDescription="@string/app_name"
+                android:src="@drawable/main_contact_unselect" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_centerVertical="true"
+                android:layout_marginLeft="10dp"
+                android:layout_toRightOf="@id/iv_group_info_member_icon"
+                android:text="群成员" />
+
+            <TextView
+                android:id="@+id/tv_group_info_member_count"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentRight="true"
+                android:layout_centerVertical="true"
+                android:layout_marginRight="10dp"
+                android:drawablePadding="5dp"
+                android:drawableRight="@drawable/contact_right_arrow"
+                android:gravity="center"
+                android:text="3" />
+        </RelativeLayout>
+
+        <LinearLayout
+            android:id="@+id/ll_group_info_gallarylayout"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="1dp"
+            android:layout_marginRight="1dp"
+            android:orientation="horizontal" >
+
+            <!--<Gallery
+                android:id="@+id/gl_disgroup_info_gallary"
+                android:layout_width="20dp"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:scrollbars="horizontal" />-->
+
+            <com.yineng.ynmessager.view.HorizontalListView
+                android:id="@+id/hl_group_info_member_list"
+                android:layout_width="20dp"
+                android:layout_height="match_parent"
+                android:layout_weight="1" >
+            </com.yineng.ynmessager.view.HorizontalListView>
+
+            <Button
+                android:id="@+id/btn_group_info_add_btn"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:gravity="center"
+                android:onClick="onClickListener"
+                android:text="添加" />
+        </LinearLayout>
+    </LinearLayout>
+
+    <!-- <View
+        android:id="@+id/v_disgroup_info_line1"
+        android:layout_width="fill_parent"
+        android:layout_height="1dp"
+        android:layout_below="@+id/rl_group_info_namelayout"
+        android:background="@color/common_focus_item" />
+
+    <RelativeLayout
+        android:id="@+id/rl_disgroup_info_addlayout"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/v_disgroup_info_line1" >
+
+        <RelativeLayout
+            android:id="@+id/rl_disgroup_info_namelayout"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="20dp"
+            android:layout_marginTop="20dp" >
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:gravity="center"
+                android:padding="5dp"
+                android:text="讨论组成员" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentRight="true"
+                android:gravity="center"
+                android:padding="5dp"
+                android:text="53人" />
+        </RelativeLayout>
+
+        <LinearLayout
+            android:id="@+id/ll_disgroup_info_gallarylayout"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/rl_disgroup_info_namelayout"
+            android:orientation="horizontal" >
+
+            <Gallery
+                android:id="@+id/gl_disgroup_info_gallary"
+                android:layout_width="20dp"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:scrollbars="horizontal" />
+
+            <Button
+                android:id="@+id/btn_disgroup_info_add_btn"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:gravity="center"
+                android:text="添加" />
+        </LinearLayout>
+    </RelativeLayout> -->
+
+    <Button
+        android:id="@+id/btn_group_info_find_chat_record_btn"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/ll_group_info_addlayout"
+        android:gravity="center"
+        android:onClick="onClickListener"
+        android:text="查找聊天记录" />
+
+<!--     <Button
+        android:id="@+id/btn_disgroup_info_logout_group_btn"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:gravity="center"
+        android:text="退出讨论组" /> -->
+
+</RelativeLayout>

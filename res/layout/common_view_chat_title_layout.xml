@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/rl_chat_common_title_layout"
+    android:layout_width="fill_parent"
+    android:layout_height="48dp"
+    android:background="@color/common_black_overlay" >
+
+<!--     <Button
+        android:id="@+id/chat_common_title_view_back"
+        android:layout_width="70dp"
+        android:layout_height="fill_parent"
+        android:layout_centerVertical="true"
+        android:background="@null"
+        android:ellipsize="middle"
+        android:gravity="center"
+        android:onClick="onTitleViewClickListener"
+        android:scaleType="center"
+        android:singleLine="true"
+        android:text="消息" /> -->
+
+<!--     <Button
+        android:id="@+id/chat_title_view_infomation"
+        android:layout_width="70dp"
+        android:layout_height="fill_parent"
+        android:layout_alignParentRight="true"
+        android:gravity="center"
+        android:text="资料" /> -->
+
+    <TextView
+        android:id="@+id/chat_common_title_view_back"
+        android:layout_width="wrap_content"
+        android:layout_height="fill_parent"
+        android:drawableLeft="@drawable/titlebar_back"
+        android:gravity="center_vertical"
+        android:clickable="true"
+        android:text="消息"
+        android:onClick="onTitleViewClickListener" />
+
+    <ImageView
+        android:id="@+id/chat_common_title_view_infomation"
+        android:layout_width="50dp"
+        android:layout_height="fill_parent"
+        android:layout_alignParentRight="true"
+        android:onClick="onTitleViewClickListener"
+        android:padding="6dp"
+        android:src="@drawable/main_contact_unselect" />
+
+    <TextView
+        android:id="@+id/chat_common_title_view_name"
+        android:layout_width="fill_parent"
+        android:layout_height="fill_parent"
+        android:layout_centerInParent="true"
+        android:layout_toLeftOf="@id/chat_common_title_view_infomation"
+        android:layout_toRightOf="@id/chat_common_title_view_back"
+        android:ellipsize="middle"
+        android:gravity="center"
+        android:singleLine="true"
+        android:text="群/讨论组名称"
+        android:textColor="#ffffff" />
+
+</RelativeLayout>

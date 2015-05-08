@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:background="#F2F2F2"
+    android:orientation="vertical" >
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center"
+        android:padding="@dimen/additionalFunction_popupwindow_button_Padding"
+        android:text="@string/additionalFunction_deleteConfirm"
+        android:textColor="@color/red"
+        android:textSize="@dimen/additionalFunction_popupwindow_title_textSize" />
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/additionalFunction_popupwindow_divideLine_height"
+        android:background="@color/gray" />
+
+    <TextView
+        android:id="@+id/additionalFunction_txt_confirmYes"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center"
+        android:padding="@dimen/additionalFunction_popupwindow_button_Padding"
+        android:text="@string/additionalFunction_confirmYes"
+        android:textColor="@color/black" />
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/additionalFunction_popupwindow_divideLine_height"
+        android:background="@color/gray" />
+
+    <TextView
+        android:id="@+id/additionalFunction_txt_confirmNo"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center"
+        android:padding="@dimen/additionalFunction_popupwindow_button_Padding"
+        android:text="@string/additionalFunction_confirmNo"
+        android:textColor="@color/black" />
+
+</LinearLayout>

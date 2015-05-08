@@ -1,0 +1,261 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/ll_contact_personinfo_layout"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/common_background_color"
+    android:orientation="vertical" >
+
+    <RelativeLayout
+        android:layout_width="fill_parent"
+        android:layout_height="48dp"
+        android:background="@color/common_black_overlay" >
+
+        <TextView
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:layout_centerInParent="true"
+            android:gravity="center"
+            android:text="详细信息"
+            android:textColor="#ffffff" />
+
+        <ImageView
+            android:layout_width="60dp"
+            android:layout_height="60dp"
+            android:layout_centerVertical="true"
+            android:onClick="back"
+            android:scaleType="center"
+            android:src="@drawable/face_del_ico_dafeult" />
+        
+        <Button 
+            android:id="@+id/bt_contact_personinfo_refresh"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="更新"
+            android:layout_alignParentRight="true"
+            android:onClick="onClickListener"
+            />
+    </RelativeLayout>
+
+    <RelativeLayout
+        android:layout_width="fill_parent"
+        android:layout_height="80dp" >
+
+        <ImageView
+            android:id="@+id/iv_contact_personinfo_icon"
+            android:layout_width="46dp"
+            android:layout_height="50dp"
+            android:layout_alignParentBottom="true"
+            android:layout_alignParentLeft="true"
+            android:layout_marginLeft="25dp"
+            android:scaleType="center"
+            android:src="@drawable/main_contact_unselect" />
+
+        <LinearLayout
+            android:layout_width="fill_parent"
+            android:layout_height="fill_parent"
+            android:layout_toRightOf="@id/iv_contact_personinfo_icon"
+            android:paddingLeft="25dp"
+            android:orientation="vertical" >
+
+            <TextView
+                android:id="@+id/tv_contact_personinfo_name"
+                android:layout_width="wrap_content"
+                android:layout_height="0dp"
+                android:layout_weight="1"
+                android:gravity="center"
+                android:textSize="14sp" />
+
+            <TextView
+                android:id="@+id/tv_contact_personinfo_gender"
+                android:layout_width="wrap_content"
+                android:layout_height="0dp"
+                android:layout_weight="1"
+                android:gravity="center"
+                android:textSize="14sp" />
+
+            <TextView
+                android:id="@+id/tv_contact_personinfo_post"
+                android:layout_width="wrap_content"
+                android:layout_height="0dp"
+                android:layout_weight="1"
+                android:gravity="center"
+                android:textSize="14sp" />
+        </LinearLayout>
+    </RelativeLayout>
+
+    <ScrollView
+        android:layout_width="fill_parent"
+        android:layout_height="fill_parent"
+        android:background="@color/common_background_color" >
+
+        <LinearLayout
+            android:layout_width="fill_parent"
+            android:layout_height="fill_parent"
+            android:orientation="vertical"
+            android:padding="15dp" >
+
+            <LinearLayout
+                style="@style/contactItem"
+                android:layout_width="match_parent"
+                android:orientation="horizontal"
+                android:paddingRight="0dp" >
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="部门："
+                    android:textSize="14sp" />
+
+                <TextView
+                    android:id="@+id/tv_contact_personinfo_department"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:textSize="14sp" />
+            </LinearLayout>
+
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:background="#e3e3e3" />
+
+            <LinearLayout
+                android:id="@+id/ll_contact_personinfo_phonenumber"
+                style="@style/contactItem"
+                android:layout_width="match_parent"
+                android:orientation="horizontal"
+                android:onClick="onClickListener"
+                android:paddingRight="0dp" >
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="手机："
+                    android:textSize="14sp" />
+
+                <TextView
+                    android:id="@+id/tv_contact_personinfo_phonenumber"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:textSize="14sp" />
+
+                <TextView
+                    android:id="@+id/tv_contact_personinfo_phone"
+                    android:layout_width="wrap_content"
+                    android:layout_height="fill_parent"
+                    android:drawableRight="@drawable/contact_right_arrow"
+                    android:gravity="right|center_vertical"
+                    android:paddingLeft="10dp"
+                    android:paddingRight="10dp"
+                    android:text=""
+                    android:textSize="14sp" />
+            </LinearLayout>
+
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:background="#e3e3e3" />
+
+            <LinearLayout
+                android:id="@+id/ll_contact_personinfo_telenumber"
+                style="@style/contactItem"
+                android:layout_width="match_parent"
+                android:orientation="horizontal"
+                android:paddingRight="0dp"
+                android:onClick="onClickListener" >
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="电话:"
+                    android:textSize="14sp" />
+
+                <TextView
+                    android:id="@+id/tv_contact_personinfo_telenumber"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:textSize="14sp" />
+
+                <TextView
+                    android:id="@+id/tv_contact_personinfo_call"
+                    android:layout_width="wrap_content"
+                    android:layout_height="fill_parent"
+                    android:drawableRight="@drawable/contact_right_arrow"
+                    android:gravity="right|center_vertical"
+                    android:paddingLeft="10dp"
+                    android:paddingRight="10dp"
+                    android:text=""
+                    android:textSize="14sp" />
+            </LinearLayout>
+
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:background="#e3e3e3" />
+
+            <LinearLayout
+                style="@style/contactItem"
+                android:layout_width="match_parent"
+                android:orientation="horizontal"
+                android:paddingRight="10dp" >
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Email:"
+                    android:textSize="14sp" />
+
+                <TextView
+                    android:id="@+id/tv_contact_personinfo_email"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:textSize="14sp" />
+            </LinearLayout>
+
+            <LinearLayout
+                android:id="@+id/ll_contact_personinfo_sendcard"
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:layout_margin="10dp"
+                android:background="#e3e3e3"
+                android:onClick="onClickListener"
+                android:padding="1dp" >
+
+                <TextView
+                    android:id="@+id/tv_contact_personinfo_sendCard"
+                    android:layout_width="fill_parent"
+                    android:layout_height="wrap_content"
+                    android:background="#ffffff"
+                    android:gravity="center"
+                    android:padding="10dp"
+                    android:text="发送名片给好友"
+                    android:textSize="14sp" />
+            </LinearLayout>
+
+            <LinearLayout
+                android:id="@+id/ll_contact_personinfo_creatChat"
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:layout_margin="10dp"
+                android:background="#e3e3e3"
+                android:onClick="onClickListener"
+                android:padding="1dp" >
+
+                <TextView
+                    android:layout_width="fill_parent"
+                    android:layout_height="wrap_content"
+                    android:background="#ffff4444"
+                    android:gravity="center"
+                    android:padding="10dp"
+                    android:text="发起会话"
+                    android:textColor="#ffffff"
+                    android:textSize="14sp" />
+            </LinearLayout>
+        </LinearLayout>
+    </ScrollView>
+
+</LinearLayout>

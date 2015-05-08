@@ -1,0 +1,199 @@
+<TabHost xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@android:id/tabhost"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:layout_alignParentLeft="true"
+    android:layout_centerVertical="true" >
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical" >
+
+        <TabWidget
+            android:id="@android:id/tabs"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_alignParentBottom="true" >
+        </TabWidget>
+
+        <FrameLayout
+            android:id="@android:id/tabcontent"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_above="@android:id/tabs" >
+
+            <fragment
+                android:id="@+id/tab1"
+                android:name="com.yineng.ynmessager.activity.home.HomeFragment"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent" />
+
+            <fragment
+                android:id="@+id/tab2"
+                android:name="com.yineng.ynmessager.activity.session.SessionFragment"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent" />
+
+            <fragment
+                android:id="@+id/tab3"
+                android:name="com.yineng.ynmessager.activity.contact.ContactFragment"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent" />
+
+           <!--  <fragment
+                android:id="@+id/tab4"
+                android:name="com.yineng.ynmessager.activity.user.UserFragment"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent" /> -->
+        </FrameLayout>
+
+        <LinearLayout
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:layout_above="@android:id/tabs"
+            android:layout_marginBottom="-10dp"
+            android:clickable="false"
+            android:focusable="false"
+            android:orientation="horizontal" >
+
+            <View
+                android:layout_width="0dp"
+                android:layout_height="1dp"
+                android:layout_weight="1"
+                android:visibility="invisible" />
+
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1" 
+                android:gravity="center_horizontal">
+
+                <TextView
+                    android:id="@+id/tv_main_notice_ureadnumbers"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:background="@drawable/main_notice_bg"
+                    android:gravity="center"                   
+                    android:paddingBottom="0dp"
+                    android:paddingLeft="5dp"
+                    android:paddingRight="5dp"
+                    android:paddingTop="0dp"
+                    android:text="12"
+                    android:textColor="#ffffff" />              
+            </LinearLayout>
+              <View
+                    android:layout_width="0dp"
+                    android:layout_height="1dp"
+                    android:layout_weight="1"
+                    android:visibility="invisible" />
+               
+        </LinearLayout>
+    </RelativeLayout>
+
+</TabHost>
+<!--
+<TabHost xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@android:id/tabhost"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:layout_alignParentLeft="true"
+    android:layout_centerVertical="true" >
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical" >
+
+        <TabWidget
+            android:id="@android:id/tabs"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:layout_alignParentBottom="true">
+        </TabWidget>
+
+        <FrameLayout
+            android:id="@android:id/tabcontent"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_above="@android:id/tabs" 
+            >
+             <fragment
+                android:id="@+id/tab1"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:name="com.yineng.ynmessager.activity.main.Tab1Fragmengt"
+                 />
+
+            <fragment
+                android:id="@+id/tab2"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:name="com.yineng.ynmessager.activity.main.Tab2Fragment"
+                 />
+
+            <fragment
+                android:id="@+id/tab3"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:name="com.yineng.ynmessager.activity.main.Tab3Fragment"
+                 />
+
+            <fragment
+                android:id="@+id/tab4"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:name="com.yineng.ynmessager.activity.main.Tab4Fragment"
+                 />
+
+        </FrameLayout>
+
+        tab coustom view instead
+       <LinearLayout  android:layout_width="match_parent"
+            android:layout_height="60dp"
+            android:orientation="horizontal"
+            android:layout_alignParentBottom="true"
+            >
+           <Button 
+               android:id="@+id/tab1_btn"
+               android:layout_width="0dp"
+               android:layout_height="match_parent"
+               android:layout_weight="1"
+               android:background="@android:color/black"
+               android:text="tab1"
+               android:textColor="@android:color/white"
+               />
+           <Button 
+               android:id="@+id/tab2_btn"
+               android:layout_width="0dp"
+               android:layout_height="match_parent"
+               android:layout_weight="1"
+               android:background="@android:color/black"
+               android:text="tab2"
+               android:textColor="@android:color/white"
+               />
+           <Button 
+               android:id="@+id/tab3_btn"
+               android:layout_width="0dp"
+               android:layout_height="match_parent"
+               android:layout_weight="1"
+               android:background="@android:color/black"
+               android:text="tab3"
+               android:textColor="@android:color/white"
+               />
+           <Button 
+               android:id="@+id/tab4_btn"
+               android:layout_width="0dp"
+               android:layout_height="match_parent"
+               android:layout_weight="1"
+               android:background="@android:color/black"
+               android:text="tab4"
+               android:textColor="@android:color/white"
+               />
+       </LinearLayout>
+    </RelativeLayout>
+
+</TabHost>
+-->
