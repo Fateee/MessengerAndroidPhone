@@ -118,7 +118,7 @@ public class NoticesManager
 		Setting setting = AppController.getInstance().mUserSetting;
 		if(setting != null)
 		{
-			boolean isInTimeScope = TimeUtil.isInTimeScope(setting.getDistractionFree_begin_h(),
+			boolean isInTimeScope = TimeUtil.isCurrentInTimeScope(setting.getDistractionFree_begin_h(),
 					setting.getDistractionFree_begin_m(),setting.getDistractionFree_end_h(),
 					setting.getDistractionFree_end_m());
 			// 首先如果开了声音

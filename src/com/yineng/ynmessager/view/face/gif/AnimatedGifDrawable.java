@@ -2,6 +2,8 @@ package com.yineng.ynmessager.view.face.gif;
 
 import java.io.InputStream;
 
+import com.yineng.ynmessager.view.face.gif.GifDecoder.GifFrame;
+
 import android.graphics.Bitmap;
 import android.graphics.drawable.AnimationDrawable;
 import android.graphics.drawable.BitmapDrawable;
@@ -11,10 +13,11 @@ public class AnimatedGifDrawable extends AnimationDrawable {
 
 	private int mCurrentIndex = 0;
 	private UpdateListener mListener;
+	private GifDecoder decoder;
 
 	public AnimatedGifDrawable(InputStream source, UpdateListener listener) {
 		mListener = listener;
-		GifDecoder decoder = new GifDecoder();
+		decoder = new GifDecoder();
 		decoder.read(source);
 		// Iterate through the gif frames, add each as animation frame
 		for (int i = 0; i < decoder.getFrameCount(); i++) {
@@ -61,4 +64,13 @@ public class AnimatedGifDrawable extends AnimationDrawable {
 		void update();
 	}
 
+	public void recycleBitmaps() {
+		if (decoder.frames != null) {
+			for (GifFrame frame : decoder.frames) {
+				if (!frame.image.isRecycled()) {
+					frame.image.recycle();
+				}
+			}
+		}
+	}
 }

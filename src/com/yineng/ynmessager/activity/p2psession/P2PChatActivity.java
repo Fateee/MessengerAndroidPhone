@@ -6,10 +6,15 @@ import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
+import javax.xml.transform.Templates;
 
 import org.jivesoftware.smack.packet.Message;
 import org.jivesoftware.smack.packet.Message.Type;
 
+import android.R.integer;
 import android.app.AlarmManager;
 import android.app.PendingIntent;
 import android.content.BroadcastReceiver;
@@ -18,10 +23,14 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.os.Bundle;
 import android.os.Handler;
+import android.text.Spannable;
+import android.text.SpannableString;
 import android.util.Log;
 import android.view.KeyEvent;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.View.OnClickListener;
+import android.view.View.OnTouchListener;
 import android.view.WindowManager;
 import android.widget.AbsListView;
 import android.widget.AbsListView.OnScrollListener;
@@ -43,8 +52,6 @@ import com.handmark.pulltorefresh.library.PullToRefreshListView;
 import com.yineng.ynmessager.R;
 import com.yineng.ynmessager.activity.BaseActivity;
 import com.yineng.ynmessager.activity.groupsession.GroupChatActivity;
-import com.yineng.ynmessager.activity.session.FaceConversionUtil;
-import com.yineng.ynmessager.activity.session.FaceRelativeLayout;
 import com.yineng.ynmessager.app.Const;
 import com.yineng.ynmessager.bean.RecentChat;
 import com.yineng.ynmessager.bean.contact.User;
@@ -61,7 +68,12 @@ import com.yineng.ynmessager.smack.ReceiveMessageCallBack;
 import com.yineng.ynmessager.smack.ReceiveReqIQCallBack;
 import com.yineng.ynmessager.smack.ReqIQResult;
 import com.yineng.ynmessager.util.JIDUtil;
+import com.yineng.ynmessager.util.L;
 import com.yineng.ynmessager.util.TimeUtil;
+import com.yineng.ynmessager.view.face.FaceConversionUtil;
+import com.yineng.ynmessager.view.face.FaceRelativeLayout;
+import com.yineng.ynmessager.view.face.gif.AnimatedGifDrawable;
+import com.yineng.ynmessager.view.face.gif.AnimatedImageSpan;
 
 /**
  * 
@@ -74,33 +86,28 @@ public class P2PChatActivity extends BaseActivity implements OnClickListener,
 		ReceiveMessageCallBack, ReceiveReqIQCallBack {
 	public static final String ACCOUNT = "Account";
 	public static final String CHOOSE_IMAGE_PATHS = "choose_image_paths";// 选择图片的路径列表
-	public static final int CONFIRM_RESULT_OK = 1;// 选择了图片
-	public static final int CONCEL_RESULT_CODE = 2;// 取消选择图片
-	public static final int REQUESTCODE = 0;// 打开图片选择界面的请求码
+	public final int CONFIRM_RESULT_OK = 1;// 选择了图片
+	public final int CONCEL_RESULT_CODE = 2;// 取消选择图片
+	public final int REQUESTCODE = 0;// 打开图片选择界面的请求码
 
-	private static final String RECEIPT_BROADCAST = "receipt_broadcast";// 回执广播
-	private static final String BREAK_THREAD_TAG = "break_thread_tag";// 销毁线程的标识
+	private final String RECEIPT_BROADCAST = "receipt_broadcast";// 回执广播
+	private final String BREAK_THREAD_TAG = "break_thread_tag";// 销毁线程的标识
 
-	private static final int GET_RECEIPT = 2;// 获得回执的处理
-	private static final int BROADCAST = 3;// 收到广播的处理
-	private static final int RECEIVE_MSG = 4;// 收到别人发送的消息
-	private static final int REFRESH_UI = 5;// 刷新UI
+	private final int GET_RECEIPT = 2;// 获得回执的处理
+	private final int BROADCAST = 3;// 收到广播的处理
+	private final int RECEIVE_MSG = 4;// 收到别人发送的消息
+	private final int REFRESH_UI = 5;// 刷新UI
 
-	private static final int PAGE_SIZE = 20;// 分页查询的信息数量
-	private static final long TIME_INTERVAL = 60 * 5 * 1000;// 时间在5分钟内的消息不显示时间
-	private static final long RECEIPT_TIME_INTERVAL = 30 * 1000;// 超过半分钟未收到回执，则认为发送消息失败
+	private final int PAGE_SIZE = 20;// 分页查询的信息数量
+	private final long TIME_INTERVAL = 60 * 5 * 1000;// 时间在5分钟内的消息不显示时间
+	private final long RECEIPT_TIME_INTERVAL = 30 * 1000;// 超过半分钟未收到回执，则认为发送消息失败
 
 	private ReceiptThread mReceiptThread;
 	private ReceipMessageQueue mReceipMessageQueue = new ReceipMessageQueue();// 回执消息处理队列
 	private LinkedList<P2PChatMsgEntity> mMessageList = new LinkedList<P2PChatMsgEntity>();
 	private List<String> mImagePathList = new CopyOnWriteArrayList<String>();
-	private int mImagesArray[] = null;// 下拉布局中图片选择按钮、其他按钮的图标数组
-	private String strSubFunctionName[] = null;// 子功能名称
 
 	private TextView mUnReadTV;
-	private RelativeLayout mUtilLayout;
-	private GridView mUtilGridLayout;
-	private ImageView mSelectIV;
 	private Button mSendBtn;
 	private XmppConnectionManager mXmppConnManager;
 	private EditText mEditContentET;
@@ -224,9 +231,6 @@ public class P2PChatActivity extends BaseActivity implements OnClickListener,
 	public void initialize() {
 		initTitleView();
 		mUnReadTV = (TextView) findViewById(R.id.tv_p2p_chat_tips);
-		mSelectIV = (ImageView) findViewById(R.id.btn_select);
-		mUtilLayout = (RelativeLayout) findViewById(R.id.ll_utilchoose);
-		mUtilGridLayout = (GridView) findViewById(R.id.gv_choose_grid_layout);
 		mSendBtn = (Button) findViewById(R.id.btn_send);
 		mEditContentET = (EditText) findViewById(R.id.et_sendmessage);
 		mPullToRefreshListView = (PullToRefreshListView) findViewById(R.id.pl_p2p_chat_pull_refresh_list);
@@ -239,27 +243,11 @@ public class P2PChatActivity extends BaseActivity implements OnClickListener,
 		mReceiptBroadcastReceiver = new ReceiptBroadcastReceiver();
 		IntentFilter filter = new IntentFilter(RECEIPT_BROADCAST);
 		registerReceiver(mReceiptBroadcastReceiver, filter);
-		FaceConversionUtil.getInstace().getFileText(getApplication());
 		mP2PChatMsgDao = new P2PChatMsgDao(this);
 		mRecentChatDao = new RecentChatDao(this);
 
-		// 初始化图片选择器按钮
 		mAdapter = new P2PChatMsgAdapter(this);
 		mListView.setAdapter(mAdapter);
-		mImagesArray = new int[] { R.drawable.imageloader_pic_dir };
-		strSubFunctionName = new String[] { "发送图片" };
-		ArrayList<HashMap<String, Object>> lstImageItem = new ArrayList<HashMap<String, Object>>();
-		for (int i = 0; i < strSubFunctionName.length; i++) {
-			HashMap<String, Object> map = new HashMap<String, Object>();
-			map.put("itemImage", mImagesArray[i]);
-			map.put("itemText", strSubFunctionName[i]);
-			lstImageItem.add(map);
-		}
-		SimpleAdapter saImageItems = new SimpleAdapter(this, lstImageItem,// 数据源
-				R.layout.chat_bottom_grid_item,// 显示布局
-				new String[] { "itemImage", "itemText" }, new int[] {
-						R.id.select_Image_item, R.id.select_text_item });
-		mUtilGridLayout.setAdapter(saImageItems);
 
 		// 消息发送线程，回执处理线程
 		mReceiptThread = new ReceiptThread();
@@ -288,24 +276,6 @@ public class P2PChatActivity extends BaseActivity implements OnClickListener,
 
 	private void initEvent() {
 		mSendBtn.setOnClickListener(this);
-		mSelectIV.setOnClickListener(this);
-		mUtilGridLayout.setOnItemClickListener(new OnItemClickListener() {
-			@Override
-			public void onItemClick(AdapterView<?> arg0, View arg1, int arg2,
-					long arg3) {
-				switch (arg2) {
-				case 0:
-					// 点击跳转图片选择器
-					Intent intent = new Intent(P2PChatActivity.this,
-							ImageLoaderActivity.class);
-					startActivityForResult(intent, 0);
-					break;
-
-				default:
-					break;
-				}
-			}
-		});
 
 		mPullToRefreshListView
 				.setOnRefreshListener(new OnRefreshListener<ListView>() {
@@ -329,8 +299,67 @@ public class P2PChatActivity extends BaseActivity implements OnClickListener,
 			public void onScrollStateChanged(AbsListView view, int scrollState) {
 				switch (scrollState) {
 				case OnScrollListener.SCROLL_STATE_IDLE: //
+					L.e("scrollState-SCROLL_STATE_IDLE");
+					int firstVisiblePos = view.getFirstVisiblePosition();
+					int lastVisiblePos = view.getLastVisiblePosition();
+					
+					List<P2PChatMsgEntity> mAdapterList = mAdapter.getData();
+					if (mAdapterList != null) {
+						for (int i = 0; i < firstVisiblePos; i++) {
+							P2PChatMsgEntity p2pChatMsgEntity = mAdapterList.get(i);
+							SpannableString tempSpan = p2pChatMsgEntity.getSpannableString();
+							if (tempSpan != null) {
+								AnimatedImageSpan[] tem = tempSpan.getSpans(0, tempSpan.length()-1, AnimatedImageSpan.class);
+								for (AnimatedImageSpan animatedImageSpan : tem) {
+									animatedImageSpan.pauseGifImg();
+								}
+							}
+						}
+						for (int i = lastVisiblePos+1; i < mAdapterList.size(); i++) {
+							P2PChatMsgEntity p2pChatMsgEntity = mAdapterList.get(i);
+							SpannableString tempSpan = p2pChatMsgEntity.getSpannableString();
+							if (tempSpan != null) {
+								AnimatedImageSpan[] tem = tempSpan.getSpans(0, tempSpan.length()-1, AnimatedImageSpan.class);
+								for (AnimatedImageSpan animatedImageSpan : tem) {
+									animatedImageSpan.pauseGifImg();
+								}
+							}
+						}
+						for (int i = firstVisiblePos; i <= lastVisiblePos&&i < mAdapterList.size(); i++) {
+							P2PChatMsgEntity p2pChatMsgEntity = mAdapterList.get(i);
+							SpannableString tempSpan = p2pChatMsgEntity.getSpannableString();
+							if (tempSpan != null) {
+								AnimatedImageSpan[] tem = tempSpan.getSpans(0, tempSpan.length()-1, AnimatedImageSpan.class);
+								for (AnimatedImageSpan animatedImageSpan : tem) {
+									animatedImageSpan.runGifImg();
+								}
+							}
+						}
+//						for (P2PChatMsgEntity p2pChatMsgEntity : mAdapterList) {
+//							SpannableString tempSpan = p2pChatMsgEntity.getSpannableString();
+//							if (tempSpan != null) {
+//								AnimatedImageSpan[] tem = tempSpan.getSpans(0, tempSpan.length()-1, AnimatedImageSpan.class);
+//								for (AnimatedImageSpan animatedImageSpan : tem) {
+//									animatedImageSpan.recycleBitmaps();
+//								}
+//								tempSpan.removeSpan(tem);
+//								
+////								String regex = "(\\[\\/\\d{1,2}\\])";
+////								Pattern p = Pattern.compile(regex);
+////								Matcher m = p.matcher(tempSpan);
+////								while (m.find()) {
+//////									tempSpan.setSpan(null, m.start(), m.end(),Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+////									AnimatedImageSpan[] tem = tempSpan.getSpans(m.start(), m.end(), AnimatedImageSpan.class);
+//////									((AnimatedGifDrawable) tem[0].getDrawable()).recycleBitmaps();
+////									tem[0].recycleBitmaps();
+////									tempSpan.removeSpan(tem);
+////								}
+//							}
+//						}
+					}
+					
 					// 停止...
-					if (view.getLastVisiblePosition() == (view.getCount() - 1)) {
+					if (lastVisiblePos == (view.getCount() - 1)) {
 						isBottom = true;
 						mUnreadNum = 0;
 						refreshUnreadNumUI();
@@ -352,6 +381,25 @@ public class P2PChatActivity extends BaseActivity implements OnClickListener,
 			@Override
 			public void onScroll(AbsListView view, int firstVisibleItem,
 					int visibleItemCount, int totalItemCount) {
+				L.e("onScroll");
+//				TextView tempView = (TextView) view.findViewById(R.id.tv_sendtime);
+//				if (tempView != null) {
+//					L.e("tag -- "+tempView.getTag());
+//					SpannableString spannableString = (SpannableString) tempView.getTag();
+//					if (spannableString != null) {
+//						spannableString.setSpan(null, 0, spannableString.length(), Spannable.SPAN_INCLUSIVE_EXCLUSIVE);
+//					}
+//				}
+			}
+		});
+		
+		mListView.setOnTouchListener(new OnTouchListener() {
+			@Override
+			public boolean onTouch(View arg0, MotionEvent arg1) {
+				if(arg1.getAction()==MotionEvent.ACTION_DOWN){
+					((FaceRelativeLayout) findViewById(R.id.FaceRelativeLayout)).hideFaceView();
+				}
+				return false;
 			}
 		});
 	}
@@ -404,18 +452,18 @@ public class P2PChatActivity extends BaseActivity implements OnClickListener,
 	}
 
 	@Override
-	public boolean onKeyDown(int keyCode, KeyEvent event) {
-		if (keyCode == KeyEvent.KEYCODE_BACK
-				&& ((FaceRelativeLayout) findViewById(R.id.FaceRelativeLayout))
-						.hideFaceView()) {
-			return true;
+	public void onBackPressed() {
+		if (((FaceRelativeLayout) findViewById(R.id.FaceRelativeLayout))
+				.hideFaceView()) {
+			return;
 		}
-		return super.onKeyDown(keyCode, event);
+		super.onBackPressed();
 	}
 	
 	public void onTitleViewClickListener(View v) {
 		switch (v.getId()) {
 		case R.id.chat_common_title_view_back:
+			((FaceRelativeLayout) findViewById(R.id.FaceRelativeLayout)).hideFaceView();
 			finish();
 			break;
 		case R.id.chat_common_title_view_infomation:
@@ -525,13 +573,6 @@ public class P2PChatActivity extends BaseActivity implements OnClickListener,
 		case R.id.btn_send:
 			clickSend();
 			break;
-		case R.id.btn_select:
-			if (mUtilLayout.isShown()) {
-				mUtilLayout.setVisibility(View.GONE);
-			} else {
-				mUtilLayout.setVisibility(View.VISIBLE);
-			}
-			break;
 
 		}
 	}
@@ -544,7 +585,7 @@ public class P2PChatActivity extends BaseActivity implements OnClickListener,
 	 * @param lastTime
 	 * @return
 	 */
-	public static boolean compareTime(long preTime, long nextTime) {
+	public boolean compareTime(long preTime, long nextTime) {
 		if ((nextTime - preTime) >= TIME_INTERVAL) {
 			return true;
 		}
@@ -554,6 +595,9 @@ public class P2PChatActivity extends BaseActivity implements OnClickListener,
 	@Override
 	protected void onDestroy() {
 		super.onDestroy();
+		/**销毁gif引用**/
+		destroyGifValue();
+		
 		notBreak = false;
 
 		mXmppConnManager.removeReceiveMessageCallBack(mChatUserNum);
@@ -565,6 +609,36 @@ public class P2PChatActivity extends BaseActivity implements OnClickListener,
 		mReceipMessageQueue.putEntity(BREAK_THREAD_TAG);
 		NoticesManager.getInstance(this).updateRecentChatList(mChatUserNum,
 				Const.CHAT_TYPE_P2P);// 更新最近会话列表
+	}
+
+	/**
+	 * 
+	 */
+	private void destroyGifValue() {
+		List<P2PChatMsgEntity> mAdapterList = mAdapter.getData();
+		if (mAdapterList != null) {
+			for (P2PChatMsgEntity p2pChatMsgEntity : mAdapterList) {
+				SpannableString tempSpan = p2pChatMsgEntity.getSpannableString();
+				if (tempSpan != null) {
+					AnimatedImageSpan[] tem = tempSpan.getSpans(0, tempSpan.length()-1, AnimatedImageSpan.class);
+					for (AnimatedImageSpan animatedImageSpan : tem) {
+						animatedImageSpan.recycleBitmaps();
+					}
+					tempSpan.removeSpan(tem);
+					
+//					String regex = "(\\[\\/\\d{1,2}\\])";
+//					Pattern p = Pattern.compile(regex);
+//					Matcher m = p.matcher(tempSpan);
+//					while (m.find()) {
+////						tempSpan.setSpan(null, m.start(), m.end(),Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+//						AnimatedImageSpan[] tem = tempSpan.getSpans(m.start(), m.end(), AnimatedImageSpan.class);
+////						((AnimatedGifDrawable) tem[0].getDrawable()).recycleBitmaps();
+//						tem[0].recycleBitmaps();
+//						tempSpan.removeSpan(tem);
+//					}
+				}
+			}
+		}
 	}
 
 	@Override

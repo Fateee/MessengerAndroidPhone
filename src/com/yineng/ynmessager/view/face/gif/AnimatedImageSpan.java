@@ -1,5 +1,8 @@
 package com.yineng.ynmessager.view.face.gif;
 
+
+import com.yineng.ynmessager.util.L;
+
 import android.graphics.Canvas;
 import android.graphics.Paint;
 import android.graphics.Rect;
@@ -10,19 +13,25 @@ import android.text.style.DynamicDrawableSpan;
 public class AnimatedImageSpan extends DynamicDrawableSpan {
 
     private Drawable mDrawable;
-
-    public AnimatedImageSpan(Drawable d) {
+	private Handler mHandler;
+	private Runnable mRunnable;
+	private boolean isBitmapStatic = false;
+    public AnimatedImageSpan(Drawable d, final String num) {
         super();
         mDrawable = d;
         // Use handler for 'ticks' to proceed to next frame 
-        final Handler mHandler = new Handler();
-        mHandler.post(new Runnable() {
+        mHandler = new Handler();
+        mRunnable = new Runnable() {
             public void run() {
-                ((AnimatedGifDrawable)mDrawable).nextFrame();
-                // Set next with a delay depending on the duration for this frame 
-                mHandler.postDelayed(this, ((AnimatedGifDrawable)mDrawable).getFrameDuration());
+            	if (!isBitmapStatic) {
+                    ((AnimatedGifDrawable)mDrawable).nextFrame();
+                    // Set next with a delay depending on the duration for this frame 
+                    mHandler.postDelayed(this, ((AnimatedGifDrawable)mDrawable).getFrameDuration());
+				}
+//            	L.e("mHandler : "+num);
             }
-        });
+        };
+        mHandler.post(mRunnable);
     }
 
     /*
@@ -73,6 +82,27 @@ public class AnimatedImageSpan extends DynamicDrawableSpan {
         canvas.restore();
 
     }
+    
+	public void recycleBitmaps() {
+		mHandler.removeCallbacksAndMessages(null);
+		((AnimatedGifDrawable)mDrawable).recycleBitmaps();
+	}
 
+	/**
+	 * 让gif动起来
+	 */
+	public void runGifImg(){
+		if (isBitmapStatic) {
+			isBitmapStatic = false;
+			mHandler.post(mRunnable);
+		}
+	}
+	
+	/**
+	 * 让gif暂停，防止后台线程一直执行
+	 */
+	public void pauseGifImg(){
+		isBitmapStatic = true;
+	}
 }
 

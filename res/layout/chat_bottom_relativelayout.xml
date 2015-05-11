@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<com.yineng.ynmessager.activity.session.FaceRelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<com.yineng.ynmessager.view.face.FaceRelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:id="@+id/FaceRelativeLayout"
     android:layout_width="fill_parent"
     android:layout_height="wrap_content" >
@@ -92,4 +92,4 @@
         </LinearLayout>
     </RelativeLayout>
 
-</com.yineng.ynmessager.activity.session.FaceRelativeLayout>
+</com.yineng.ynmessager.view.face.FaceRelativeLayout>

@@ -14,9 +14,10 @@ import android.widget.TextView;
 
 import com.alibaba.fastjson.JSON;
 import com.yineng.ynmessager.R;
-import com.yineng.ynmessager.activity.session.FaceConversionUtil;
 import com.yineng.ynmessager.bean.p2psession.MessageBodyEntity;
+import com.yineng.ynmessager.util.L;
 import com.yineng.ynmessager.util.TimeUtil;
+import com.yineng.ynmessager.view.face.FaceConversionUtil;
 
 /**
  * 
@@ -39,6 +40,10 @@ public class P2PChatMsgAdapter extends BaseAdapter {
 
 	public void setData(List<P2PChatMsgEntity> coll) {
 		this.coll = coll;
+	}
+
+	public List<P2PChatMsgEntity> getData() {
+		return coll;
 	}
 
 	@Override
@@ -137,14 +142,22 @@ public class P2PChatMsgAdapter extends BaseAdapter {
 			}
 		});
 		if (entity.getMessage() != null) {
-			MessageBodyEntity body = JSON.parseObject(entity.getMessage(),
-					MessageBodyEntity.class);
-//			SpannableString spannableString = FaceConversionUtil.getInstace()
-//					.getExpressionString(context, body.getContent());
-			// 对内容做处理
-			SpannableString spannableString = FaceConversionUtil
-					.getInstace().handlerContent(this.context,viewHolder.tvContent,
-					body.getContent());
+			SpannableString  spannableString;
+//			L.e("getview == "+viewHolder.tvSendTime.getTag());
+			if (entity.getSpannableString() != null) {
+				spannableString = entity.getSpannableString();
+			} else {
+				MessageBodyEntity body = JSON.parseObject(entity.getMessage(),
+						MessageBodyEntity.class);
+//				SpannableString spannableString = FaceConversionUtil.getInstace()
+//						.getExpressionString(context, body.getContent());
+				
+				// 对内容做处理
+				spannableString = FaceConversionUtil
+						.getInstace().handlerContent(this.context,viewHolder.tvContent,
+						body.getContent());
+				entity.setSpannableString(spannableString);
+			}
 			viewHolder.tvContent.setText(spannableString);
 		}
 		return convertView;

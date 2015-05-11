@@ -1,4 +1,4 @@
-package com.yineng.ynmessager.activity.session;
+package com.yineng.ynmessager.view.face;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -181,6 +181,9 @@ public final class FaceConversionUtil {
 		if (data == null) {
 			return;
 		}
+		mEmojiMap.clear();
+		mEmojiList.clear();
+		mEmojiLists.clear();
 		ChatEmoji emojEentry;
 		try {
 			for (String str : data) {
@@ -268,7 +271,6 @@ public final class FaceConversionUtil {
 		Matcher m = p.matcher(content);
 		if (handlerCount(content) < 10) {
 			showGifFace(true,m,sb,gifTextView,mContext);
-			
 		} else {
 			showGifFace(false,m,sb,gifTextView,mContext);
 		}
@@ -285,33 +287,33 @@ public final class FaceConversionUtil {
 	 * @param b
 	 */
 	private void showGifFace(boolean show, Matcher m, SpannableString sb, final TextView gifTextView, Context mContext) {
-		InputStream is = null;
 		while (m.find()) {
 			String tempText = m.group();
 			try {
-				String num = tempText.substring("[/".length(), tempText.length()- "]".length());
+				String num = tempText.substring("[/".length(), tempText.length()-"]".length());
 				String gif = "face/gif/" + num + ".gif";
 				/**
 				 * 如果open这里不抛异常说明存在gif，则显示对应的gif
 				 * 否则说明gif找不到，则显示png
 				 * */
-				is = mContext.getAssets().open(gif);
+				InputStream is = mContext.getAssets().open(gif);
 				
 				if (show) {/**显示gif**/
-					sb.setSpan(new AnimatedImageSpan(new AnimatedGifDrawable(is,new AnimatedGifDrawable.UpdateListener() {
+					AnimatedGifDrawable mAnimatedGifDrawable = new AnimatedGifDrawable(is,new AnimatedGifDrawable.UpdateListener() {
 						@Override
 						public void update() {
 							gifTextView.postInvalidate();
 						}
-					})), m.start(), m.end(),
-					Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+					});
+					AnimatedImageSpan mAnimatedImageSpan = new AnimatedImageSpan(mAnimatedGifDrawable,num);
+					sb.setSpan(mAnimatedImageSpan, m.start(), m.end(),Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
 				} else {/**显示静态pic**/
 					Bitmap mBitmap = BitmapFactory.decodeStream(is);
 					// 通过图片资源id来得到bitmap，用一个ImageSpan来包装
 					ImageSpan imageSpan = new ImageSpan(mBitmap);
 					sb.setSpan(imageSpan, m.start(), m.end(),Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
 				}
-
+				is.close();
 			} catch (Exception e) {
 //				String png = tempText.substring("#[".length(),tempText.length() - "]#".length());
 //				try {
@@ -320,14 +322,6 @@ public final class FaceConversionUtil {
 //					// TODO Auto-generated catch block
 //					e1.printStackTrace();
 //				}
-				e.printStackTrace();
-			}
-		}
-		if (is != null) {
-			try {
-				is.close();
-			} catch (IOException e) {
-				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
 		}

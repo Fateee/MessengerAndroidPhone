@@ -47,6 +47,7 @@ import com.yineng.ynmessager.util.TimeUtil;
 import com.yineng.ynmessager.view.SearchChatRecordEditText;
 import com.yineng.ynmessager.view.SearchChatRecordEditText.onCancelSearchAnimationListener;
 import com.yineng.ynmessager.view.SearchChatRecordEditText.onResultListItemCLickListener;
+import com.yineng.ynmessager.view.face.FaceConversionUtil;
 
 public class FindChatRecordActivity extends BaseActivity {
 	private static final int PAGE_SIZE = 20;
@@ -520,14 +521,21 @@ public class FindChatRecordActivity extends BaseActivity {
 //				}
 //			}); 
 			if (entity.getMessage() != null) { 
-				MessageBodyEntity body = JSON.parseObject(entity.getMessage(),
-						MessageBodyEntity.class);
-//				SpannableString spannableString = FaceConversionUtil.getInstace()
-//						.getExpressionString(context, body.getContent());
-				// 对内容做处理
-				SpannableString spannableString = FaceConversionUtil
-						.getInstace().handlerContent(this.context,viewHolder.tvContent,
-						body.getContent());
+				SpannableString  spannableString;
+				if (entity.getSpannableString() != null) {
+					spannableString = entity.getSpannableString();
+				} else {
+					MessageBodyEntity body = JSON.parseObject(entity.getMessage(),
+							MessageBodyEntity.class);
+//					SpannableString spannableString = FaceConversionUtil.getInstace()
+//							.getExpressionString(context, body.getContent());
+					
+					// 对内容做处理
+					spannableString = FaceConversionUtil
+							.getInstace().handlerContent(this.context,viewHolder.tvContent,
+							body.getContent());
+					entity.setSpannableString(spannableString);
+				}
 				viewHolder.tvContent.setText(spannableString);
 			}
 			return convertView;
@@ -545,6 +553,7 @@ public class FindChatRecordActivity extends BaseActivity {
 	@Override
 	protected void onDestroy() {
 		super.onDestroy();
+		mChatMsgAdapter.mMsgList = null;
 		unregisterReceiver(mCommonReceiver);
 	}
 }

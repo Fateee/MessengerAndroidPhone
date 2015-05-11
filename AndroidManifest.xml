@@ -62,6 +62,7 @@
         <activity
             android:name=".activity.groupsession.GroupChatActivity"
             android:configChanges="orientation|keyboardHidden|screenSize"
+            android:windowSoftInputMode="stateHidden|adjustResize"
             android:label="@string/app_name"
             android:launchMode="singleTask" >
         </activity>
@@ -84,6 +85,7 @@
         <activity
             android:name=".activity.dissession.DisChatActivity"
             android:configChanges="orientation|keyboardHidden|screenSize"
+            android:windowSoftInputMode="stateHidden|adjustResize"
             android:label="@string/app_name"
             android:launchMode="singleTask" >
         </activity>

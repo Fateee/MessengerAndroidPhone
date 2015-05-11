@@ -1,7 +1,11 @@
 package com.yineng.ynmessager.activity.session;
 
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
+
 import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.content.BroadcastReceiver;
@@ -13,27 +17,25 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
 import android.support.v4.app.Fragment;
-import android.text.format.DateUtils;
 import android.view.LayoutInflater;
 import android.view.View;
-import android.view.ViewGroup;
 import android.view.View.OnClickListener;
+import android.view.ViewGroup;
 import android.view.animation.Animation;
+import android.view.animation.Animation.AnimationListener;
 import android.view.animation.AnimationUtils;
 import android.view.animation.TranslateAnimation;
-import android.view.animation.Animation.AnimationListener;
 import android.widget.BaseAdapter;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
-
 import android.widget.RelativeLayout;
 import android.widget.TextView;
+
 import com.handmark.pulltorefresh.library.PullToRefreshBase.Mode;
 import com.handmark.pulltorefresh.library.PullToRefreshListView;
 import com.yineng.ynmessager.R;
-
 import com.yineng.ynmessager.app.Const;
 import com.yineng.ynmessager.bean.RecentChat;
 import com.yineng.ynmessager.bean.contact.ContactGroup;
@@ -49,8 +51,8 @@ import com.yineng.ynmessager.util.L;
 import com.yineng.ynmessager.util.TimeUtil;
 import com.yineng.ynmessager.util.ToastUtil;
 import com.yineng.ynmessager.view.SearchContactEditText;
-import com.yineng.ynmessager.view.SwipeListViewItem;
 import com.yineng.ynmessager.view.SearchContactEditText.onCancelSearchAnimationListener;
+import com.yineng.ynmessager.view.SwipeListViewItem;
 import com.yineng.ynmessager.view.SwipeListViewItem.SwipeViewItemOpendListener;
 
 public class SessionFragment extends Fragment implements StatusChangedCallBack, onCancelSearchAnimationListener,
@@ -389,19 +391,19 @@ public class SessionFragment extends Fragment implements StatusChangedCallBack, 
 		public void onReceive(Context context, Intent intent)
 		{
 			String action = intent.getAction();
-			if(Const.BROADCAST_ACTION_CLEAR_SESSION_LIST.equals(action))  //清空会话列表
+			if(Const.BROADCAST_ACTION_CLEAR_SESSION_LIST.equals(action)) // 清空会话列表
 			{
-				mRecentChatDao.deleteAll();  //先清空整个表
-				loadRecentChatByPage(0);  //再加载数据库到UI
+				mRecentChatDao.deleteAll(); // 先清空整个表
+				loadRecentChatByPage(0); // 再加载数据库到UI
 				ToastUtil.toastAlerMessageCenter(SessionFragment.this.getActivity(),
 						getString(R.string.session_clearListDone),2000);
-			}else if(Const.BROADCAST_ACTION_CLEAR_ALL_CHAT_MSG.equals(action))  //清除所有聊天记录
+			}else if(Const.BROADCAST_ACTION_CLEAR_ALL_CHAT_MSG.equals(action)) // 清除所有聊天记录
 			{
 				mGroupChatDao.deleteAll();
 				mDisGroupChatDao.deleteAll();
 				mP2pChatMsgDao.deleteAll();
-				mRecentChatDao.deleteAll();  //先清空整个表
-				loadRecentChatByPage(0);  //再加载数据库到UI
+				mRecentChatDao.deleteAll(); // 先清空整个表
+				loadRecentChatByPage(0); // 再加载数据库到UI
 				ToastUtil.toastAlerMessageCenter(SessionFragment.this.getActivity(),
 						getString(R.string.session_clearAllChatMsgDone),2000);
 			}
@@ -475,6 +477,7 @@ public class SessionFragment extends Fragment implements StatusChangedCallBack, 
 		private Context mContext;
 		private RecentChatDao recentChatDao;
 		private SwipeViewItemOpendListener mOpendListener;
+		private SimpleDateFormat mDateFormat = new SimpleDateFormat(TimeUtil.FORMAT_DATETIME_24);
 
 		public SwipeListviewAdapter(SwipeViewItemOpendListener listener, Context context,
 				LinkedList<RecentChat> sessionDatas)
@@ -546,17 +549,19 @@ public class SessionFragment extends Fragment implements StatusChangedCallBack, 
 			{
 				viewHolder = (ViewHolder)convertView.getTag();
 			}
+
 			final SwipeListViewItem swipeListViewItem = (SwipeListViewItem)convertView;
+
 			swipeListViewItem.setRecentChat(recentChat);
 			swipeListViewItem.setItemOpendListener(mOpendListener);
-			// ???
-			long now = System.currentTimeMillis() / 1000;
-			long time = now - 86400 * 5;
-			String relative = DateUtils.getRelativeTimeSpanString(time,now,DateUtils.WEEK_IN_MILLIS).toString();
-			L.d(TAG,time + "->" + relative);
+
+			// 获取会话中最后一次消息的聊天时间
+			Date date = convertStringDate(recentChat.getDateTime());
+			String relative = TimeUtil.getTimeRelativeFromNow(date);
+			// 转换成与当前时间的关系文字
 			viewHolder.mSessionDateTime.setText(relative);
-			// viewHolder.mSessionDateTime.setText(recentChat.getDateTime());
-			L.d(TAG,"recentChat:" + recentChat.getDateTime());
+			L.d(TAG,"recentChat.getDateTime:" + recentChat.getDateTime());
+
 			if((recentChat.getChatType() == Const.CHAT_TYPE_DIS || recentChat.getChatType() == Const.CHAT_TYPE_GROUP)
 					&& recentChat.getSenderName() != null)
 			{
@@ -686,6 +691,20 @@ public class SessionFragment extends Fragment implements StatusChangedCallBack, 
 			}
 
 			return convertView;
+		}
+
+		private Date convertStringDate(String date)
+		{
+			Date d = null;
+			// 2015-05-08 09:56:58
+			try
+			{
+				d = mDateFormat.parse(date);
+			}catch(ParseException e)
+			{
+				L.e(TAG,e.getMessage(),e);
+			}
+			return d;
 		}
 
 		private final class ViewHolder

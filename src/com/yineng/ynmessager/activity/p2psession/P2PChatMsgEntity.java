@@ -1,5 +1,7 @@
 package com.yineng.ynmessager.activity.p2psession;
 
+import android.text.SpannableString;
+
 public class P2PChatMsgEntity {
 	// 已读和未读标识
 	public static final int IS_READED = 1;
@@ -33,7 +35,11 @@ public class P2PChatMsgEntity {
 	private int isReaded;// 1:已读/0:未读
 	private boolean isShowTime;// UI显示时，指定是否显示时间
 	private String fileId;// 文件id
-
+	/**
+	 * 用于界面显示的文本
+	 */
+	private SpannableString  spannableString;
+	
 	public String getPacketId() {
 		return packetId;
 	}
@@ -112,6 +118,14 @@ public class P2PChatMsgEntity {
 
 	public void setFileId(String fileId) {
 		this.fileId = fileId;
+	}
+
+	public SpannableString getSpannableString() {
+		return spannableString;
+	}
+
+	public void setSpannableString(SpannableString spannableString) {
+		this.spannableString = spannableString;
 	}
 
 }

@@ -1,9 +1,12 @@
-package com.yineng.ynmessager.activity.session;
+package com.yineng.ynmessager.view.face;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 
+import android.app.Activity;
 import android.content.Context;
+import android.content.Intent;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
 import android.support.v4.view.ViewPager;
@@ -15,6 +18,8 @@ import android.view.Gravity;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
+import android.view.WindowManager;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
 import android.widget.EditText;
@@ -22,10 +27,13 @@ import android.widget.GridView;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
+import android.widget.SimpleAdapter;
 
 import com.yineng.ynmessager.R;
+import com.yineng.ynmessager.activity.p2psession.P2PChatActivity;
 import com.yineng.ynmessager.activity.p2psession.ViewPagerAdapter;
 import com.yineng.ynmessager.bean.ChatEmoji;
+import com.yineng.ynmessager.imageloader.ImageLoaderActivity;
 
 /**
  * 
@@ -64,6 +72,13 @@ public class FaceRelativeLayout extends RelativeLayout implements
 
 	/** 当前表情页 */
 	private int current = 0;
+	
+	/**
+	 * 发送图片布局
+	 */
+	private RelativeLayout mUtilLayout;
+	
+	private GridView mUtilGridLayout;
 
 	public FaceRelativeLayout(Context mContext) {
 		super(mContext);
@@ -106,6 +121,7 @@ public class FaceRelativeLayout extends RelativeLayout implements
 	private void onCreate() {
 		initView();
 		initViewPager();
+		initPicSelector();
 		initPoint();
 		initData();
 	}
@@ -114,6 +130,11 @@ public class FaceRelativeLayout extends RelativeLayout implements
 	public void onClick(View v) {
 		switch (v.getId()) {
 		case R.id.btn_face:
+			hideSoftInputView();//隐藏软键盘
+			//隐藏图片选择框
+			if (mUtilLayout.isShown()) {
+				mUtilLayout.setVisibility(View.GONE);
+			}
 			// 隐藏表情选择框
 			if (mView.getVisibility() == View.VISIBLE) {
 				mView.setVisibility(View.GONE);
@@ -126,8 +147,24 @@ public class FaceRelativeLayout extends RelativeLayout implements
 			if (mView.getVisibility() == View.VISIBLE) {
 				mView.setVisibility(View.GONE);
 			}
+			//隐藏图片选择框
+			if (mUtilLayout.isShown()) {
+				mUtilLayout.setVisibility(View.GONE);
+			}
 			break;
-
+		case R.id.btn_select:
+			hideSoftInputView();//隐藏软键盘
+			// 隐藏表情选择框
+			if (mView.getVisibility() == View.VISIBLE) {
+				mView.setVisibility(View.GONE);
+			}
+			//隐藏图片选择框
+			if (mUtilLayout.isShown()) {
+				mUtilLayout.setVisibility(View.GONE);
+			} else {
+				mUtilLayout.setVisibility(View.VISIBLE);
+			}
+			break;
 		}
 	}
 
@@ -135,9 +172,12 @@ public class FaceRelativeLayout extends RelativeLayout implements
 	 * 隐藏表情选择框
 	 */
 	public boolean hideFaceView() {
-		// 隐藏表情选择框
-		if (mView.getVisibility() == View.VISIBLE) {
+		hideSoftInputView();//隐藏软键盘
+		// 隐藏表情选择框图片选择框、图片选择框
+		if (mView.getVisibility() == View.VISIBLE
+				|| mUtilLayout.isShown()) {
 			mView.setVisibility(View.GONE);
+			mUtilLayout.setVisibility(View.GONE);
 			return true;
 		}
 		return false;
@@ -152,8 +192,10 @@ public class FaceRelativeLayout extends RelativeLayout implements
 		mLayoutPoint = (LinearLayout) findViewById(R.id.iv_image);
 		mSendMessageET.setOnClickListener(this);
 		findViewById(R.id.btn_face).setOnClickListener(this);
+		findViewById(R.id.btn_select).setOnClickListener(this);
 		mView = findViewById(R.id.ll_facechoose);
-
+		mUtilLayout = (RelativeLayout) findViewById(R.id.ll_utilchoose);
+		mUtilGridLayout = (GridView) findViewById(R.id.gv_choose_grid_layout);
 	}
 
 	/**
@@ -197,6 +239,44 @@ public class FaceRelativeLayout extends RelativeLayout implements
 		mPageViewList.add(nullView2);
 	}
 
+	/**
+	 * 初始化图片选择器按钮
+	 */
+	private void initPicSelector() {
+		int[] mImagesArray = new int[] { R.drawable.imageloader_pic_dir };
+		String[] strSubFunctionName = new String[] { "发送图片" };
+		ArrayList<HashMap<String, Object>> lstImageItem = new ArrayList<HashMap<String, Object>>();
+		for (int i = 0; i < strSubFunctionName.length; i++) {
+			HashMap<String, Object> map = new HashMap<String, Object>();
+			map.put("itemImage", mImagesArray[i]);
+			map.put("itemText", strSubFunctionName[i]);
+			lstImageItem.add(map);
+		}
+		SimpleAdapter saImageItems = new SimpleAdapter(mContext, lstImageItem,// 数据源
+				R.layout.chat_bottom_grid_item,// 显示布局
+				new String[] { "itemImage", "itemText" }, new int[] {
+						R.id.select_Image_item, R.id.select_text_item });
+		mUtilGridLayout.setAdapter(saImageItems);
+		
+		mUtilGridLayout.setOnItemClickListener(new OnItemClickListener() {
+			@Override
+			public void onItemClick(AdapterView<?> arg0, View arg1, int arg2,
+					long arg3) {
+				switch (arg2) {
+				case 0:
+					// 点击跳转图片选择器
+					Intent intent = new Intent(mContext,
+							ImageLoaderActivity.class);
+					mContext.startActivity(intent);
+					break;
+
+				default:
+					break;
+				}
+			}
+		});
+	}
+	
 	/**
 	 * 初始化游标
 	 */
@@ -305,5 +385,17 @@ public class FaceRelativeLayout extends RelativeLayout implements
 			mSendMessageET.append(spannableString);
 		}
 
+	}
+	
+	//隐藏键盘
+	public void hideSoftInputView() {
+		InputMethodManager manager = ((InputMethodManager) mContext
+				.getSystemService(Activity.INPUT_METHOD_SERVICE));
+		if (((Activity) mContext).getWindow().getAttributes().softInputMode != WindowManager.LayoutParams.SOFT_INPUT_STATE_HIDDEN) {
+			if (((Activity) mContext).getCurrentFocus() != null)
+				manager.hideSoftInputFromWindow(((Activity) mContext)
+						.getCurrentFocus().getWindowToken(),
+						InputMethodManager.HIDE_NOT_ALWAYS);
+		}
 	}
 }

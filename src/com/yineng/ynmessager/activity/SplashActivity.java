@@ -14,7 +14,6 @@ import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 
 import com.yineng.ynmessager.R;
-import com.yineng.ynmessager.activity.session.FaceConversionUtil;
 import com.yineng.ynmessager.app.Const;
 import com.yineng.ynmessager.manager.NoticesManager;
 import com.yineng.ynmessager.service.XmppConnService;
@@ -22,6 +21,7 @@ import com.yineng.ynmessager.sharedpreference.LastLoginUserSP;
 import com.yineng.ynmessager.util.L;
 import com.yineng.ynmessager.util.PreferenceUtils;
 import com.yineng.ynmessager.view.ScrollLayout;
+import com.yineng.ynmessager.view.face.FaceConversionUtil;
 
 public class SplashActivity extends BaseActivity implements
 		OnSplashViewChangeListener {

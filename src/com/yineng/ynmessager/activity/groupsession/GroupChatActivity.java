@@ -9,7 +9,6 @@ import java.util.List;
 import org.jivesoftware.smack.packet.Message;
 import org.jivesoftware.smack.packet.Message.Type;
 
-import android.R.integer;
 import android.app.AlarmManager;
 import android.app.PendingIntent;
 import android.content.BroadcastReceiver;
@@ -21,8 +20,10 @@ import android.os.Handler;
 import android.text.SpannableString;
 import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.View.OnClickListener;
+import android.view.View.OnTouchListener;
 import android.view.ViewGroup;
 import android.widget.AbsListView;
 import android.widget.AbsListView.OnScrollListener;
@@ -45,7 +46,6 @@ import com.handmark.pulltorefresh.library.PullToRefreshListView;
 import com.yineng.ynmessager.R;
 import com.yineng.ynmessager.activity.BaseActivity;
 import com.yineng.ynmessager.activity.p2psession.P2PChatMsgEntity;
-import com.yineng.ynmessager.activity.session.FaceConversionUtil;
 import com.yineng.ynmessager.app.Const;
 import com.yineng.ynmessager.bean.RecentChat;
 import com.yineng.ynmessager.bean.contact.ContactGroup;
@@ -53,8 +53,8 @@ import com.yineng.ynmessager.bean.contact.User;
 import com.yineng.ynmessager.bean.groupsession.GroupChatMsgEntity;
 import com.yineng.ynmessager.bean.p2psession.MessageBodyEntity;
 import com.yineng.ynmessager.db.ContactOrgDao;
-import com.yineng.ynmessager.db.dao.RecentChatDao;
 import com.yineng.ynmessager.db.dao.GroupChatDao;
+import com.yineng.ynmessager.db.dao.RecentChatDao;
 import com.yineng.ynmessager.imageloader.ImageLoaderActivity;
 import com.yineng.ynmessager.manager.NoticesManager;
 import com.yineng.ynmessager.manager.XmppConnectionManager;
@@ -68,6 +68,8 @@ import com.yineng.ynmessager.smack.ReqIQResult;
 import com.yineng.ynmessager.util.JIDUtil;
 import com.yineng.ynmessager.util.L;
 import com.yineng.ynmessager.util.TimeUtil;
+import com.yineng.ynmessager.view.face.FaceConversionUtil;
+import com.yineng.ynmessager.view.face.FaceRelativeLayout;
 
 /**
  * 
@@ -80,9 +82,6 @@ public class GroupChatActivity extends BaseActivity implements OnClickListener, 
 	private RecentChatDao mRecentChatDao;// 消息列表操作
 	private Context mContext;
 	private TextView mUnReadTV;
-	private RelativeLayout mUtilLayout;
-	private GridView mUtilGridLayout;
-	private ImageView mSelectIV;
 	private Button mSendBtn;
 	private XmppConnectionManager mXmppConnManager;
 	private EditText mEditContentET;
@@ -94,8 +93,6 @@ public class GroupChatActivity extends BaseActivity implements OnClickListener, 
 	private AlarmManager mAlarmManager;
 	private ReceiptBroadcastReceiver mReceiptBroadcastReceiver;
 	private static final String RECEIPT_BROADCAST = "receipt_broadcast";// 回执广播
-	private int mImagesArray[] = null;// 下拉布局中图片选择按钮、其他按钮的图标数组
-	private String strSubFunctionName[] = null;// 子功能名称
 	private ReceiptThread mReceiptThread;
 	private ReceipMessageQueue mReceipMessageQueue = new ReceipMessageQueue();// 回执消息处理队列
 	private LinkedList<GroupChatMsgEntity> mMessageList = new LinkedList<GroupChatMsgEntity>();
@@ -183,9 +180,6 @@ public class GroupChatActivity extends BaseActivity implements OnClickListener, 
 //		mGroupTitleTV = (TextView) findViewById(R.id.tv_create_disgroup_title);
 //		mGroupTitleTV.setText(mGroupName);
 		mUnReadTV = (TextView) findViewById(R.id.tv_p2p_chat_tips);
-		mSelectIV = (ImageView) findViewById(R.id.btn_select);
-		mUtilLayout = (RelativeLayout) findViewById(R.id.ll_utilchoose);
-		mUtilGridLayout = (GridView) findViewById(R.id.gv_choose_grid_layout);
 		mSendBtn = (Button) findViewById(R.id.btn_send);
 		mEditContentET = (EditText) findViewById(R.id.et_sendmessage);
 		mPullToRefreshListView = (PullToRefreshListView) findViewById(R.id.chat_pull_refresh_list);
@@ -198,27 +192,12 @@ public class GroupChatActivity extends BaseActivity implements OnClickListener, 
 		mReceiptBroadcastReceiver = new ReceiptBroadcastReceiver();
 		IntentFilter filter = new IntentFilter(RECEIPT_BROADCAST);
 		registerReceiver(mReceiptBroadcastReceiver, filter);
-		FaceConversionUtil.getInstace().getFileText(getApplication());
+//		FaceConversionUtil.getInstace().getFileText(getApplication());
 		mGroupChatDao= new GroupChatDao(mContext);
 		mRecentChatDao = new RecentChatDao(this);
 
-		// 初始化图片选择器按钮
 		mAdapter = new GroupChatMsgAdapter(this);
 		mListView.setAdapter(mAdapter);
-		mImagesArray = new int[] { R.drawable.imageloader_pic_dir };
-		strSubFunctionName = new String[] { "发送图片" };
-		ArrayList<HashMap<String, Object>> lstImageItem = new ArrayList<HashMap<String, Object>>();
-		for (int i = 0; i < strSubFunctionName.length; i++) {
-			HashMap<String, Object> map = new HashMap<String, Object>();
-			map.put("itemImage", mImagesArray[i]);
-			map.put("itemText", strSubFunctionName[i]);
-			lstImageItem.add(map);
-		}
-		SimpleAdapter saImageItems = new SimpleAdapter(this, lstImageItem,// 数据源
-				R.layout.chat_bottom_grid_item,// 显示布局
-				new String[] { "itemImage", "itemText" }, new int[] {
-						R.id.select_Image_item, R.id.select_text_item });
-		mUtilGridLayout.setAdapter(saImageItems);
 
 		// 消息发送线程，回执处理线程
 		mReceiptThread = new ReceiptThread();
@@ -274,24 +253,6 @@ public class GroupChatActivity extends BaseActivity implements OnClickListener, 
 
 	private void initEvent() {
 		mSendBtn.setOnClickListener(this);
-		mSelectIV.setOnClickListener(this);
-		mUtilGridLayout.setOnItemClickListener(new OnItemClickListener() {
-			@Override
-			public void onItemClick(AdapterView<?> arg0, View arg1, int arg2,
-					long arg3) {
-				switch (arg2) {
-				case 0:
-					// 点击跳转图片选择器
-					Intent intent = new Intent(GroupChatActivity.this,
-							ImageLoaderActivity.class);
-					startActivityForResult(intent, 0);
-					break;
-
-				default:
-					break;
-				}
-			}
-		});
 
 		mPullToRefreshListView.setOnRefreshListener(new OnRefreshListener<ListView>() {
 
@@ -334,6 +295,16 @@ public class GroupChatActivity extends BaseActivity implements OnClickListener, 
 			@Override
 			public void onScroll(AbsListView view, int firstVisibleItem,
 					int visibleItemCount, int totalItemCount) {
+			}
+		});
+		
+		mListView.setOnTouchListener(new OnTouchListener() {
+			@Override
+			public boolean onTouch(View arg0, MotionEvent arg1) {
+				if(arg1.getAction()==MotionEvent.ACTION_DOWN){
+					((FaceRelativeLayout) findViewById(R.id.FaceRelativeLayout)).hideFaceView();
+				}
+				return false;
 			}
 		});
 		addGroupUpdatedListener();
@@ -393,9 +364,19 @@ public class GroupChatActivity extends BaseActivity implements OnClickListener, 
 //		}
 //	}
 	
+	@Override
+	public void onBackPressed() {
+		if (((FaceRelativeLayout) findViewById(R.id.FaceRelativeLayout))
+				.hideFaceView()) {
+			return;
+		}
+		super.onBackPressed();
+	}
+	
 	public void onTitleViewClickListener(View v) {
 		switch (v.getId()) {
 		case R.id.chat_common_title_view_back:
+			((FaceRelativeLayout) findViewById(R.id.FaceRelativeLayout)).hideFaceView();
 			finish();
 			break;
 		case R.id.chat_common_title_view_infomation:
@@ -518,13 +499,6 @@ public class GroupChatActivity extends BaseActivity implements OnClickListener, 
 		switch (v.getId()) {
 		case R.id.btn_send:
 			clickSend();
-			break;
-		case R.id.btn_select:
-			if (mUtilLayout.isShown()) {
-				mUtilLayout.setVisibility(View.GONE);
-			} else {
-				mUtilLayout.setVisibility(View.VISIBLE);
-			}
 			break;
 
 		}
@@ -871,14 +845,21 @@ public class GroupChatActivity extends BaseActivity implements OnClickListener, 
 				}
 			}); 
 			if (entity.getMessage() != null) { 
-				MessageBodyEntity body = JSON.parseObject(entity.getMessage(),
-						MessageBodyEntity.class);
-//				SpannableString spannableString = FaceConversionUtil.getInstace()
-//						.getExpressionString(context, body.getContent());
-				// 对内容做处理
-				SpannableString spannableString = FaceConversionUtil
-						.getInstace().handlerContent(this.context,viewHolder.tvContent,
-						body.getContent());
+				SpannableString  spannableString;
+				if (viewHolder.tvSendTime.getTag() != null) {
+					spannableString = (SpannableString) viewHolder.tvSendTime.getTag();
+				} else {
+					MessageBodyEntity body = JSON.parseObject(entity.getMessage(),
+							MessageBodyEntity.class);
+//					SpannableString spannableString = FaceConversionUtil.getInstace()
+//							.getExpressionString(context, body.getContent());
+					
+					// 对内容做处理
+					spannableString = FaceConversionUtil
+							.getInstace().handlerContent(this.context,viewHolder.tvContent,
+							body.getContent());
+					viewHolder.tvSendTime.setTag(spannableString);
+				}
 				viewHolder.tvContent.setText(spannableString);
 			}
 			return convertView;

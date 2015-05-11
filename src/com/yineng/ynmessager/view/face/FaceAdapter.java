@@ -1,4 +1,4 @@
-package com.yineng.ynmessager.activity.session;
+package com.yineng.ynmessager.view.face;
 
 import java.io.IOException;
 import java.util.List;

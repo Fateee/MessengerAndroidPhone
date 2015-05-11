@@ -7,6 +7,14 @@
     <!-- 公共文字 -->
     <string name="common_offline_notice_title">下线通知</string>
     <string name="common_offline_notice_msg">您的账号已在其他手机上登录，如非本人操作，则密码可能已泄露，建议请尽快在PC端YNmessenger设置中修改密码。</string>
+    <string name="common_monday">星期一</string>
+    <string name="common_tuesday">星期二</string>
+    <string name="common_wednesday">星期三</string>
+    <string name="common_thursday">星期四</string>
+    <string name="common_friday">星期五</string>
+    <string name="common_saturday">星期六</string>
+    <string name="common_sunday">星期天</string>
+    
     <!-- main界面 -->
     <string name="main_tabitem_home">主页</string>
     <string name="main_tabitem_organization">联系人</string>
@@ -44,6 +52,8 @@
     <string name="session_clearListDone">已完成清除消息列表</string>
     <string name="session_clearAllChatMsgDone">已完成清除所有聊天记录</string>
     <string name="session_clearCacheDone">已完成清除缓存</string>
+    <string name="session_yesterday">昨天</string>
+    
     <string name="pull_to_refresh_pull_label">下拉刷新</string>
     <string name="pull_to_refresh_release_label">松开加载</string>
     <string name="pull_to_refresh_refreshing_label">正在载入</string>

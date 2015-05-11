@@ -31,12 +31,8 @@ import android.widget.TextView;
 
 import com.alibaba.fastjson.JSON;
 import com.yineng.ynmessager.R;
-import com.yineng.ynmessager.activity.contact.ContactPersonInfoActivity;
 import com.yineng.ynmessager.activity.p2psession.P2PChatMsgEntity;
-import com.yineng.ynmessager.activity.session.FaceConversionUtil;
 import com.yineng.ynmessager.app.Const;
-import com.yineng.ynmessager.app.ContactActivityManager;
-import com.yineng.ynmessager.bean.contact.OrganizationTree;
 import com.yineng.ynmessager.bean.contact.User;
 import com.yineng.ynmessager.bean.groupsession.GroupChatMsgEntity;
 import com.yineng.ynmessager.bean.p2psession.MessageBodyEntity;
@@ -45,6 +41,7 @@ import com.yineng.ynmessager.db.P2PChatMsgDao;
 import com.yineng.ynmessager.db.dao.DisGroupChatDao;
 import com.yineng.ynmessager.db.dao.GroupChatDao;
 import com.yineng.ynmessager.util.TimeUtil;
+import com.yineng.ynmessager.view.face.FaceConversionUtil;
 
 public class SearchChatRecordEditText extends Dialog implements
 		OnFocusChangeListener, TextWatcher {
@@ -438,14 +435,29 @@ public class SearchChatRecordEditText extends Dialog implements
 			mViewHolder.mFindChatRecordUserNameTV.setText(mChatName);
 			mViewHolder.mFindChatRecordMsgDateTV.setText(TimeUtil.getDateByMillisecond(mChatDate, TimeUtil.FORMAT_DATETIME_24));
 			if (mChatContent != null) { 
-				MessageBodyEntity body = JSON.parseObject(mChatContent,
-						MessageBodyEntity.class);
-//				SpannableString spannableString = FaceConversionUtil.getInstace()
-//						.getExpressionString(nContext, body.getContent());
-				// 对内容做处理
-				SpannableString spannableString = FaceConversionUtil
-						.getInstace().handlerContent(nContext,mViewHolder.mFindChatRecordMsgContentTV,
-						body.getContent());
+//				MessageBodyEntity body = JSON.parseObject(mChatContent,
+//						MessageBodyEntity.class);
+////				SpannableString spannableString = FaceConversionUtil.getInstace()
+////						.getExpressionString(nContext, body.getContent());
+//				// 对内容做处理
+//				SpannableString spannableString = FaceConversionUtil
+//						.getInstace().handlerContent(nContext,mViewHolder.mFindChatRecordMsgContentTV,
+//						body.getContent());
+//				mViewHolder.mFindChatRecordMsgContentTV.setText(spannableString);
+//				
+				SpannableString  spannableString;
+				if (mViewHolder.mFindChatRecordMsgContentTV.getTag() != null) {
+					spannableString = (SpannableString) mViewHolder.mFindChatRecordMsgContentTV.getTag();
+				} else {
+					MessageBodyEntity body = JSON.parseObject(mChatContent,
+							MessageBodyEntity.class);
+					
+					// 对内容做处理
+					spannableString = FaceConversionUtil
+							.getInstace().handlerContent(nContext,mViewHolder.mFindChatRecordMsgContentTV,
+							body.getContent());
+					mViewHolder.mFindChatRecordMsgContentTV.setTag(spannableString);
+				}
 				mViewHolder.mFindChatRecordMsgContentTV.setText(spannableString);
 			}
 			return convertView;
