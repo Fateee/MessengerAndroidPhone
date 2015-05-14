@@ -268,7 +268,8 @@ public class TimeUtil
 
 		if(DateUtils.isToday(weekFromToday[0])) // 判断是否为今天
 		{
-			relative = calendar.get(Calendar.HOUR_OF_DAY) + ":" + calendar.get(Calendar.MINUTE);
+			String timeDisplay[] = betterTimeDisplay(calendar.get(Calendar.HOUR_OF_DAY),calendar.get(Calendar.MINUTE));
+			relative = timeDisplay[0] + ":" + timeDisplay[1];
 		}else if(DateUtils.isToday(weekFromToday[1])) // 是否为昨天
 		{
 			relative = context.getString(R.string.session_yesterday);
@@ -310,8 +311,7 @@ public class TimeUtil
 					relative = "";
 					break;
 			}
-		}else
-		// 超出一周以外的
+		}else  // 超出一周以外的
 		{
 			relative = calendar.get(Calendar.YEAR) + "-" + (calendar.get(Calendar.MONTH) + 1) + "-"
 					+ calendar.get(Calendar.DAY_OF_MONTH);

@@ -156,6 +156,11 @@ public class DisAddActivity extends BaseActivity implements /*ReceiveReqIQCallBa
 	 *
 	 */
 	private LinkedList<OrganizationTree> mGuideList = new LinkedList<OrganizationTree>();
+	
+	/**
+	 * 用于判断群组、讨论组层次
+	 */
+	private LinkedList<ContactGroup> mGroupGuideList = new LinkedList<ContactGroup>();
 	/**
 	 * mNewAddUserList:创建讨论组时选择的用户
 	 * 
@@ -780,7 +785,11 @@ public class DisAddActivity extends BaseActivity implements /*ReceiveReqIQCallBa
 									}
 									break;
 								case 1:// 群
-
+									ContactGroup tempGroup = new ContactGroup();
+									tempGroup.setGroupName("0");
+									tempGroup.setNaturalName("群组");
+									tempGroup.setGroupType(Const.CONTACT_GROUP_TYPE);
+									addGroupGuideList(tempGroup);
 									List<ContactGroup> list2 = mContactOrgDao
 											.queryGroupList(8);
 									if (list2 != null && !list2.isEmpty()) {
@@ -790,8 +799,13 @@ public class DisAddActivity extends BaseActivity implements /*ReceiveReqIQCallBa
 										}
 										notifyDataSetChanged();
 									}
-									break;// 讨论组
-								case 2:
+									break;
+								case 2:// 讨论组
+									ContactGroup tempDisGroup = new ContactGroup();
+									tempDisGroup.setGroupName("0");
+									tempDisGroup.setNaturalName("讨论组");
+									tempDisGroup.setGroupType(Const.CONTACT_DISGROUP_TYPE);
+									addGroupGuideList(tempDisGroup);
 									List<ContactGroup> list3 = mContactOrgDao
 											.queryGroupList(9);
 									if (list3 != null && !list3.isEmpty()) {
@@ -811,16 +825,43 @@ public class DisAddActivity extends BaseActivity implements /*ReceiveReqIQCallBa
 			}
 
 			if (tempResultObject instanceof ContactGroup) {// 群组
+				viewHolder.llContactItemOrg.setVisibility(View.VISIBLE);
 				ContactGroup bean = (ContactGroup) tempResultObject;
+				if (bean.getGroupType() == 8) { // 群组
+					viewHolder.tvContactItemOrgName.setText(bean.getNaturalName());
+				} else { // 讨论组
+					if (bean.getSubject() != null && !bean.getSubject().isEmpty()) {
+						viewHolder.tvContactItemOrgName.setText(bean.getSubject());
+					} else {
+						viewHolder.tvContactItemOrgName.setText(bean.getNaturalName());
+					}
+				}
 				List<User> list = mContactOrgDao.queryUsersByGroupName(
 						bean.getGroupName(), bean.getGroupType());
-				if (list != null && !list.isEmpty()) {
-					mCurrentObjectList.clear();
-					for (User entity : list) {
-						mCurrentObjectList.add(entity);
-					}
-					notifyDataSetChanged();
+				int mUserCount = 0;
+				if (list != null) {
+					mUserCount = list.size();// 总人数
 				}
+				viewHolder.tvContactItemOrgCount.setText(mUserCount + "");
+				viewHolder.llContactItemOrg.setTag(bean);
+				viewHolder.llContactItemOrg.setOnClickListener(new OnClickListener() {
+					
+					@Override
+					public void onClick(View v) {
+						ContactGroup tempBean = (ContactGroup) v.getTag();
+						addGroupGuideList(tempBean);
+						List<User> list = mContactOrgDao.queryUsersByGroupName(
+								tempBean.getGroupName(), tempBean.getGroupType());
+						if (list != null && !list.isEmpty()) {
+							mCurrentObjectList.clear();
+							for (User entity : list) {
+								mCurrentObjectList.add(entity);
+							}
+							updateCurrentObjectList(mNewAddUserList,mOldUserList,mCurrentObjectList);
+							notifyDataSetChanged();
+						}
+					}
+				});
 			}
 			return convertView;
 		}
@@ -859,6 +900,13 @@ public class DisAddActivity extends BaseActivity implements /*ReceiveReqIQCallBa
 		private void addGuideList(OrganizationTree entity) {
 			mGuideList.add(entity);
 		}
+		
+		/**
+		 * @param tempGroup
+		 */
+		protected void addGroupGuideList(ContactGroup tempGroup) {
+			mGroupGuideList.add(tempGroup);
+		}
 
 		class ViewHolder {
 			public TextView tvContactItemPersonName;
@@ -882,20 +930,67 @@ public class DisAddActivity extends BaseActivity implements /*ReceiveReqIQCallBa
 		}
 	}
 
+	private int removeGroupGuideLastItem() {
+		if (!mGroupGuideList.isEmpty()) {
+			return mGroupGuideList.removeLast().getGroupType();
+		}
+		return 0;
+	}
+	
+	/**
+	 * 
+	 */
 	private void back() {
-		removeGuidLastOne();
-		if (!mGuideList.isEmpty()) {
-			updateCurrentObjectList(getCurrentOrgNum());
-			mHandler.sendEmptyMessage(REFRESH_LIST_UI);
-			isRootList = false;
-		} else {
-			if (!isRootList) {
-				showRootListUI();
-				isRootList = true;
+		if (isFinishAcitivity) {
+			removeGuidLastOne();
+			if (!mGuideList.isEmpty()) {
+				updateCurrentObjectList(getCurrentOrgNum());
+				mHandler.sendEmptyMessage(REFRESH_LIST_UI);
+				isRootList = false;
 			} else {
-				finish();
+				if (!isRootList) {
+					showRootListUI();
+					isRootList = true;
+				} else {
+					finish();
+				}
+			}
+		} else {
+			int groupType = removeGroupGuideLastItem();
+			if (!mGroupGuideList.isEmpty()) {
+				if (groupType != 0) {
+					List<ContactGroup> list3 = mContactOrgDao.queryGroupList(groupType);
+					if (list3 != null && !list3.isEmpty()) {
+						mCurrentObjectList.clear();
+						for (ContactGroup entity3 : list3) {
+							mCurrentObjectList.add(entity3);
+						}
+					}
+					mHandler.sendEmptyMessage(REFRESH_LIST_UI);
+					isRootList = false;
+				}
+			} else {
+				if (!isRootList) {
+					showRootListUI();
+					isRootList = true;
+				} else {
+					finish();
+				}
 			}
 		}
+//		removeGuidLastOne();
+//		if (!mGuideList.isEmpty()) {
+//			updateCurrentObjectList(getCurrentOrgNum());
+//			mHandler.sendEmptyMessage(REFRESH_LIST_UI);
+//			isRootList = false;
+//		} else {
+//			if (!isRootList) {
+//				showRootListUI();
+//				isRootList = true;
+//			} else {
+//				finish();
+//			}
+//		}
 	}
 
 	@Override

@@ -178,7 +178,7 @@
                     android:inputType="text"
                     android:maxLines="1"
                     android:singleLine="true"
-                    android:text="10.6.24.133"
+                    android:text="10.6.0.49"
                     android:textSize="@dimen/login_editer_textsize" />
 
                 <!--

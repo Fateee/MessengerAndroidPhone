@@ -2,6 +2,9 @@ package com.yineng.ynmessager.bean;
 
 import java.io.Serializable;
 
+import com.yineng.ynmessager.R;
+import com.yineng.ynmessager.app.AppController;
+
 /**
  * 最近会话列表实体类
  * 
@@ -10,6 +13,8 @@ import java.io.Serializable;
  */
 public class RecentChat implements Serializable {
 	private static final long serialVersionUID = 1L;
+	public static final String DRAFT_PREFIX = AppController.getInstance().getString(R.string.session_draftPrefix);
+	
 	private int Id;// Id
 	private String userNo;//
 	private String title;// 主题
@@ -22,6 +27,7 @@ public class RecentChat implements Serializable {
 	private String headLocalPath;// 本地路径
 	private int unReadCount; // 未读条数
 	private int isTop;// 是否置顶 1：置顶，0：不置顶
+	private String draft;
 
 	public String getUserNo() {
 		return userNo;
@@ -142,5 +148,15 @@ public class RecentChat implements Serializable {
 	public int hashCode() {
 		return this.userNo.hashCode()
 				+ Integer.valueOf(this.chatType).hashCode();
+	}
+
+	public String getDraft()
+	{
+		return draft;
+	}
+
+	public void setDraft(String draft)
+	{
+		this.draft = draft;
 	}
 }

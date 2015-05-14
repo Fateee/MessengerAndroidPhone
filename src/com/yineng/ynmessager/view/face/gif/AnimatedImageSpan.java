@@ -1,7 +1,7 @@
 package com.yineng.ynmessager.view.face.gif;
 
 
-import com.yineng.ynmessager.util.L;
+
 
 import android.graphics.Canvas;
 import android.graphics.Paint;
@@ -15,7 +15,7 @@ public class AnimatedImageSpan extends DynamicDrawableSpan {
     private Drawable mDrawable;
 	private Handler mHandler;
 	private Runnable mRunnable;
-	private boolean isBitmapStatic = false;
+	private boolean isBitmapRun = true;
     public AnimatedImageSpan(Drawable d, final String num) {
         super();
         mDrawable = d;
@@ -23,12 +23,11 @@ public class AnimatedImageSpan extends DynamicDrawableSpan {
         mHandler = new Handler();
         mRunnable = new Runnable() {
             public void run() {
-            	if (!isBitmapStatic) {
+            	if (isBitmapRun) {
                     ((AnimatedGifDrawable)mDrawable).nextFrame();
                     // Set next with a delay depending on the duration for this frame 
                     mHandler.postDelayed(this, ((AnimatedGifDrawable)mDrawable).getFrameDuration());
 				}
-//            	L.e("mHandler : "+num);
             }
         };
         mHandler.post(mRunnable);
@@ -92,8 +91,8 @@ public class AnimatedImageSpan extends DynamicDrawableSpan {
 	 * 让gif动起来
 	 */
 	public void runGifImg(){
-		if (isBitmapStatic) {
-			isBitmapStatic = false;
+		if (!isBitmapRun) {
+			isBitmapRun = true;
 			mHandler.post(mRunnable);
 		}
 	}
@@ -102,7 +101,7 @@ public class AnimatedImageSpan extends DynamicDrawableSpan {
 	 * 让gif暂停，防止后台线程一直执行
 	 */
 	public void pauseGifImg(){
-		isBitmapStatic = true;
+		isBitmapRun = false;
 	}
 }
 

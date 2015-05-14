@@ -43,6 +43,7 @@
             android:layout_toLeftOf="@id/iv_userhead"
             android:background="@drawable/chatto_bg"
             android:clickable="true"
+            android:longClickable="true"
             android:focusable="true"
             android:gravity="left|center"
             android:lineSpacingExtra="2dp"

@@ -36,10 +36,16 @@ public class P2PChatMsgDao {
 	/**
 	 * 清空表数据
 	 */
-	public void deleteAll()
+	public int deleteAll()
 	{
 		SQLiteDatabase db = mDBHelper.getWritableDatabase();
-		db.delete(mTable,null,null);
+		return db.delete(mTable,null,null);
+	}
+	
+	public int deleteByPacketId(String packetId)
+	{
+		SQLiteDatabase db = mDBHelper.getWritableDatabase();
+		return db.delete(mTable,"packetId=?",new String[]{packetId});
 	}
 	
 	private boolean IsExists(String id, SQLiteDatabase db) {

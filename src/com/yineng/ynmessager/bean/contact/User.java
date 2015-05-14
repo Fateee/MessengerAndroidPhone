@@ -16,7 +16,7 @@ public class User implements Parcelable
 	private String signature;// 签名
 	private int userType;// 用户类型
 	private int removeTag;// 删除标志 0-有效 1-无效
-	private int userStatus = 0; // 默认0：离线 1：在线
+	private int userStatus = 0; // 默认0：离线 1：在线  2:android手机在线 3：ios手机在线  4：pc在线 5：pc手机都在线
 	private boolean isSelected = false;// 是否选中
 	private boolean isExited = false;// 用户是否已存在讨论组中
 	private String sortLetters; // 显示数据拼音的首字母

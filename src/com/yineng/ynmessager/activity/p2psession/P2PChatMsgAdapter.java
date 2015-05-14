@@ -15,7 +15,6 @@ import android.widget.TextView;
 import com.alibaba.fastjson.JSON;
 import com.yineng.ynmessager.R;
 import com.yineng.ynmessager.bean.p2psession.MessageBodyEntity;
-import com.yineng.ynmessager.util.L;
 import com.yineng.ynmessager.util.TimeUtil;
 import com.yineng.ynmessager.view.face.FaceConversionUtil;
 
@@ -52,7 +51,7 @@ public class P2PChatMsgAdapter extends BaseAdapter {
 	}
 
 	@Override
-	public Object getItem(int position) {
+	public P2PChatMsgEntity  getItem(int position) {
 		return coll.get(position);
 	}
 
@@ -79,7 +78,7 @@ public class P2PChatMsgAdapter extends BaseAdapter {
 
 	@Override
 	public View getView(int position, View convertView, ViewGroup parent) {
-		P2PChatMsgEntity entity = coll.get(position);
+		final P2PChatMsgEntity entity = coll.get(position);
 		ViewHolder viewHolder = null;
 		if (convertView == null) {
 			if (entity.getIsSend() == P2PChatMsgEntity.COM_MSG) {
@@ -141,6 +140,7 @@ public class P2PChatMsgAdapter extends BaseAdapter {
 				}
 			}
 		});
+		
 		if (entity.getMessage() != null) {
 			SpannableString  spannableString;
 //			L.e("getview == "+viewHolder.tvSendTime.getTag());

@@ -44,6 +44,7 @@
         android:layout_marginLeft="14dp"
         android:background="@drawable/chatfrom_bg"
         android:clickable="true"
+        android:longClickable="true"
         android:focusable="true"
         android:gravity="left|center"
         android:lineSpacingExtra="2dp"

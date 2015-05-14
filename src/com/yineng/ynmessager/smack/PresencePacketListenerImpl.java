@@ -43,15 +43,12 @@ public class PresencePacketListenerImpl implements PacketListener {
 	private LinkedList<ContactGroupUser> mGroupMemberAccountQueue = new LinkedList<ContactGroupUser>();
 	private LinkedList<ContactGroupUser> mDisGroupMemberAccountQueue= new LinkedList<ContactGroupUser>();
 	private groupCreatedListener mGroupCreatedListener;
-//	private AddGroupMemberThread mAddGroupMemberThread = null;
-//	private int mGroupExisted;
 	
 	public PresencePacketListenerImpl(Context mContext) {
 		mXmppConnManager = XmppConnectionManager.getInstance();
 		mContactOrgDao = new ContactOrgDao(mContext);
 		mRecentChatDao = new RecentChatDao(mContext);
 		mDisGroupChatDao = new DisGroupChatDao(mContext);
-//		mXmppConnManager.addReceiveReqIQCallBack(Const.REQ_IQ_XMLNS_GET_GROUP,PresencePacketListenerImpl.this);
 		this.mContext = mContext;
 	}
 

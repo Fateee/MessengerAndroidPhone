@@ -195,11 +195,12 @@ public class NoticesManager
 	{
 		boolean isAppRunning = false;
 		List<RunningTaskInfo> runningTaskInfos = mActivityManager.getRunningTasks(10);
+		String packageName = mContext.getApplicationContext().getPackageName();
 		if(runningTaskInfos != null && runningTaskInfos.size() > 0)
 		{
 			for(RunningTaskInfo info : runningTaskInfos)
 			{
-				if(info.topActivity.getPackageName().equals(mContext.getApplicationContext().getPackageName()))
+				if(info.topActivity.getPackageName().equals(packageName))
 				{
 					isAppRunning = true;
 					break;

@@ -435,29 +435,14 @@ public class SearchChatRecordEditText extends Dialog implements
 			mViewHolder.mFindChatRecordUserNameTV.setText(mChatName);
 			mViewHolder.mFindChatRecordMsgDateTV.setText(TimeUtil.getDateByMillisecond(mChatDate, TimeUtil.FORMAT_DATETIME_24));
 			if (mChatContent != null) { 
-//				MessageBodyEntity body = JSON.parseObject(mChatContent,
-//						MessageBodyEntity.class);
-////				SpannableString spannableString = FaceConversionUtil.getInstace()
-////						.getExpressionString(nContext, body.getContent());
-//				// 对内容做处理
+				MessageBodyEntity body = JSON.parseObject(mChatContent,
+						MessageBodyEntity.class);
+				SpannableString spannableString = FaceConversionUtil.getInstace()
+						.getExpressionString(nContext, body.getContent());
+				// 对内容做处理
 //				SpannableString spannableString = FaceConversionUtil
 //						.getInstace().handlerContent(nContext,mViewHolder.mFindChatRecordMsgContentTV,
 //						body.getContent());
-//				mViewHolder.mFindChatRecordMsgContentTV.setText(spannableString);
-//				
-				SpannableString  spannableString;
-				if (mViewHolder.mFindChatRecordMsgContentTV.getTag() != null) {
-					spannableString = (SpannableString) mViewHolder.mFindChatRecordMsgContentTV.getTag();
-				} else {
-					MessageBodyEntity body = JSON.parseObject(mChatContent,
-							MessageBodyEntity.class);
-					
-					// 对内容做处理
-					spannableString = FaceConversionUtil
-							.getInstace().handlerContent(nContext,mViewHolder.mFindChatRecordMsgContentTV,
-							body.getContent());
-					mViewHolder.mFindChatRecordMsgContentTV.setTag(spannableString);
-				}
 				mViewHolder.mFindChatRecordMsgContentTV.setText(spannableString);
 			}
 			return convertView;

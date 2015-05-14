@@ -2,41 +2,45 @@ package com.yineng.ynmessager.activity.groupsession;
 
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 
 import org.jivesoftware.smack.packet.Message;
 import org.jivesoftware.smack.packet.Message.Type;
 
+import android.annotation.SuppressLint;
 import android.app.AlarmManager;
 import android.app.PendingIntent;
 import android.content.BroadcastReceiver;
+import android.content.ClipData;
+import android.content.ClipboardManager;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.os.Bundle;
 import android.os.Handler;
 import android.text.SpannableString;
+import android.text.TextUtils;
 import android.util.Log;
+import android.view.ContextMenu;
+import android.view.ContextThemeWrapper;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.View;
+import android.view.ContextMenu.ContextMenuInfo;
 import android.view.View.OnClickListener;
 import android.view.View.OnTouchListener;
 import android.view.ViewGroup;
 import android.widget.AbsListView;
 import android.widget.AbsListView.OnScrollListener;
-import android.widget.AdapterView;
-import android.widget.AdapterView.OnItemClickListener;
+import android.widget.AdapterView.AdapterContextMenuInfo;
 import android.widget.BaseAdapter;
 import android.widget.Button;
 import android.widget.EditText;
-import android.widget.GridView;
-import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.RelativeLayout;
-import android.widget.SimpleAdapter;
 import android.widget.TextView;
 
 import com.alibaba.fastjson.JSON;
@@ -55,7 +59,6 @@ import com.yineng.ynmessager.bean.p2psession.MessageBodyEntity;
 import com.yineng.ynmessager.db.ContactOrgDao;
 import com.yineng.ynmessager.db.dao.GroupChatDao;
 import com.yineng.ynmessager.db.dao.RecentChatDao;
-import com.yineng.ynmessager.imageloader.ImageLoaderActivity;
 import com.yineng.ynmessager.manager.NoticesManager;
 import com.yineng.ynmessager.manager.XmppConnectionManager;
 import com.yineng.ynmessager.receiver.CommonReceiver;
@@ -70,6 +73,7 @@ import com.yineng.ynmessager.util.L;
 import com.yineng.ynmessager.util.TimeUtil;
 import com.yineng.ynmessager.view.face.FaceConversionUtil;
 import com.yineng.ynmessager.view.face.FaceRelativeLayout;
+import com.yineng.ynmessager.view.face.gif.AnimatedImageSpan;
 
 /**
  * 
@@ -81,6 +85,7 @@ import com.yineng.ynmessager.view.face.FaceRelativeLayout;
 public class GroupChatActivity extends BaseActivity implements OnClickListener, ReceiveMessageCallBack, ReceiveReqIQCallBack{
 	private RecentChatDao mRecentChatDao;// 消息列表操作
 	private Context mContext;
+	private ClipboardManager mClipboard;
 	private TextView mUnReadTV;
 	private Button mSendBtn;
 	private XmppConnectionManager mXmppConnManager;
@@ -153,6 +158,7 @@ public class GroupChatActivity extends BaseActivity implements OnClickListener, 
 	private CommonReceiver mCommonReceiver;
 	//是否销毁Activity
 	protected boolean isFinishAcitivity = false;
+	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
@@ -160,9 +166,47 @@ public class GroupChatActivity extends BaseActivity implements OnClickListener, 
 		setContentView(R.layout.activity_group_chat_layout);
 		initData();
 		updateUnreadCount();// 更新未读记录条数为0
+		
+		//加载草稿
+		String draft = mRecentChatDao.queryDraftByUserNo(mChatUserNum);
+		SpannableString spannableDraft = FaceConversionUtil.getInstace().getExpressionString(this,draft);
+		mEditContentET.setText(spannableDraft);
+		mEditContentET.setSelection(spannableDraft.length());
 	}
 
+	@Override
+	public void onCreateContextMenu(ContextMenu menu, View v, ContextMenuInfo menuInfo)
+	{
+		menu.setHeaderTitle(R.string.p2pChatActivity_contextMenuTitle);
+		menu.add(Menu.NONE,0,Menu.NONE,R.string.p2pChatActivity_copyChatMsg);
+		menu.add(Menu.NONE,1,Menu.NONE,R.string.p2pChatActivity_RetrySendMsg);
+		menu.add(Menu.NONE,2,Menu.NONE,R.string.p2pChatActivity_deleteChatMsg);
+	}
+	
+	@SuppressLint("NewApi")
+	@Override
+	public boolean onContextItemSelected(MenuItem item)
+	{
+		AdapterContextMenuInfo menuInfo = (AdapterContextMenuInfo)item.getMenuInfo();
+		GroupChatMsgEntity viewItem = mAdapter.getItem(menuInfo.position - 1);  //-1是因为这里position是从1开始的
+		
+		int itemId = item.getItemId();
+		switch(itemId)
+		{
+			case 0:  //复制文本
+				mClipboard.setPrimaryClip(ClipData.newPlainText(TAG,viewItem.getSpannableString().toString()));
+				showToast(R.string.common_copyToClipboard);
+				break;
+			case 1:  //重发
+				break;
+			case 2:  //删除
+				break;
+		}
+		return true;
+	}
+	
 	private void initData() {
+		mClipboard = (ClipboardManager)getSystemService(Context.CLIPBOARD_SERVICE);
 		mContactOrgDao = new ContactOrgDao(mContext);
 		//初始化该群组对象数据
 		initGroupObject(false);
@@ -184,7 +228,8 @@ public class GroupChatActivity extends BaseActivity implements OnClickListener, 
 		mEditContentET = (EditText) findViewById(R.id.et_sendmessage);
 		mPullToRefreshListView = (PullToRefreshListView) findViewById(R.id.chat_pull_refresh_list);
 		mListView = mPullToRefreshListView.getRefreshableView();
-
+		mListView.setOnCreateContextMenuListener(this);
+		
 		mXmppConnManager = XmppConnectionManager.getInstance();
 		mAlarmManager = (AlarmManager) getSystemService(ALARM_SERVICE);
 		Intent intent = new Intent(RECEIPT_BROADCAST);
@@ -194,7 +239,7 @@ public class GroupChatActivity extends BaseActivity implements OnClickListener, 
 		registerReceiver(mReceiptBroadcastReceiver, filter);
 //		FaceConversionUtil.getInstace().getFileText(getApplication());
 		mGroupChatDao= new GroupChatDao(mContext);
-		mRecentChatDao = new RecentChatDao(this);
+		mRecentChatDao = new RecentChatDao(getApplicationContext());
 
 		mAdapter = new GroupChatMsgAdapter(this);
 		mListView.setAdapter(mAdapter);
@@ -658,19 +703,49 @@ public class GroupChatActivity extends BaseActivity implements OnClickListener, 
 	protected void onDestroy() {
 		super.onDestroy();
 		notBreak = false;
-
+		/**销毁gif引用**/
+		destroyGifValue();
+		
 		mXmppConnManager.removeReceiveMessageCallBack(mChatUserNum);
 		mXmppConnManager.removeReceiveReqIQCallBack("com:yineng:receipt");
 		unregisterReceiver(mReceiptBroadcastReceiver);
 		mAlarmManager.cancel(mReceiptPendingIntent);
 
+		//保存消息草稿
+		CharSequence draft = mEditContentET.getText();
+		mRecentChatDao.updateDraft(mChatUserNum,draft.toString());
+		
 		// 销毁回执线程
 		mReceipMessageQueue.putEntity(BREAK_THREAD_TAG);
 		
 		NoticesManager.getInstance(this).updateRecentChatList(mChatUserNum, Const.CHAT_TYPE_GROUP);//更新最近会话列表
 		//取消重命名群组广播
 		unregisterReceiver(mCommonReceiver);
+		
+		handleDraft();
+		
+		System.gc();
 	}
+	
+	/**
+	 * 草稿的处理
+	 */
+	private void handleDraft()
+	{
+		CharSequence draft = mEditContentET.getText();
+		RecentChat thisChat = mRecentChatDao.isChatExist(mChatUserNum,Const.CHAT_TYPE_GROUP);
+		if(!TextUtils.isEmpty(draft) && thisChat == null)  //最近会话列表中没有存在，但已经输入草稿，需保存草稿的情况
+		{
+			updateRecentChatList("",draft.toString());
+		}else if(TextUtils.isEmpty(draft) && thisChat !=null && TextUtils.isEmpty(thisChat.getContent()))  //存在于最近会话里面，但没有任何聊天记录，也没有草稿的情况
+		{
+			mRecentChatDao.deleteRecentChatById(thisChat.getId());  //从最近会话列表里面删除
+		}else  //适用于一般情况，直接更新草稿
+		{
+			mRecentChatDao.updateDraft(mChatUserNum,draft.toString());
+		}
+	}
+	
 	/**
 	 * 更新未读记录
 	 */
@@ -716,6 +791,11 @@ public class GroupChatActivity extends BaseActivity implements OnClickListener, 
 	 * 把消息内容更新到最近会话列表
 	 */
 	private void updateRecentChatList(String content) {
+		updateRecentChatList(content,"");
+	}
+	
+	private void updateRecentChatList(String content,String draft)
+	{
 		RecentChat recentChat = new RecentChat();
 		recentChat.setChatType(Const.CHAT_TYPE_GROUP);
 		recentChat.setUserNo(mChatUserNum);
@@ -729,6 +809,7 @@ public class GroupChatActivity extends BaseActivity implements OnClickListener, 
 		recentChat.setDateTime(TimeUtil
 				.getCurrenDateTime(TimeUtil.FORMAT_DATETIME_24_mic));
 		recentChat.setUnReadCount(0);
+		recentChat.setDraft(draft);
 		mRecentChatDao.saveRecentChat(recentChat);
 	}
 	
@@ -747,13 +828,21 @@ public class GroupChatActivity extends BaseActivity implements OnClickListener, 
 			this.coll = coll;
 		}
 		
+		/**
+		 * 返回list
+		 * @return
+		 */
+		public List<GroupChatMsgEntity> getData() {
+			return this.coll;
+		}
+		
 		@Override
 		public int getCount() {
 			return coll.size();
 		}
 
 		@Override
-		public Object getItem(int position) {
+		public GroupChatMsgEntity getItem(int position) {
 			return coll.get(position);
 		}
 
@@ -846,8 +935,8 @@ public class GroupChatActivity extends BaseActivity implements OnClickListener, 
 			}); 
 			if (entity.getMessage() != null) { 
 				SpannableString  spannableString;
-				if (viewHolder.tvSendTime.getTag() != null) {
-					spannableString = (SpannableString) viewHolder.tvSendTime.getTag();
+				if (entity.getSpannableString() != null) {
+					spannableString = entity.getSpannableString();
 				} else {
 					MessageBodyEntity body = JSON.parseObject(entity.getMessage(),
 							MessageBodyEntity.class);
@@ -858,7 +947,7 @@ public class GroupChatActivity extends BaseActivity implements OnClickListener, 
 					spannableString = FaceConversionUtil
 							.getInstace().handlerContent(this.context,viewHolder.tvContent,
 							body.getContent());
-					viewHolder.tvSendTime.setTag(spannableString);
+					entity.setSpannableString(spannableString);
 				}
 				viewHolder.tvContent.setText(spannableString);
 			}
@@ -879,4 +968,22 @@ public class GroupChatActivity extends BaseActivity implements OnClickListener, 
 		
 	}
 
+	/**
+	 * 回收bitmap暂用的内存空间
+	 */
+	private void destroyGifValue() {
+		List<GroupChatMsgEntity> mAdapterList = mAdapter.getData();
+		if (mAdapterList != null) {
+			for (GroupChatMsgEntity groupChatMsgEntity : mAdapterList) {
+				SpannableString tempSpan = groupChatMsgEntity.getSpannableString();
+				if (tempSpan != null) {
+					AnimatedImageSpan[] tem = tempSpan.getSpans(0, tempSpan.length()-1, AnimatedImageSpan.class);
+					for (AnimatedImageSpan animatedImageSpan : tem) {
+						animatedImageSpan.recycleBitmaps();
+					}
+					tempSpan.removeSpan(tem);
+				}
+			}
+		}
+	}
 }

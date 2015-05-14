@@ -48,6 +48,7 @@ import com.yineng.ynmessager.view.SearchChatRecordEditText;
 import com.yineng.ynmessager.view.SearchChatRecordEditText.onCancelSearchAnimationListener;
 import com.yineng.ynmessager.view.SearchChatRecordEditText.onResultListItemCLickListener;
 import com.yineng.ynmessager.view.face.FaceConversionUtil;
+import com.yineng.ynmessager.view.face.gif.AnimatedImageSpan;
 
 public class FindChatRecordActivity extends BaseActivity {
 	private static final int PAGE_SIZE = 20;
@@ -553,7 +554,28 @@ public class FindChatRecordActivity extends BaseActivity {
 	@Override
 	protected void onDestroy() {
 		super.onDestroy();
-		mChatMsgAdapter.mMsgList = null;
+		/**销毁gif引用**/
+		destroyGifValue();
 		unregisterReceiver(mCommonReceiver);
+		System.gc();
+	}
+	
+	/**
+	 * 回收bitmap暂用的内存空间
+	 */
+	private void destroyGifValue() {
+		List<GroupChatMsgEntity> mAdapterList = mChatMsgAdapter.getmMsgList();
+		if (mAdapterList != null) {
+			for (GroupChatMsgEntity groupChatMsgEntity : mAdapterList) {
+				SpannableString tempSpan = groupChatMsgEntity.getSpannableString();
+				if (tempSpan != null) {
+					AnimatedImageSpan[] tem = tempSpan.getSpans(0, tempSpan.length()-1, AnimatedImageSpan.class);
+					for (AnimatedImageSpan animatedImageSpan : tem) {
+						animatedImageSpan.recycleBitmaps();
+					}
+					tempSpan.removeSpan(tem);
+				}
+			}
+		}
 	}
 }

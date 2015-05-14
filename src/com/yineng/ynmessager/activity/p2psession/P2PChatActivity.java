@@ -2,47 +2,44 @@ package com.yineng.ynmessager.activity.p2psession;
 
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-
-import javax.xml.transform.Templates;
 
 import org.jivesoftware.smack.packet.Message;
 import org.jivesoftware.smack.packet.Message.Type;
 
-import android.R.integer;
+import android.annotation.SuppressLint;
+import android.annotation.TargetApi;
 import android.app.AlarmManager;
 import android.app.PendingIntent;
 import android.content.BroadcastReceiver;
+import android.content.ClipData;
+import android.content.ClipboardManager;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
-import android.text.Spannable;
 import android.text.SpannableString;
+import android.text.TextUtils;
 import android.util.Log;
-import android.view.KeyEvent;
+import android.view.ContextMenu;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.View;
+import android.view.ContextMenu.ContextMenuInfo;
 import android.view.View.OnClickListener;
 import android.view.View.OnTouchListener;
 import android.view.WindowManager;
 import android.widget.AbsListView;
 import android.widget.AbsListView.OnScrollListener;
-import android.widget.AdapterView;
-import android.widget.AdapterView.OnItemClickListener;
+import android.widget.AdapterView.AdapterContextMenuInfo;
 import android.widget.Button;
 import android.widget.EditText;
-import android.widget.GridView;
-import android.widget.ImageView;
 import android.widget.ListView;
-import android.widget.RelativeLayout;
-import android.widget.SimpleAdapter;
 import android.widget.TextView;
 
 import com.alibaba.fastjson.JSON;
@@ -60,7 +57,6 @@ import com.yineng.ynmessager.bean.p2psession.MessageBodyEntity;
 import com.yineng.ynmessager.db.ContactOrgDao;
 import com.yineng.ynmessager.db.P2PChatMsgDao;
 import com.yineng.ynmessager.db.dao.RecentChatDao;
-import com.yineng.ynmessager.imageloader.ImageLoaderActivity;
 import com.yineng.ynmessager.manager.NoticesManager;
 import com.yineng.ynmessager.manager.XmppConnectionManager;
 import com.yineng.ynmessager.sharedpreference.LastLoginUserSP;
@@ -72,7 +68,6 @@ import com.yineng.ynmessager.util.L;
 import com.yineng.ynmessager.util.TimeUtil;
 import com.yineng.ynmessager.view.face.FaceConversionUtil;
 import com.yineng.ynmessager.view.face.FaceRelativeLayout;
-import com.yineng.ynmessager.view.face.gif.AnimatedGifDrawable;
 import com.yineng.ynmessager.view.face.gif.AnimatedImageSpan;
 
 /**
@@ -97,16 +92,18 @@ public class P2PChatActivity extends BaseActivity implements OnClickListener,
 	private final int BROADCAST = 3;// 收到广播的处理
 	private final int RECEIVE_MSG = 4;// 收到别人发送的消息
 	private final int REFRESH_UI = 5;// 刷新UI
+	private final int REFRESH_FACE_UI = 6;//刷新表情UI
 
 	private final int PAGE_SIZE = 20;// 分页查询的信息数量
 	private final long TIME_INTERVAL = 60 * 5 * 1000;// 时间在5分钟内的消息不显示时间
 	private final long RECEIPT_TIME_INTERVAL = 30 * 1000;// 超过半分钟未收到回执，则认为发送消息失败
 
+	private ClipboardManager mClipboard;
 	private ReceiptThread mReceiptThread;
 	private ReceipMessageQueue mReceipMessageQueue = new ReceipMessageQueue();// 回执消息处理队列
 	private LinkedList<P2PChatMsgEntity> mMessageList = new LinkedList<P2PChatMsgEntity>();
 	private List<String> mImagePathList = new CopyOnWriteArrayList<String>();
-
+	
 	private TextView mUnReadTV;
 	private Button mSendBtn;
 	private XmppConnectionManager mXmppConnManager;
@@ -158,6 +155,27 @@ public class P2PChatActivity extends BaseActivity implements OnClickListener,
 			case RECEIVE_MSG:// 收到消息
 				addToLastOrupdateMessageList((P2PChatMsgEntity) msg.obj);
 				notifyAdapterDataSetChanged();
+				break;
+			case REFRESH_FACE_UI:
+//				List<P2PChatMsgEntity> mAdapterList = (List<P2PChatMsgEntity>) msg.obj;
+//				int firstVisiblePos = msg.arg1;
+//				int lastVisiblePos = msg.arg2;
+//				for (int i = 0; i < mAdapterList.size(); i++) {
+//					P2PChatMsgEntity p2pChatMsgEntity = mAdapterList.get(i);
+//					SpannableString tempSpan = p2pChatMsgEntity.getSpannableString();
+//					if (tempSpan != null) {
+//						AnimatedImageSpan[] tem = tempSpan.getSpans(0, tempSpan.length()-1, AnimatedImageSpan.class);
+//						if (i >= firstVisiblePos && i <= lastVisiblePos) {
+//							for (AnimatedImageSpan animatedImageSpan : tem) {
+//								animatedImageSpan.runGifImg();
+//							}
+//						} else {
+//							for (AnimatedImageSpan animatedImageSpan : tem) {
+//								animatedImageSpan.pauseGifImg();
+//							}
+//						}
+//					}
+//				}
 				break;
 			default:
 				break;
@@ -211,13 +229,53 @@ public class P2PChatActivity extends BaseActivity implements OnClickListener,
 				WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_HIDDEN);
 		initialize();
 		updateUnreadCount();// 更新未读记录条数为0
+		
+		//加载草稿
+		String draft = mRecentChatDao.queryDraftByUserNo(mChatUserNum);
+		SpannableString spannableDraft = FaceConversionUtil.getInstace().getExpressionString(this,draft);
+		mEditContentET.setText(spannableDraft);
+		mEditContentET.setSelection(spannableDraft.length());
+		
 	}
 
+	@Override
+	public void onCreateContextMenu(ContextMenu menu, View v, ContextMenuInfo menuInfo)
+	{
+		menu.setHeaderTitle(R.string.p2pChatActivity_contextMenuTitle);
+		menu.add(Menu.NONE,0,Menu.NONE,R.string.p2pChatActivity_copyChatMsg);
+		menu.add(Menu.NONE,1,Menu.NONE,R.string.p2pChatActivity_RetrySendMsg);
+		menu.add(Menu.NONE,2,Menu.NONE,R.string.p2pChatActivity_deleteChatMsg);
+	}
+	
+	@SuppressLint("NewApi")
+	@Override
+	public boolean onContextItemSelected(MenuItem item)
+	{
+		AdapterContextMenuInfo menuInfo = (AdapterContextMenuInfo)item.getMenuInfo();
+		P2PChatMsgEntity viewItem = mAdapter.getItem(menuInfo.position - 1);  //-1是因为这里position是从1开始的
+		
+		int itemId = item.getItemId();
+		switch(itemId)
+		{
+			case 0:  //复制文本
+				mClipboard.setPrimaryClip(ClipData.newPlainText(TAG,viewItem.getSpannableString().toString()));
+				showToast(R.string.common_copyToClipboard);
+				break;
+			case 1:  //重发
+				break;
+			case 2:  //删除
+				mP2PChatMsgDao.deleteByPacketId(viewItem.getPacketId());
+				refreshUIByPageIndex();
+				break;
+		}
+		return true;
+	}
+	
 	/**
 	 * 初始化聊天对象数据
 	 */
 	private void initUserObjectData() {
-		ContactOrgDao mContactOrgDao = new ContactOrgDao(P2PChatActivity.this);
+		ContactOrgDao mContactOrgDao = new ContactOrgDao(getApplicationContext());
 		mChatUserInfo = (User) getIntent().getParcelableExtra(Const.INTENT_USER_EXTRA_NAME);
 		if (mChatUserInfo == null) {
 			mChatUserNum = getIntent().getStringExtra(ACCOUNT);
@@ -235,7 +293,8 @@ public class P2PChatActivity extends BaseActivity implements OnClickListener,
 		mEditContentET = (EditText) findViewById(R.id.et_sendmessage);
 		mPullToRefreshListView = (PullToRefreshListView) findViewById(R.id.pl_p2p_chat_pull_refresh_list);
 		mListView = mPullToRefreshListView.getRefreshableView();
-
+		mListView.setOnCreateContextMenuListener(this);
+		
 		mXmppConnManager = XmppConnectionManager.getInstance();
 		mAlarmManager = (AlarmManager) getSystemService(ALARM_SERVICE);
 		Intent intent = new Intent(RECEIPT_BROADCAST);
@@ -245,7 +304,8 @@ public class P2PChatActivity extends BaseActivity implements OnClickListener,
 		registerReceiver(mReceiptBroadcastReceiver, filter);
 		mP2PChatMsgDao = new P2PChatMsgDao(this);
 		mRecentChatDao = new RecentChatDao(this);
-
+		mClipboard = (ClipboardManager)getSystemService(Context.CLIPBOARD_SERVICE);
+		
 		mAdapter = new P2PChatMsgAdapter(this);
 		mListView.setAdapter(mAdapter);
 
@@ -299,64 +359,28 @@ public class P2PChatActivity extends BaseActivity implements OnClickListener,
 			public void onScrollStateChanged(AbsListView view, int scrollState) {
 				switch (scrollState) {
 				case OnScrollListener.SCROLL_STATE_IDLE: //
-					L.e("scrollState-SCROLL_STATE_IDLE");
+					L.e("child count "+view.getChildCount()+" "+view.getCount());
+					
 					int firstVisiblePos = view.getFirstVisiblePosition();
 					int lastVisiblePos = view.getLastVisiblePosition();
-					
-					List<P2PChatMsgEntity> mAdapterList = mAdapter.getData();
-					if (mAdapterList != null) {
-						for (int i = 0; i < firstVisiblePos; i++) {
-							P2PChatMsgEntity p2pChatMsgEntity = mAdapterList.get(i);
-							SpannableString tempSpan = p2pChatMsgEntity.getSpannableString();
-							if (tempSpan != null) {
-								AnimatedImageSpan[] tem = tempSpan.getSpans(0, tempSpan.length()-1, AnimatedImageSpan.class);
-								for (AnimatedImageSpan animatedImageSpan : tem) {
-									animatedImageSpan.pauseGifImg();
-								}
-							}
-						}
-						for (int i = lastVisiblePos+1; i < mAdapterList.size(); i++) {
-							P2PChatMsgEntity p2pChatMsgEntity = mAdapterList.get(i);
-							SpannableString tempSpan = p2pChatMsgEntity.getSpannableString();
-							if (tempSpan != null) {
-								AnimatedImageSpan[] tem = tempSpan.getSpans(0, tempSpan.length()-1, AnimatedImageSpan.class);
-								for (AnimatedImageSpan animatedImageSpan : tem) {
-									animatedImageSpan.pauseGifImg();
-								}
-							}
-						}
-						for (int i = firstVisiblePos; i <= lastVisiblePos&&i < mAdapterList.size(); i++) {
-							P2PChatMsgEntity p2pChatMsgEntity = mAdapterList.get(i);
-							SpannableString tempSpan = p2pChatMsgEntity.getSpannableString();
-							if (tempSpan != null) {
-								AnimatedImageSpan[] tem = tempSpan.getSpans(0, tempSpan.length()-1, AnimatedImageSpan.class);
-								for (AnimatedImageSpan animatedImageSpan : tem) {
-									animatedImageSpan.runGifImg();
-								}
-							}
-						}
-//						for (P2PChatMsgEntity p2pChatMsgEntity : mAdapterList) {
-//							SpannableString tempSpan = p2pChatMsgEntity.getSpannableString();
-//							if (tempSpan != null) {
-//								AnimatedImageSpan[] tem = tempSpan.getSpans(0, tempSpan.length()-1, AnimatedImageSpan.class);
-//								for (AnimatedImageSpan animatedImageSpan : tem) {
-//									animatedImageSpan.recycleBitmaps();
-//								}
-//								tempSpan.removeSpan(tem);
-//								
-////								String regex = "(\\[\\/\\d{1,2}\\])";
-////								Pattern p = Pattern.compile(regex);
-////								Matcher m = p.matcher(tempSpan);
-////								while (m.find()) {
-//////									tempSpan.setSpan(null, m.start(), m.end(),Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
-////									AnimatedImageSpan[] tem = tempSpan.getSpans(m.start(), m.end(), AnimatedImageSpan.class);
-//////									((AnimatedGifDrawable) tem[0].getDrawable()).recycleBitmaps();
-////									tem[0].recycleBitmaps();
-////									tempSpan.removeSpan(tem);
-////								}
-//							}
+//					List<P2PChatMsgEntity> mAdapterList = mAdapter.getData();
+//					if (mAdapterList != null) {
+//						if (firstVisiblePos > 0) {
+//							firstVisiblePos = firstVisiblePos -1;
 //						}
-					}
+//						if (lastVisiblePos <= mAdapterList.size()) {
+//							lastVisiblePos = lastVisiblePos -1;
+//						} else {
+//							lastVisiblePos = mAdapterList.size()-1;
+//						}
+//
+//						android.os.Message msg = mHandler.obtainMessage();
+//						msg.what = REFRESH_FACE_UI;
+//						msg.arg1 = firstVisiblePos;
+//						msg.arg2 = lastVisiblePos;
+//						msg.obj = mAdapterList;
+//						mHandler.sendMessage(msg);
+//					}
 					
 					// 停止...
 					if (lastVisiblePos == (view.getCount() - 1)) {
@@ -381,7 +405,7 @@ public class P2PChatActivity extends BaseActivity implements OnClickListener,
 			@Override
 			public void onScroll(AbsListView view, int firstVisibleItem,
 					int visibleItemCount, int totalItemCount) {
-				L.e("onScroll");
+//				L.e("onScroll");
 //				TextView tempView = (TextView) view.findViewById(R.id.tv_sendtime);
 //				if (tempView != null) {
 //					L.e("tag -- "+tempView.getTag());
@@ -609,35 +633,28 @@ public class P2PChatActivity extends BaseActivity implements OnClickListener,
 		mReceipMessageQueue.putEntity(BREAK_THREAD_TAG);
 		NoticesManager.getInstance(this).updateRecentChatList(mChatUserNum,
 				Const.CHAT_TYPE_P2P);// 更新最近会话列表
+		
+		handleDraft();
+		
+		System.gc();
 	}
-
+	
 	/**
-	 * 
+	 * 草稿的处理
 	 */
-	private void destroyGifValue() {
-		List<P2PChatMsgEntity> mAdapterList = mAdapter.getData();
-		if (mAdapterList != null) {
-			for (P2PChatMsgEntity p2pChatMsgEntity : mAdapterList) {
-				SpannableString tempSpan = p2pChatMsgEntity.getSpannableString();
-				if (tempSpan != null) {
-					AnimatedImageSpan[] tem = tempSpan.getSpans(0, tempSpan.length()-1, AnimatedImageSpan.class);
-					for (AnimatedImageSpan animatedImageSpan : tem) {
-						animatedImageSpan.recycleBitmaps();
-					}
-					tempSpan.removeSpan(tem);
-					
-//					String regex = "(\\[\\/\\d{1,2}\\])";
-//					Pattern p = Pattern.compile(regex);
-//					Matcher m = p.matcher(tempSpan);
-//					while (m.find()) {
-////						tempSpan.setSpan(null, m.start(), m.end(),Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
-//						AnimatedImageSpan[] tem = tempSpan.getSpans(m.start(), m.end(), AnimatedImageSpan.class);
-////						((AnimatedGifDrawable) tem[0].getDrawable()).recycleBitmaps();
-//						tem[0].recycleBitmaps();
-//						tempSpan.removeSpan(tem);
-//					}
-				}
-			}
+	private void handleDraft()
+	{
+		CharSequence draft = mEditContentET.getText();
+		RecentChat thisChat = mRecentChatDao.isChatExist(mChatUserNum,Const.CHAT_TYPE_P2P);
+		if(!TextUtils.isEmpty(draft) && thisChat == null)  //最近会话列表中没有存在，但已经输入草稿，需保存草稿的情况
+		{
+			updateRecentChatList("",draft.toString());
+		}else if(TextUtils.isEmpty(draft) && thisChat !=null && TextUtils.isEmpty(thisChat.getContent()))  //存在于最近会话里面，但没有任何聊天记录，也没有草稿的情况
+		{
+			mRecentChatDao.deleteRecentChatById(thisChat.getId());  //从最近会话列表里面删除
+		}else  //适用于一般情况，直接更新草稿
+		{
+			mRecentChatDao.updateDraft(mChatUserNum,draft.toString());
 		}
 	}
 
@@ -778,6 +795,11 @@ public class P2PChatActivity extends BaseActivity implements OnClickListener,
 	 * 把消息内容更新到最近会话列表
 	 */
 	private void updateRecentChatList(String content) {
+		updateRecentChatList(content,"");
+	}
+	
+	private void updateRecentChatList(String content,String draft)
+	{
 		RecentChat recentChat = new RecentChat();
 		recentChat.setChatType(Const.CHAT_TYPE_P2P);
 		recentChat.setUserNo(mChatUserNum);
@@ -787,11 +809,31 @@ public class P2PChatActivity extends BaseActivity implements OnClickListener,
 		recentChat.setDateTime(TimeUtil
 				.getCurrenDateTime(TimeUtil.FORMAT_DATETIME_24_mic));
 		recentChat.setUnReadCount(0);
+		recentChat.setDraft(draft);
 		mRecentChatDao.saveRecentChat(recentChat);
 	}
 
 	@Override
 	public void receivedMessage(GroupChatMsgEntity msg) {
 
+	}
+	
+	/**
+	 * 回收bitmap暂用的内存空间
+	 */
+	private void destroyGifValue() {
+		List<P2PChatMsgEntity> mAdapterList = mAdapter.getData();
+		if (mAdapterList != null) {
+			for (P2PChatMsgEntity p2pChatMsgEntity : mAdapterList) {
+				SpannableString tempSpan = p2pChatMsgEntity.getSpannableString();
+				if (tempSpan != null) {
+					AnimatedImageSpan[] tem = tempSpan.getSpans(0, tempSpan.length()-1, AnimatedImageSpan.class);
+					for (AnimatedImageSpan animatedImageSpan : tem) {
+						animatedImageSpan.recycleBitmaps();
+					}
+					tempSpan.removeSpan(tem);
+				}
+			}
+		}
 	}
 }

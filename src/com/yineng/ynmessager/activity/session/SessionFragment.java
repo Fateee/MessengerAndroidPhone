@@ -17,6 +17,7 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
 import android.support.v4.app.Fragment;
+import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -146,11 +147,18 @@ public class SessionFragment extends Fragment implements StatusChangedCallBack, 
 	{
 		super.onViewCreated(view,savedInstanceState);
 		initViews(view);
-		loadRecentChatByPage(0);
 		registerUnreadMsgCountReceiver();
 		registerRefreshListBroadcastReceiver();
 	}
 
+	@Override
+	public void onStart()
+	{
+		super.onStart();
+		
+		loadRecentChatByPage(0);
+	}
+	
 	private void initViews(View view)
 	{
 		mRecentChatsList = new LinkedList<RecentChat>();
@@ -236,20 +244,6 @@ public class SessionFragment extends Fragment implements StatusChangedCallBack, 
 		mCancelAnimation.setDuration(200);
 		mFrameLinearLayout.startAnimation(mCancelAnimation);
 
-	}
-
-	@Override
-	public void onResume()
-	{
-		mSwipeListviewAdapter.notifyDataSetChanged();
-		super.onResume();
-	}
-
-	@Override
-	public void onStop()
-	{
-
-		super.onStop();
 	}
 
 	@Override
@@ -469,13 +463,12 @@ public class SessionFragment extends Fragment implements StatusChangedCallBack, 
 		}
 	}
 
-	class SwipeListviewAdapter extends BaseAdapter
+	private class SwipeListviewAdapter extends BaseAdapter
 	{
 		private LinkedList<RecentChat> mSessionDatas;
 		private LayoutInflater mInflater;
 		private int mScreenWidth;
 		private Context mContext;
-		private RecentChatDao recentChatDao;
 		private SwipeViewItemOpendListener mOpendListener;
 		private SimpleDateFormat mDateFormat = new SimpleDateFormat(TimeUtil.FORMAT_DATETIME_24);
 
@@ -487,7 +480,6 @@ public class SessionFragment extends Fragment implements StatusChangedCallBack, 
 			mScreenWidth = ((Activity)context).getWindowManager().getDefaultDisplay().getWidth();
 			mContext = context;
 			mOpendListener = listener;
-			recentChatDao = new RecentChatDao(context);
 		}
 
 		@Override
@@ -562,15 +554,23 @@ public class SessionFragment extends Fragment implements StatusChangedCallBack, 
 			viewHolder.mSessionDateTime.setText(relative);
 			L.d(TAG,"recentChat.getDateTime:" + recentChat.getDateTime());
 
-			if((recentChat.getChatType() == Const.CHAT_TYPE_DIS || recentChat.getChatType() == Const.CHAT_TYPE_GROUP)
-					&& recentChat.getSenderName() != null)
+			//设置显示草稿还是消息内容
+			String draft = recentChat.getDraft();
+			if(TextUtils.isEmpty(draft))  //如果没有草稿
 			{
-				viewHolder.mSessionContent.setText(recentChat.getSenderName() + ": " + recentChat.getContent());
-			}else
+				if((recentChat.getChatType() == Const.CHAT_TYPE_DIS || recentChat.getChatType() == Const.CHAT_TYPE_GROUP)
+						&& recentChat.getSenderName() != null)
+				{
+					viewHolder.mSessionContent.setText(recentChat.getSenderName() + ": " + recentChat.getContent());
+				}else
+				{
+					viewHolder.mSessionContent.setText(recentChat.getContent());
+				}
+			}else  //如果有草稿
 			{
-				viewHolder.mSessionContent.setText(recentChat.getContent());
+				viewHolder.mSessionContent.setText(RecentChat.DRAFT_PREFIX + draft);
 			}
-
+			
 			if(recentChat.getUnReadCount() > 0)
 			{
 				viewHolder.mSessionUnreadCoun.setText(recentChat.getUnReadCount() + "");
@@ -581,6 +581,7 @@ public class SessionFragment extends Fragment implements StatusChangedCallBack, 
 			}
 
 			viewHolder.mSessionTitle.setText(recentChat.getTitle());
+
 			viewHolder.mSessionSetTopButton.setTag(position);
 			viewHolder.mSessionDeleteButton.setTag(position);
 			if(recentChat.getIsTop() == 1)
@@ -619,7 +620,7 @@ public class SessionFragment extends Fragment implements StatusChangedCallBack, 
 						@Override
 						public void onAnimationEnd(Animation animation)
 						{
-							recentChatDao.deleteRecentChatById(mSessionDatas.get(pos).getId());
+							mRecentChatDao.deleteRecentChatById(mSessionDatas.get(pos).getId());
 							mSessionDatas.remove(pos);
 							swipeListViewItem.scrollTo(0,0);
 							Intent intent = new Intent();
@@ -643,14 +644,14 @@ public class SessionFragment extends Fragment implements StatusChangedCallBack, 
 					if(recentChat.getIsTop() == 1)
 					{// 取消置顶
 						recentChat.setIsTop(0);
-						recentChatDao.updateIsTop(recentChat.getId(),0);
+						mRecentChatDao.updateIsTop(recentChat.getId(),0);
 						SessionFragment.sortRecentChatList(mSessionDatas,recentChat);
 
 					}else
 					{// 置顶
 						recentChat.setIsTop(1);
 						mSessionDatas.addFirst(recentChat);
-						recentChatDao.updateIsTop(recentChat.getId(),1);
+						mRecentChatDao.updateIsTop(recentChat.getId(),1);
 					}
 
 					final SwipeListViewItem swipeListViewItem = (SwipeListViewItem)v.getParent().getParent()
@@ -689,10 +690,15 @@ public class SessionFragment extends Fragment implements StatusChangedCallBack, 
 			{
 				convertView.scrollTo(0,0);
 			}
-
+			
 			return convertView;
 		}
-
+		
+		/**
+		 * 将日期时间字符串转换为Date对象
+		 * @param date 要转换的日期时间字符串
+		 * @return 想要获得的Date对象
+		 */
 		private Date convertStringDate(String date)
 		{
 			Date d = null;

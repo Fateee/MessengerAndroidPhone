@@ -433,7 +433,8 @@ public class UserAccountDB extends SQLiteOpenHelper {
 		sb_recentChat.append("[headUrl] varchar(100),"); // 头像url
 		sb_recentChat.append("[headLocalPath] varchar(100),"); // 头像本地路径
 		sb_recentChat.append("[isTop] INTEGER DEFAULT 0,"); // 是否置顶 1：置顶，0：不置顶
-		sb_recentChat.append("[unReadCount] INTEGER DEFAULT 0)"); // 未读条数， 默认为0
+		sb_recentChat.append("[unReadCount] INTEGER DEFAULT 0,"); // 未读条数， 默认为0
+		sb_recentChat.append("[draft] TEXT)");
 		return sb_recentChat.toString();
 	}
 

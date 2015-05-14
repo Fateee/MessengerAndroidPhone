@@ -65,7 +65,8 @@ public final class FaceConversionUtil {
 		
 		SpannableString spannableString = new SpannableString(str);
 		// 正则表达式比配字符串里是否含有表情，如： 我好[开心]啊
-		String zhengze = "\\[[^\\]]+\\]";
+//		String zhengze = "\\[[^\\]]+\\]";
+		String zhengze = "(\\[\\/\\d{1,2}\\])";
 		// 通过传入的正则表达式来生成一个pattern
 		Pattern sinaPatten = Pattern.compile(zhengze, Pattern.CASE_INSENSITIVE);
 		try {

@@ -14,6 +14,8 @@
     <string name="common_friday">星期五</string>
     <string name="common_saturday">星期六</string>
     <string name="common_sunday">星期天</string>
+    <string name="common_copyToClipboard">已复制到剪贴板</string>
+    
     
     <!-- main界面 -->
     <string name="main_tabitem_home">主页</string>
@@ -53,6 +55,7 @@
     <string name="session_clearAllChatMsgDone">已完成清除所有聊天记录</string>
     <string name="session_clearCacheDone">已完成清除缓存</string>
     <string name="session_yesterday">昨天</string>
+    <string name="session_draftPrefix">草稿：</string>
     
     <string name="pull_to_refresh_pull_label">下拉刷新</string>
     <string name="pull_to_refresh_release_label">松开加载</string>
@@ -64,12 +67,17 @@
     <string name="pull_to_refresh_refreshing_label">Loading…</string>
     -->
 
-
     <!-- Just use standard Pull Down String when pulling up. These can be set for languages which require it -->
     <string name="pull_to_refresh_from_bottom_pull_label">@string/pull_to_refresh_pull_label</string>
     <string name="pull_to_refresh_from_bottom_release_label">@string/pull_to_refresh_release_label</string>
     <string name="pull_to_refresh_from_bottom_refreshing_label">@string/pull_to_refresh_refreshing_label</string>
 
+    <!-- P2PChatActivity 2人会话界面 -->
+    <string name="p2pChatActivity_contextMenuTitle">操作</string>
+    <string name="p2pChatActivity_copyChatMsg">复制文本</string>
+    <string name="p2pChatActivity_RetrySendMsg">重发</string>
+    <string name="p2pChatActivity_deleteChatMsg">删除</string>
+    
     <!-- 个人资料页弹出框界面 -->
     <string name="personinfo_pop_add_contact">添加到手机通讯录</string>
     <string name="personinfo_pop_call_contact">拨打号码</string>

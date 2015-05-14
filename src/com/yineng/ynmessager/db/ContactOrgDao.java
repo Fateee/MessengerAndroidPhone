@@ -752,7 +752,7 @@ public class ContactOrgDao
 		boolean isUserStatusExist = isUserStatusExist(mUserStatus.getUserNo());
 		ContentValues userContentValues = new ContentValues();
 		userContentValues.put("userNo",mUserStatus.getUserNo());
-		userContentValues.put("status",mUserStatus.getStatus());
+		userContentValues.put("status","online");
 		userContentValues.put("statusID",mUserStatus.getStatusID());
 		if(isUserStatusExist)
 		{
@@ -988,6 +988,7 @@ public class ContactOrgDao
 				int notifyMode = mCursor.getInt(mCursor.getColumnIndex("notifyMode"));
 				ContactGroup tempContactGroup = new ContactGroup(groupName,createUser,createTime,naturalName,subject,
 						maxUsers,desc,notifyMode);
+				tempContactGroup.setGroupType(groupType);
 				mList.add(tempContactGroup);
 			}
 		}

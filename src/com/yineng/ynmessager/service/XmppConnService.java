@@ -33,6 +33,7 @@ import com.yineng.ynmessager.bean.contact.ContactGroup;
 import com.yineng.ynmessager.bean.contact.ContactGroupBean;
 import com.yineng.ynmessager.bean.contact.ContactGroupUser;
 import com.yineng.ynmessager.bean.contact.ContactOrg;
+import com.yineng.ynmessager.bean.contact.UserStatus;
 import com.yineng.ynmessager.bean.login.LoginThread;
 import com.yineng.ynmessager.db.ContactOrgDao;
 import com.yineng.ynmessager.manager.XmppConnectionManager;
@@ -469,7 +470,7 @@ public class XmppConnService extends Service implements ReceiveReqIQCallBack {
 				mContactOrgDao.saveAllOrgData(allContactOrg.getOrgList());
 				mContactOrgDao.saveAllUserData(allContactOrg.getUserList());
 				mContactOrgDao.saveAllUserRelationData(allContactOrg.getRelList());
-				mContactOrgDao.saveAllUserStatusData(allContactOrg.getStatusList());
+//				mContactOrgDao.saveAllUserStatusData(allContactOrg.getStatusList());
 				L.e("XmppConnService",
 						"getServertime ->" + allContactOrg.getServertime());
 				String mServerTime = String.valueOf(allContactOrg.getServertime());
@@ -482,7 +483,10 @@ public class XmppConnService extends Service implements ReceiveReqIQCallBack {
 		} else if (Const.REQ_IQ_XMLNS_GET_STATUS.equals(nameSpace)) {
 			L.v("XmppConnService", "status iq xml ->" + packet.getResp());
 			if (packet.getCode() == Const.IQ_RESPONSE_CODE_SUCCESS) {
-				
+				UserStatus allOnlineUsers = JSON.parseObject(packet.getResp(),UserStatus.class);
+				mContactOrgDao.saveAllUserStatusData(allOnlineUsers.getStatusList());
+				//把我的信息插入到数据库
+				mContactOrgDao.updateOneUserStatus(new UserStatus(AppController.getInstance().mSelfUser.getUserNo(), "online", 1));
 			}
 		} else if (Const.REQ_IQ_XMLNS_GET_GROUP.equals(nameSpace)) {//群组、讨论组
 			if (packet.getCode() == Const.IQ_RESPONSE_CODE_SUCCESS) {
@@ -606,4 +610,5 @@ public class XmppConnService extends Service implements ReceiveReqIQCallBack {
 		mBuilder.append("\"}");
 		return mBuilder.toString();
 	}
+	
 }
