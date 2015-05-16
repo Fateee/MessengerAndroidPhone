@@ -43,6 +43,7 @@ import com.yineng.ynmessager.db.ContactOrgDao;
 import com.yineng.ynmessager.manager.XmppConnectionManager;
 import com.yineng.ynmessager.smack.ReceivePresenceCallBack;
 import com.yineng.ynmessager.util.JIDUtil;
+import com.yineng.ynmessager.util.L;
 import com.yineng.ynmessager.view.SearchContactEditText;
 import com.yineng.ynmessager.view.SearchContactEditText.onCancelSearchAnimationListener;
 
@@ -316,12 +317,17 @@ public class ContactChildOrgActivity extends BaseActivity implements
 
 		@Override
 		public void onAnimationEnd(Animation animation) {
-			mHandler.sendEmptyMessage(SHOW_SEARCH_VIEW);
+			if (isShowSearchEditText) {
+				mHandler.sendEmptyMessage(SHOW_SEARCH_VIEW);
+			} else {
+				mHandler.sendEmptyMessage(CANCEL_SEARCH_VIEW);
+			}
 		}
 	};
+	private boolean isShowSearchEditText;
 
-	@SuppressLint("NewApi")
 	public void showSearchContactAnimation() {
+		isShowSearchEditText = true;
 		RelativeLayout.LayoutParams etParamTest = (RelativeLayout.LayoutParams) mContactEditView
 				.getLayoutParams();
 		searchViewY = mContactEditView.getY() - etParamTest.topMargin;
@@ -333,10 +339,11 @@ public class ContactChildOrgActivity extends BaseActivity implements
 
 	@Override
 	public void cancelSearchContactAnimation() {
+		isShowSearchEditText = false;
 		mSearchContactEditText.dismiss();
-		mHandler.sendEmptyMessage(CANCEL_SEARCH_VIEW);
-		cancelAnimation = new TranslateAnimation(0, 0, -searchViewY, 0);
+		cancelAnimation = new TranslateAnimation(0, 0, 0, searchViewY);
 		cancelAnimation.setDuration(200);
+		cancelAnimation.setAnimationListener(showAnimationListener);
 		mContactRelativeLayout.startAnimation(cancelAnimation);
 	}
 

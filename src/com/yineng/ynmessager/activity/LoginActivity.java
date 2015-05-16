@@ -310,7 +310,10 @@ public class LoginActivity extends BaseActivity {
 				} else {// 如果网络可用，开启登陆线程
 					mXmppConnectionManager = XmppConnectionManager
 							.getInstance();
-
+					//如果密码不同，则恢复状态，重新初始化
+					if (!mUserPassword.equals(mLastUser.getUserPassword())) {
+						XmppConnectionManager.getInstance().setXmppConnectionConfigNull();
+					}
 					mXmppConnectionManager.init(
 							LoginThread.getHostFromAddress(mServiceAddress),
 							LoginThread.getPortFromAddress(mServiceAddress),

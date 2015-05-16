@@ -106,6 +106,7 @@ public class ContactFragment extends Fragment implements onCancelSearchAnimation
 	
 	private void findSearchContactView(View view) {
 		mSearchContactEditText = new SearchContactEditText(mContext);
+		mSearchContactEditText.setSessionFragment(false,true);
 		mContactEditView =  (EditText) view.findViewById(R.id.se_contact_org_search_dis);
 		mContactRelativeLayout= (RelativeLayout) view.findViewById(R.id.ll_contact_org_frame);
 	}
@@ -231,6 +232,9 @@ public class ContactFragment extends Fragment implements onCancelSearchAnimation
 	
 	TranslateAnimation showAnimation = null;
 	TranslateAnimation cancelAnimation = null;
+	/**
+	 * 动画过程监听
+	 */
 	private AnimationListener showAnimationListener = new AnimationListener() {
 		@Override
 		public void onAnimationStart(Animation animation) {
@@ -244,25 +248,33 @@ public class ContactFragment extends Fragment implements onCancelSearchAnimation
 
 		@Override
 		public void onAnimationEnd(Animation animation) {
-			mHandler.sendEmptyMessage(SHOW_SEARCH_VIEW);
+			if (isShowSearchEditText) {
+				mHandler.sendEmptyMessage(SHOW_SEARCH_VIEW);
+			} else {
+				mHandler.sendEmptyMessage(CANCEL_SEARCH_VIEW);
+			}
 		}
 	};
+	private boolean isShowSearchEditText;
 
 	public void showSearchContactAnimation() {
-		RelativeLayout.LayoutParams etParamTest = (RelativeLayout.LayoutParams) mContactEditView.getLayoutParams();
-		searchViewY = mContactEditView.getY()-etParamTest.topMargin;
+		isShowSearchEditText = true;
+		RelativeLayout.LayoutParams etParamTest = (RelativeLayout.LayoutParams) mContactEditView
+				.getLayoutParams();
+		searchViewY = mContactEditView.getY() - etParamTest.topMargin;
 		showAnimation = new TranslateAnimation(0, 0, 0, -searchViewY);
 		showAnimation.setDuration(200);
-		showAnimation.setAnimationListener(showAnimationListener);	
+		showAnimation.setAnimationListener(showAnimationListener);
 		mContactRelativeLayout.startAnimation(showAnimation);
 	}
-	
+
 	@Override
 	public void cancelSearchContactAnimation() {
+		isShowSearchEditText = false;
 		mSearchContactEditText.dismiss();
-		mHandler.sendEmptyMessage(CANCEL_SEARCH_VIEW);
-		cancelAnimation = new TranslateAnimation(0, 0, -searchViewY, 0);
+		cancelAnimation = new TranslateAnimation(0, 0, 0, searchViewY);
 		cancelAnimation.setDuration(200);
+		cancelAnimation.setAnimationListener(showAnimationListener);
 		mContactRelativeLayout.startAnimation(cancelAnimation);
 	}
 	

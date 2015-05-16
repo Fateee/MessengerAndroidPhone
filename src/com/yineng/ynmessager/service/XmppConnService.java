@@ -11,8 +11,11 @@ import org.jivesoftware.smack.filter.PacketFilter;
 import org.jivesoftware.smack.filter.PacketTypeFilter;
 import org.jivesoftware.smack.packet.IQ;
 import org.jivesoftware.smack.packet.Message;
+import org.jivesoftware.smack.packet.Packet;
 import org.jivesoftware.smack.packet.Message.Type;
 import org.jivesoftware.smack.packet.Presence;
+import org.jivesoftware.smack.sasl.SASLMechanism.Failure;
+import org.jivesoftware.smack.sasl.SASLPlainMechanism;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -54,7 +57,7 @@ import com.yineng.ynmessager.util.NetWorkUtil;
  * @author YINENG
  * 
  */
-public class XmppConnService extends Service implements ReceiveReqIQCallBack {
+public class XmppConnService extends Service implements ReceiveReqIQCallBack,PacketListener {
 	public static final int MAX_TIME = 10;
 	public final int OFFLINE_MESSAGE_LOADED = 100;
 	private Context mContext;// 全局上下文
@@ -150,6 +153,10 @@ public class XmppConnService extends Service implements ReceiveReqIQCallBack {
 	// };
 	private ContactOrgDao mContactOrgDao;
 	private String mPacketId;
+	/**
+	 * 登录失败的packet
+	 */
+	private PacketTypeFilter mFailureFilter;
 
 	@Override
 	public void onCreate() {
@@ -160,6 +167,7 @@ public class XmppConnService extends Service implements ReceiveReqIQCallBack {
 		mIqFilter = new PacketTypeFilter(IQ.class);
 		mPresenceFilter = new PacketTypeFilter(Presence.class);
 		mMSGFilter = new PacketTypeFilter(Message.class);
+		mFailureFilter = new PacketTypeFilter(Failure.class);
 		// new listener
 		mIQListener = new IQPacketListenerImpl();
 		mPresenceListener = new PresencePacketListenerImpl(this);
@@ -179,6 +187,7 @@ public class XmppConnService extends Service implements ReceiveReqIQCallBack {
 			if (mXmppConnManager == null) {
 				mXmppConnManager = XmppConnectionManager.getInstance();
 			}
+			mXmppConnManager.addPacketListener(this, mFailureFilter);
 			if (!mXmppConnManager.isInit()) {
 				mXmppConnManager.init(LoginThread.getHostFromAddress(lastUser
 						.getUserServicesAddress()), LoginThread
@@ -609,6 +618,16 @@ public class XmppConnService extends Service implements ReceiveReqIQCallBack {
 		mBuilder.append(mGroupName);
 		mBuilder.append("\"}");
 		return mBuilder.toString();
+	}
+
+	@Override
+	public void processPacket(Packet packet) {
+//		System.out.println("Service----processPacket : " + packet.toXML());	
+		Failure tempFailure = (Failure) packet;
+//		System.out.println("getCondition : " + tempFailure.getCondition());	
+		if (tempFailure.getCondition().equals("not-authorized")) {
+			sendBroadcast(new Intent(Const.BROADCAST_ACTION_ID_PAST));
+		}
 	}
 	
 }

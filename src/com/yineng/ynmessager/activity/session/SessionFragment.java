@@ -176,7 +176,7 @@ public class SessionFragment extends Fragment implements StatusChangedCallBack, 
 		mPullToRefreshListView.setAdapter(mSwipeListviewAdapter);
 		mEditText = (EditText)view.findViewById(R.id.et_main_session_search);
 		mSearchContactEditText = new SearchContactEditText(this.getActivity());
-		mSearchContactEditText.setSessionFragment(true);
+		mSearchContactEditText.setSessionFragment(true,true);
 		mEditText.setOnClickListener(new OnClickListener() {
 			@Override
 			public void onClick(View paramView)
@@ -220,13 +220,19 @@ public class SessionFragment extends Fragment implements StatusChangedCallBack, 
 		@Override
 		public void onAnimationEnd(Animation animation)
 		{
-			mHandler.sendEmptyMessage(SHOW_SEARCH_VIEW);
+			if (isShowSearchEditText) {
+				mHandler.sendEmptyMessage(SHOW_SEARCH_VIEW);
+			} else {
+				mHandler.sendEmptyMessage(CANCEL_SEARCH_VIEW);
+			}
 		}
 	};
+	
+	private boolean isShowSearchEditText = false;
 
-	@SuppressLint("NewApi")
 	public void showSearchContactAnimation()
 	{
+		isShowSearchEditText = true;
 		LinearLayout.LayoutParams etParamTest = (LinearLayout.LayoutParams)mEditText.getLayoutParams();
 		searchViewY = mEditText.getY() - (float)etParamTest.topMargin;
 		mShowAnimation = new TranslateAnimation(0,0,0,-searchViewY);
@@ -238,10 +244,11 @@ public class SessionFragment extends Fragment implements StatusChangedCallBack, 
 	@Override
 	public void cancelSearchContactAnimation()
 	{
+		isShowSearchEditText = false;
 		mSearchContactEditText.dismiss();
-		mHandler.sendEmptyMessage(CANCEL_SEARCH_VIEW);
-		mCancelAnimation = new TranslateAnimation(0,0,-searchViewY,0);
+		mCancelAnimation = new TranslateAnimation(0,0, 0, searchViewY);
 		mCancelAnimation.setDuration(200);
+		mCancelAnimation.setAnimationListener(mShowAnimationListener);
 		mFrameLinearLayout.startAnimation(mCancelAnimation);
 
 	}
@@ -549,7 +556,7 @@ public class SessionFragment extends Fragment implements StatusChangedCallBack, 
 
 			// 获取会话中最后一次消息的聊天时间
 			Date date = convertStringDate(recentChat.getDateTime());
-			String relative = TimeUtil.getTimeRelativeFromNow(date);
+			String relative = TimeUtil.getTimeRelationFromNow(getActivity().getApplicationContext(), date);
 			// 转换成与当前时间的关系文字
 			viewHolder.mSessionDateTime.setText(relative);
 			L.d(TAG,"recentChat.getDateTime:" + recentChat.getDateTime());

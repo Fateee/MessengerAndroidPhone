@@ -5,8 +5,10 @@
     <string name="app_name">Amessager</string>
 
     <!-- 公共文字 -->
+    <string name="common_dialog_title">提示:</string>
     <string name="common_offline_notice_title">下线通知</string>
     <string name="common_offline_notice_msg">您的账号已在其他手机上登录，如非本人操作，则密码可能已泄露，建议请尽快在PC端YNmessenger设置中修改密码。</string>
+    <string name="common_id_past_msg">您的身份验证已过期，请重新登录</string>
     <string name="common_monday">星期一</string>
     <string name="common_tuesday">星期二</string>
     <string name="common_wednesday">星期三</string>
@@ -75,7 +77,6 @@
     <!-- P2PChatActivity 2人会话界面 -->
     <string name="p2pChatActivity_contextMenuTitle">操作</string>
     <string name="p2pChatActivity_copyChatMsg">复制文本</string>
-    <string name="p2pChatActivity_RetrySendMsg">重发</string>
     <string name="p2pChatActivity_deleteChatMsg">删除</string>
     
     <!-- 个人资料页弹出框界面 -->

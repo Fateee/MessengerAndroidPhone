@@ -2,10 +2,11 @@ package com.yineng.ynmessager.activity.dissession;
 
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.HashMap;
+import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Map;
+
+import javax.xml.transform.Templates;
 
 import org.jivesoftware.smack.packet.IQ.Type;
 
@@ -21,19 +22,21 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
+import android.view.animation.Animation;
+import android.view.animation.Animation.AnimationListener;
+import android.view.animation.TranslateAnimation;
+import android.widget.AdapterView;
+import android.widget.AdapterView.OnItemClickListener;
 import android.widget.BaseAdapter;
 import android.widget.Button;
-import android.widget.CheckBox;
-import android.widget.CompoundButton;
-import android.widget.AdapterView.OnItemClickListener;
-import android.widget.CompoundButton.OnCheckedChangeListener;
 import android.widget.EditText;
-import android.widget.LinearLayout.LayoutParams;
-import android.widget.AdapterView;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.LinearLayout.LayoutParams;
+import android.widget.ListAdapter;
 import android.widget.ListView;
 import android.widget.PopupWindow;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -41,6 +44,7 @@ import com.alibaba.fastjson.JSON;
 import com.yineng.ynmessager.R;
 import com.yineng.ynmessager.activity.BaseActivity;
 import com.yineng.ynmessager.app.Const;
+import com.yineng.ynmessager.app.ContactActivityManager;
 import com.yineng.ynmessager.bean.ClientInitConfig;
 import com.yineng.ynmessager.bean.contact.ContactCommonBean;
 import com.yineng.ynmessager.bean.contact.ContactGroup;
@@ -54,13 +58,14 @@ import com.yineng.ynmessager.receiver.CommonReceiver;
 import com.yineng.ynmessager.receiver.CommonReceiver.IQuitGroupListener;
 import com.yineng.ynmessager.receiver.CommonReceiver.updateGroupDataListener;
 import com.yineng.ynmessager.sharedpreference.LastLoginUserSP;
-import com.yineng.ynmessager.smack.ReceiveReqIQCallBack;
 import com.yineng.ynmessager.smack.ReqIQ;
-import com.yineng.ynmessager.smack.ReqIQResult;
 import com.yineng.ynmessager.util.JIDUtil;
 import com.yineng.ynmessager.util.NetWorkUtil;
 import com.yineng.ynmessager.util.ToastUtil;
 import com.yineng.ynmessager.view.HorizontalListView;
+import com.yineng.ynmessager.view.SearchContactEditText;
+import com.yineng.ynmessager.view.SearchContactEditText.onCancelSearchAnimationListener;
+import com.yineng.ynmessager.view.SearchContactEditText.onResultSearchedListener;
 
 /**
  * ClassName: DisAddActivity <br/>
@@ -73,7 +78,7 @@ import com.yineng.ynmessager.view.HorizontalListView;
  * @since JDK 1.6
  */
 public class DisAddActivity extends BaseActivity implements /*ReceiveReqIQCallBack,*/
-		OnClickListener {
+		OnClickListener, onCancelSearchAnimationListener {
 	public static final int REFRESH_GALLARY_UI = 0;// 刷新画廊UI
 	public static final int REFRESH_LIST_UI = 1;// 刷新listview的UI
 	public static final int REFRESH_GUID_UI = 2;// 刷新组织机构跳转UI
@@ -81,7 +86,6 @@ public class DisAddActivity extends BaseActivity implements /*ReceiveReqIQCallBa
 	public static final int ADD_FAILED = 4;// 创建讨论组失败
 	public static final int OVER_FLOW_MAX_MEMBERS = 5;//成员超限
 	public static final String DIS_GROUP_ID_KEY = "discussion_group_id";// 获得传过来的讨论组IDkey
-
 	/**
 	 * mOrgPathAdapter: 组织机构跳转适配器
 	 */
@@ -109,6 +113,8 @@ public class DisAddActivity extends BaseActivity implements /*ReceiveReqIQCallBa
 	 * mOrgListAdapter: mOrgListLV的适配器
 	 */
 	private OrgListAdapter mOrgListAdapter;
+	
+	private OrgListAdapter mSearchListAdapter;
 	/**
 	 * mTitleTV:
 	 */
@@ -158,9 +164,10 @@ public class DisAddActivity extends BaseActivity implements /*ReceiveReqIQCallBa
 	private LinkedList<OrganizationTree> mGuideList = new LinkedList<OrganizationTree>();
 	
 	/**
-	 * 用于判断群组、讨论组层次
+	 * 用户历史操作记录
 	 */
-	private LinkedList<ContactGroup> mGroupGuideList = new LinkedList<ContactGroup>();
+	private LinkedList<Object> mHistoryPathList = new LinkedList<Object>();
+	
 	/**
 	 * mNewAddUserList:创建讨论组时选择的用户
 	 * 
@@ -207,6 +214,13 @@ public class DisAddActivity extends BaseActivity implements /*ReceiveReqIQCallBa
 			case OVER_FLOW_MAX_MEMBERS:
 				ToastUtil.toastAlerMessage(DisAddActivity.this, "您的讨论组人数已达到"+mMaxMemberNum+"人上限！", Toast.LENGTH_SHORT);
 				break;	
+			case SHOW_SEARCH_VIEW:
+				mSearchContactEditText.show();
+				mCreateDisGroupLayoutLL.setY(-searchViewY);
+				break;
+			case CANCEL_SEARCH_VIEW:
+				mCreateDisGroupLayoutLL.setY(0);
+				break;
 			default:
 				break;
 			}
@@ -217,7 +231,12 @@ public class DisAddActivity extends BaseActivity implements /*ReceiveReqIQCallBa
 	private int mMaxMemberNum = 100;
 	private CommonReceiver mCommonReceiver;
 	protected boolean isFinishAcitivity = false;
-	
+	private SearchContactEditText mSearchContactEditText;
+	private LinearLayout mCreateDisGroupLayoutLL;
+	protected float searchViewY;
+	final static int SHOW_SEARCH_VIEW = 6;
+	final static int CANCEL_SEARCH_VIEW = 7;
+	private boolean isShowSearchEditText = false;
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
@@ -265,6 +284,7 @@ public class DisAddActivity extends BaseActivity implements /*ReceiveReqIQCallBa
 		mOrgListLV.setAdapter(mOrgListAdapter);
 		showRootListUI();
 		initMaxUser();
+		findSearchContactView();
 	}
 
 	/**
@@ -281,36 +301,37 @@ public class DisAddActivity extends BaseActivity implements /*ReceiveReqIQCallBa
 	private void initEvent() {
 		mAddBtn.setOnClickListener(this);
 		mTitleTV.setOnClickListener(this);
-		mSearchET.addTextChangedListener(new TextWatcher() {
-			@Override
-			public void onTextChanged(CharSequence s, int start, int before,
-					int count) {
-			}
-
-			@Override
-			public void beforeTextChanged(CharSequence s, int start, int count,
-					int after) {
-				// TODO Auto-generated method stub
-
-			}
-
-			@Override
-			public void afterTextChanged(Editable s) {
-				if (s.length() > 0) {
-					mCurrentObjectList = mContactOrgDao
-							.querySearchResultByKeyWords(s.toString());
-					updateCurrentObjectList(mNewAddUserList,mOldUserList,mCurrentObjectList);
-					mHandler.sendEmptyMessage(REFRESH_LIST_UI);
-				} else {
-					if (getCurrentOrgNum() == null) {
-						showRootListUI();
-					} else {
-						updateCurrentObjectList(getCurrentOrgNum());
-						mHandler.sendEmptyMessage(REFRESH_LIST_UI);
-					}
-				}
-			}
-		});
+		initSearchContactViewListener();
+//		mSearchET.addTextChangedListener(new TextWatcher() {
+//			@Override
+//			public void onTextChanged(CharSequence s, int start, int before,
+//					int count) {
+//			}
+//
+//			@Override
+//			public void beforeTextChanged(CharSequence s, int start, int count,
+//					int after) {
+//				// TODO Auto-generated method stub
+//
+//			}
+//
+//			@Override
+//			public void afterTextChanged(Editable s) {
+//				if (s.length() > 0) {
+//					mCurrentObjectList = mContactOrgDao
+//							.querySearchResultByKeyWords(s.toString());
+//					updateCurrentObjectList(mNewAddUserList,mOldUserList,mCurrentObjectList);
+//					mHandler.sendEmptyMessage(REFRESH_LIST_UI);
+//				} else {
+//					if (getCurrentOrgNum() == null) {
+//						showRootListUI();
+//					} else {
+//						updateCurrentObjectList(getCurrentOrgNum());
+//						mHandler.sendEmptyMessage(REFRESH_LIST_UI);
+//					}
+//				}
+//			}
+//		});
 		addGroupUpdatedListener();
 	}
 
@@ -390,7 +411,6 @@ public class DisAddActivity extends BaseActivity implements /*ReceiveReqIQCallBa
 					.findViewById(R.id.tv_contact_title_jump_my_org);
 			mOrgTitlePopwinList = (ListView) view
 					.findViewById(R.id.lv_contact_title_current_path);
-
 			mOrgTitlePopwinList.setAdapter(mOrgPathAdapter);
 			// 创建一个PopuWidow对象
 			mOrgTitlePopWindow = new PopupWindow(view, parent.getWidth(),
@@ -402,8 +422,10 @@ public class DisAddActivity extends BaseActivity implements /*ReceiveReqIQCallBa
 					// 点击跳转到当前用户所在的组织机构
 					OrganizationTree entity = mContactOrgDao
 							.queryMyOrg(DisAddActivity.this);
+					resetOrgPathList(entity);
+					mHistoryPathList.clear();
+					mHistoryPathList.addAll(mGuideList);
 					updateCurrentObjectList(entity.getOrgNo());
-					mGuideList.clear();
 					closePopWindow();
 					mHandler.sendEmptyMessage(REFRESH_LIST_UI);
 				}
@@ -425,6 +447,8 @@ public class DisAddActivity extends BaseActivity implements /*ReceiveReqIQCallBa
 					int position, long id) {
 				closePopWindow();
 				removeGuideListTail(position);
+				mHistoryPathList.clear();
+				mHistoryPathList.addAll(mGuideList);
 				if (updateCurrentObjectList(getCurrentOrgNum())) {
 					// 点击跳转，更新listview
 					mHandler.sendEmptyMessage(REFRESH_LIST_UI);
@@ -501,7 +525,7 @@ public class DisAddActivity extends BaseActivity implements /*ReceiveReqIQCallBa
 		bean.setNum("0");
 		mCurrentObjectList.add(bean);
 		ContactCommonBean bean1 = new ContactCommonBean();
-		bean1.setName("群");
+		bean1.setName("群组");
 		mCurrentObjectList.add(bean1);
 		ContactCommonBean bean2 = new ContactCommonBean();
 		bean2.setName("讨论组");
@@ -605,7 +629,7 @@ public class DisAddActivity extends BaseActivity implements /*ReceiveReqIQCallBa
 			}
 		}
 	}
-	private Map<String,User> mSelectedUsersMap = new HashMap<String,User>();
+	
 	class OrgListAdapter extends BaseAdapter {
 		private Context nContext;
 		private List<Object> nListObjects = new ArrayList<Object>();
@@ -746,12 +770,16 @@ public class DisAddActivity extends BaseActivity implements /*ReceiveReqIQCallBa
 						.setOnClickListener(new OnClickListener() {
 							@Override
 							public void onClick(View v) {
+								// TODO Auto-generated method stub
+								isRootList = false;
+								if (mSearchContactEditText.isShowing()) {
+									cancelSearchContactAnimation();
+								}
 								OrganizationTree entity = (OrganizationTree) v
 										.getTag();
-								addGuideList(entity);
-								if (updateCurrentObjectList(entity.getOrgNo())) {
-									mHandler.sendEmptyMessage(REFRESH_LIST_UI);
-								}
+								resetOrgPathList(entity);
+								mHistoryPathList.add(entity);
+								updateCurrentOrgList(entity);
 							}
 						});
 			}
@@ -767,54 +795,32 @@ public class DisAddActivity extends BaseActivity implements /*ReceiveReqIQCallBa
 						.setOnClickListener(new OnClickListener() {
 							@Override
 							public void onClick(View v) {
+								// TODO Auto-generated method stub
 								isRootList = false;
 								switch ((Integer) v.getTag()) {
 								case 0:
-									OrganizationTree entity = new OrganizationTree();
-									entity.setOrgNo("0");
-									entity.setOrgName("组织机构");
-									addGuideList(entity);
-									ArrayList<OrganizationTree> list1 = (ArrayList<OrganizationTree>) mContactOrgDao
-											.queryOrgListByParentId("0");
-									if (list1 != null && !list1.isEmpty()) {
-										mCurrentObjectList.clear();
-										for (OrganizationTree entity1 : list1) {
-											mCurrentObjectList.add(entity1);
-										}
-										notifyDataSetChanged();
-									}
+									OrganizationTree entity = new OrganizationTree("0", "-1", "组织机构", 0, "0", 0);
+									resetOrgPathList(entity);
+									mHistoryPathList.add(entity);
+									updateCurrentOrgList(entity);
 									break;
 								case 1:// 群
 									ContactGroup tempGroup = new ContactGroup();
 									tempGroup.setGroupName("0");
 									tempGroup.setNaturalName("群组");
 									tempGroup.setGroupType(Const.CONTACT_GROUP_TYPE);
-									addGroupGuideList(tempGroup);
-									List<ContactGroup> list2 = mContactOrgDao
-											.queryGroupList(8);
-									if (list2 != null && !list2.isEmpty()) {
-										mCurrentObjectList.clear();
-										for (ContactGroup entity2 : list2) {
-											mCurrentObjectList.add(entity2);
-										}
-										notifyDataSetChanged();
-									}
+//									addGroupGuideList(tempGroup);
+									mHistoryPathList.add(tempGroup);
+									updateCurrentGroupList(tempGroup);
 									break;
 								case 2:// 讨论组
 									ContactGroup tempDisGroup = new ContactGroup();
 									tempDisGroup.setGroupName("0");
 									tempDisGroup.setNaturalName("讨论组");
 									tempDisGroup.setGroupType(Const.CONTACT_DISGROUP_TYPE);
-									addGroupGuideList(tempDisGroup);
-									List<ContactGroup> list3 = mContactOrgDao
-											.queryGroupList(9);
-									if (list3 != null && !list3.isEmpty()) {
-										mCurrentObjectList.clear();
-										for (ContactGroup entity3 : list3) {
-											mCurrentObjectList.add(entity3);
-										}
-										notifyDataSetChanged();
-									}
+//									addGroupGuideList(tempDisGroup);
+									mHistoryPathList.add(tempDisGroup);
+									updateCurrentGroupList(tempDisGroup);
 									break;
 
 								default:
@@ -848,18 +854,15 @@ public class DisAddActivity extends BaseActivity implements /*ReceiveReqIQCallBa
 					
 					@Override
 					public void onClick(View v) {
-						ContactGroup tempBean = (ContactGroup) v.getTag();
-						addGroupGuideList(tempBean);
-						List<User> list = mContactOrgDao.queryUsersByGroupName(
-								tempBean.getGroupName(), tempBean.getGroupType());
-						if (list != null && !list.isEmpty()) {
-							mCurrentObjectList.clear();
-							for (User entity : list) {
-								mCurrentObjectList.add(entity);
-							}
-							updateCurrentObjectList(mNewAddUserList,mOldUserList,mCurrentObjectList);
-							notifyDataSetChanged();
+						// TODO Auto-generated method stub
+						isRootList = false;
+						if (mSearchContactEditText.isShowing()) {
+							cancelSearchContactAnimation();
 						}
+						ContactGroup tempBean = (ContactGroup) v.getTag();
+//						addGroupGuideList(tempBean);
+						mHistoryPathList.add(tempBean);
+						updateCurrentGroupList(tempBean);
 					}
 				});
 			}
@@ -891,23 +894,7 @@ public class DisAddActivity extends BaseActivity implements /*ReceiveReqIQCallBa
 				}
 			}
 		}
-
-		/**
-		 * 添加对象到mGuideList
-		 * 
-		 * @param entity
-		 */
-		private void addGuideList(OrganizationTree entity) {
-			mGuideList.add(entity);
-		}
 		
-		/**
-		 * @param tempGroup
-		 */
-		protected void addGroupGuideList(ContactGroup tempGroup) {
-			mGroupGuideList.add(tempGroup);
-		}
-
 		class ViewHolder {
 			public TextView tvContactItemPersonName;
 			public ImageView ivContactItemPersonIcon;
@@ -924,78 +911,86 @@ public class DisAddActivity extends BaseActivity implements /*ReceiveReqIQCallBa
 		back();
 	}
 
-	private void removeGuidLastOne() {
-		if (!mGuideList.isEmpty()) {
-			mGuideList.removeLast();
-		}
-	}
-
-	private int removeGroupGuideLastItem() {
-		if (!mGroupGuideList.isEmpty()) {
-			return mGroupGuideList.removeLast().getGroupType();
-		}
-		return 0;
-	}
-	
 	/**
-	 * 
+	 * 返回功能
 	 */
 	private void back() {
-		if (isFinishAcitivity) {
-			removeGuidLastOne();
-			if (!mGuideList.isEmpty()) {
-				updateCurrentObjectList(getCurrentOrgNum());
-				mHandler.sendEmptyMessage(REFRESH_LIST_UI);
-				isRootList = false;
+		if (!mHistoryPathList.isEmpty()) {
+			mHistoryPathList.removeLast();
+		}
+		if (mHistoryPathList.isEmpty()) {
+			if (!isRootList) {
+				showRootListUI();
+				isRootList = true;
+				mGuideList.clear();
 			} else {
-				if (!isRootList) {
-					showRootListUI();
-					isRootList = true;
-				} else {
-					finish();
-				}
+				finish();
 			}
 		} else {
-			int groupType = removeGroupGuideLastItem();
-			if (!mGroupGuideList.isEmpty()) {
-				if (groupType != 0) {
-					List<ContactGroup> list3 = mContactOrgDao.queryGroupList(groupType);
-					if (list3 != null && !list3.isEmpty()) {
-						mCurrentObjectList.clear();
-						for (ContactGroup entity3 : list3) {
-							mCurrentObjectList.add(entity3);
-						}
-					}
-					mHandler.sendEmptyMessage(REFRESH_LIST_UI);
-					isRootList = false;
-				}
-			} else {
-				if (!isRootList) {
-					showRootListUI();
-					isRootList = true;
-				} else {
-					finish();
-				}
-			}
+			Object nowOrg = mHistoryPathList.getLast();
+			if (nowOrg instanceof OrganizationTree) {
+				resetOrgPathList((OrganizationTree) nowOrg);
+				updateCurrentOrgList((OrganizationTree) nowOrg);
+			} else if (nowOrg instanceof ContactGroup) {
+				updateCurrentGroupList((ContactGroup) nowOrg);
+			} 
 		}
-//		removeGuidLastOne();
-//		if (!mGuideList.isEmpty()) {
-//			updateCurrentObjectList(getCurrentOrgNum());
-//			mHandler.sendEmptyMessage(REFRESH_LIST_UI);
-//			isRootList = false;
-//		} else {
-//			if (!isRootList) {
-//				showRootListUI();
-//				isRootList = true;
-//			} else {
-//				finish();
-//			}
-//		}
 	}
 
 	@Override
 	public void onBackPressed() {
 		back();
+	}
+	
+	/**
+	 * @param entity
+	 */
+	protected void updateCurrentOrgList(OrganizationTree entity) {
+		if (entity.getOrgNo().equals("0")) {
+			ArrayList<OrganizationTree> list1 = (ArrayList<OrganizationTree>) mContactOrgDao
+					.queryOrgListByParentId("0");
+			if (list1 != null && !list1.isEmpty()) {
+				mCurrentObjectList.clear();
+				for (OrganizationTree entity1 : list1) {
+					mCurrentObjectList.add(entity1);
+				}
+			}
+		} else {
+			updateCurrentObjectList(entity.getOrgNo());
+		}
+		mHandler.sendEmptyMessage(REFRESH_LIST_UI);
+	}
+	
+	/**
+	 * @param tempBean
+	 */
+	protected void updateCurrentGroupList(ContactGroup tempBean) {
+		// TODO Auto-generated method stub
+		if (tempBean.getGroupName().equals("0")) {
+			List<ContactGroup> list;
+			if (tempBean.getGroupType() == Const.CONTACT_GROUP_TYPE) {
+				list = mContactOrgDao.queryGroupList(Const.CONTACT_GROUP_TYPE);
+			} else {
+				list = mContactOrgDao.queryGroupList(Const.CONTACT_DISGROUP_TYPE);
+			}
+			if (list != null && !list.isEmpty()) {
+				mCurrentObjectList.clear();
+				for (ContactGroup entity2 : list) {
+					mCurrentObjectList.add(entity2);
+				}
+			}
+		} else {
+			List<User> list = mContactOrgDao.queryUsersByGroupName(
+					tempBean.getGroupName(), tempBean.getGroupType());
+			if (list != null && !list.isEmpty()) {
+				mCurrentObjectList.clear();
+				for (User entity : list) {
+					mCurrentObjectList.add(entity);
+				}
+				updateCurrentObjectList(mNewAddUserList,mOldUserList,mCurrentObjectList);
+			}
+		}
+		mHandler.sendEmptyMessage(REFRESH_LIST_UI);
 	}
 
 	/*
@@ -1011,7 +1006,9 @@ public class DisAddActivity extends BaseActivity implements /*ReceiveReqIQCallBa
 			break;
 
 		case R.id.tv_create_disgroup_title:
-			showWindow(v);
+			if (!isRootList) {
+				showWindow(v);
+			}
 			break;
 		default:
 			break;
@@ -1039,5 +1036,106 @@ public class DisAddActivity extends BaseActivity implements /*ReceiveReqIQCallBa
 		super.onDestroy();
 //		mXmppConnectionManager.removeReceiveReqIQCallBack(Const.REQ_IQ_XMLNS_GET_GROUP);
 		unregisterReceiver(mCommonReceiver);
+	}
+	
+	private void findSearchContactView() {
+		mSearchContactEditText = new SearchContactEditText(this);
+		mSearchContactEditText.setOnResultSearchedListener(true, new onResultSearchedListener() {
+			
+			@Override
+			public void onResultSearched(List<Object> mSearchResultObjects) {
+				if (mSearchResultObjects != null) {
+					updateCurrentObjectList(mNewAddUserList,mOldUserList,mSearchResultObjects);
+					if (mSearchListAdapter != null) {
+						mSearchListAdapter.setData(mSearchResultObjects);
+					} else {
+						mSearchListAdapter = new OrgListAdapter(DisAddActivity.this);
+						mSearchListAdapter.setData(mSearchResultObjects);
+						mSearchContactEditText.mContactSearchListView.setAdapter(mSearchListAdapter);
+					}
+					//判断是否显示空数据界面
+					if (mSearchContactEditText.mSearchEditText.getText().length()>0 && mSearchResultObjects.size() <= 0) {
+						mSearchContactEditText.mContactSearchListView.setEmptyView(mSearchContactEditText.mContactSearchResultEmptyTV);
+					} else {
+						mSearchContactEditText.mContactSearchResultEmptyTV.setVisibility(View.GONE);
+						mSearchContactEditText.mContactSearchListView.setEmptyView(null);
+					}
+					mSearchListAdapter.notifyDataSetChanged();
+				}
+			}
+		});
+		mSearchET = (EditText) findViewById(R.id.et_create_disgroup_search);
+		mCreateDisGroupLayoutLL = (LinearLayout) findViewById(R.id.ll_create_disgroup_layout);
+	}
+	
+	private void initSearchContactViewListener() {
+		mSearchET.setOnClickListener(new OnClickListener() {
+
+			@Override
+			public void onClick(View paramView) {
+				isShowSearchEditText = true;
+				LinearLayout.LayoutParams etParamTest = (LinearLayout.LayoutParams) mSearchET
+						.getLayoutParams();
+				searchViewY = mSearchET.getY() - etParamTest.topMargin;
+				TranslateAnimation showAnimation = new TranslateAnimation(0, 0, 0, -searchViewY);
+				showAnimation.setDuration(200);
+				showAnimation.setAnimationListener(showAnimationListener);
+				mCreateDisGroupLayoutLL.startAnimation(showAnimation);
+			}
+		});
+		mSearchContactEditText.setOnCancelSearchAnimationListener(this);
+	}
+
+	/**
+	 * 动画过程监听
+	 */
+	private AnimationListener showAnimationListener = new AnimationListener() {
+		@Override
+		public void onAnimationStart(Animation animation) {
+
+		}
+
+		@Override
+		public void onAnimationRepeat(Animation animation) {
+
+		}
+
+		@Override
+		public void onAnimationEnd(Animation animation) {
+			if (isShowSearchEditText) {
+				mHandler.sendEmptyMessage(SHOW_SEARCH_VIEW);
+			} else {
+				mHandler.sendEmptyMessage(CANCEL_SEARCH_VIEW);
+			}
+		}
+	};
+	
+	@Override
+	public void cancelSearchContactAnimation() {
+		isShowSearchEditText = false;
+		mSearchContactEditText.dismiss();
+		TranslateAnimation cancelAnimation = new TranslateAnimation(0, 0, 0, searchViewY);
+		cancelAnimation.setDuration(200);
+		cancelAnimation.setAnimationListener(showAnimationListener);
+		mCreateDisGroupLayoutLL.startAnimation(cancelAnimation);		
+	}
+	
+	/**
+	 * 根据跳转到的org，寻找该org所属的组织机构
+	 * 
+	 * @param tempOrg
+	 */
+	protected void resetOrgPathList(OrganizationTree tempOrg) {
+		ArrayList<OrganizationTree> mMyOrgPathList = new ArrayList<OrganizationTree>();
+		mGuideList.clear();
+		mGuideList.addFirst(new OrganizationTree("0", "-1", "组织机构", 0, "0", 0));
+		mContactOrgDao.queryOrgBelongListByOrgNo(tempOrg, mMyOrgPathList);
+		if (mMyOrgPathList.size() > 0) {
+			Collections.reverse(mMyOrgPathList);
+		}
+		mGuideList.addAll(mMyOrgPathList);
+		if (!tempOrg.getOrgNo().equals("0")) {
+			mGuideList.add(tempOrg);
+		}
 	}
 }

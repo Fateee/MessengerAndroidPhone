@@ -57,6 +57,11 @@ public interface Const
 	 * 广播-登录用户退出某讨论组的action
 	 */
 	public final String BROADCAST_ACTION_I_QUIT_GROUP = "ynmsg.group.I.quit";// 我退出讨论组
+	
+	/**
+	 * 密码错误，身份验证过期
+	 */
+	public final String BROADCAST_ACTION_ID_PAST = "ysmsg.id.past";
 
 	/**
 	 * 广播 - 清空会话列表

@@ -2,13 +2,14 @@ package com.yineng.ynmessager.activity;
 
 import java.util.Iterator;
 import java.util.LinkedList;
-import java.util.List;
 
 import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.AlertDialog.Builder;
 import android.content.Intent;
+import android.content.IntentFilter;
+import android.net.ConnectivityManager;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
@@ -17,13 +18,18 @@ import android.widget.Toast;
 
 import com.yineng.ynmessager.R;
 import com.yineng.ynmessager.app.AppController;
+import com.yineng.ynmessager.app.Const;
 import com.yineng.ynmessager.bean.login.LoginThread;
 import com.yineng.ynmessager.manager.XmppConnectionManager;
+import com.yineng.ynmessager.receiver.CommonReceiver;
+import com.yineng.ynmessager.receiver.CommonReceiver.IdPastListener;
+import com.yineng.ynmessager.receiver.CommonReceiver.netWorkChangedListener;
 import com.yineng.ynmessager.service.XmppConnService;
 import com.yineng.ynmessager.sharedpreference.LastLoginUserSP;
 import com.yineng.ynmessager.smack.StatusChangedCallBack;
 import com.yineng.ynmessager.util.L;
 import com.yineng.ynmessager.util.NetWorkUtil;
+import com.yineng.ynmessager.util.ToastUtil;
 
 /**
  * 所有Activity都应从此类继承
@@ -36,10 +42,8 @@ public abstract class BaseActivity extends FragmentActivity implements StatusCha
 	private static final String BASE_TAG = "BaseActivity"; // BaseActivity的自己TAG
 	protected final String TAG = this.getClass().getSimpleName(); // 每个Activity的TAG
 	protected final AppController mApplication = AppController.getInstance(); // Application
-	private static final List<Activity> mActivityList = new LinkedList<Activity>(); // 用来储存当前运行中的Activity实例的List
+	private static final LinkedList<Activity> mActivityList = new LinkedList<Activity>(); // 用来储存当前运行中的Activity实例的List
 	private int mCurrentStats = 0;
-	// private boolean mIsNetworkAvailable;
-	// private NetChangeReceiver mNetChangeReceiver;
 
 	private Handler mHandler = new Handler() {
 		@SuppressLint("NewApi")
@@ -61,6 +65,10 @@ public abstract class BaseActivity extends FragmentActivity implements StatusCha
 	 * 下线通知对话框
 	 */
 	private Builder mOfflineNoticeDialog;
+	/**
+	 * 网络状态监听器
+	 */
+	public CommonReceiver mNetWorkChangedReceiver;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState)
@@ -75,17 +83,68 @@ public abstract class BaseActivity extends FragmentActivity implements StatusCha
 		 * .isNetworkAvailable(getApplicationContext()); // 注册网络监听器
 		 * registerNetChangeReceiver();
 		 */
+		initIdPastDialog();
 		initOfflineNoticeDialog();
+	}
+	
+	@Override
+	protected void onResume() {
+		super.onResume();
+		IntentFilter netWorkChangedFilter;
 		/***** 添加用户状态监听器 *****/
 		XmppConnectionManager.getInstance().addStatusChangedCallBack(this);
+		//		mNetWorkChangedReceiver = new CommonReceiver();
+//		IntentFilter netWorkChangedFilter = new IntentFilter(Const.BROADCAST_ACTION_ID_PAST);
+//		mNetWorkChangedReceiver.setIdPastListener(new IdPastListener() {
+//			
+//			@Override
+//			public void idPasted() {
+//				L.e("mIdPastDialog.isShowing() == "+mIdPastDialog.isShowing());
+//				if (!mIdPastDialog.isShowing()) {
+//					mIdPastDialog.show();
+//				}
+//			}
+//		});
+		if (mActivityList.getLast().getClass().getSimpleName().equals("SplashActivity") ||
+				mActivityList.getLast().getClass().getSimpleName().equals("LoginActivity")) {
+			return;
+		} else {
+			mNetWorkChangedReceiver = new CommonReceiver();
+			netWorkChangedFilter = new IntentFilter(Const.BROADCAST_ACTION_ID_PAST);
+			netWorkChangedFilter.addAction(ConnectivityManager.CONNECTIVITY_ACTION);
+			mNetWorkChangedReceiver.setNetWorkChangedListener(new netWorkChangedListener() {
+				
+				@Override
+				public void netWorkChanged(String netWorkInfo) {
+					// TODO Auto-generated method stub
+					if (netWorkInfo.equals("none")) {
+						ToastUtil.toastAlerMessageCenter(BaseActivity.this, "当前无网络", 1000);
+					} else {
+						ToastUtil.toastAlerMessageCenter(BaseActivity.this, "您当前在使用"+netWorkInfo+"网络", 1000);
+					}
+				}
+			});
+		}
+		registerReceiver(mNetWorkChangedReceiver, netWorkChangedFilter);
+	}
+	
+	@Override
+	protected void onStop() {
+		super.onStop();
+		/***** 删除用户状态监听器 *****/
+		XmppConnectionManager.getInstance().removeStatusChangedCallBack(this);
+		if (mNetWorkChangedReceiver != null) {
+			unregisterReceiver(mNetWorkChangedReceiver);
+		}
+		if (mIdPastDialog!=null&&mIdPastDialog.isShowing()) {
+			mIdPastDialog.dismiss();
+		}
 	}
 	
 	@Override
 	protected void onDestroy()
 	{
 		super.onDestroy();
-		/***** 删除用户状态监听器 *****/
-		XmppConnectionManager.getInstance().removeStatusChangedCallBack(this);
 		mActivityList.remove(this);
 		L.v(BASE_TAG,"关闭并移除了Activity：" + TAG);
 	}
@@ -98,6 +157,7 @@ public abstract class BaseActivity extends FragmentActivity implements StatusCha
 		mOfflineNoticeDialog = new AlertDialog.Builder(BaseActivity.this);
 		mOfflineNoticeDialog.setTitle(R.string.common_offline_notice_title);
 		mOfflineNoticeDialog.setMessage(R.string.common_offline_notice_msg);
+		mOfflineNoticeDialog.setCancelable(false);
 		mOfflineNoticeDialog.setPositiveButton("重新登录",new android.content.DialogInterface.OnClickListener() {
 
 			@Override
@@ -114,23 +174,50 @@ public abstract class BaseActivity extends FragmentActivity implements StatusCha
 			@Override
 			public void onClick(android.content.DialogInterface dialog, int which)
 			{
-				// 注销并退出app
-				LastLoginUserSP lastUser = LastLoginUserSP.getInstance(BaseActivity.this);
-				lastUser.saveUserPassword("");
-				XmppConnectionManager.getInstance().doExistThread();
-				stopServiceAndCloseApp();
+				logOutAndCloseApp(true);
 			}
 		});
 	}
 
 	/**
-	 * 推出应用程序
+	 * 注销账户，停止服务，关闭应用
+	 * @param closeApp 是否关闭app;
+	 * 	 true 关闭;false不关
 	 */
-	private void stopServiceAndCloseApp()
+	protected void logOutAndCloseApp(boolean closeApp) {
+		// 注销并退出app
+		LastLoginUserSP lastUser = LastLoginUserSP.getInstance(BaseActivity.this);
+		lastUser.saveUserPassword("");
+		XmppConnectionManager.getInstance().doExistThread();
+		stopServiceAndCloseApp(closeApp);
+	}
+
+	/**
+	 * 关闭服务，返回登录界面或退出应用程序
+	 * @param closeApp 是否退出APP
+	 */ 
+	private void stopServiceAndCloseApp(boolean closeApp)
 	{
 		Intent serviceIntent = new Intent(BaseActivity.this,XmppConnService.class);
 		stopService(serviceIntent);
-		exit();
+		if (closeApp) {
+			exit();
+		} else {
+			// 清理Activity
+			Iterator<Activity> iterator = mActivityList.iterator();
+			Activity activity;
+			while(iterator.hasNext())
+			{
+				activity = iterator.next();
+				if(activity != null)
+				{
+					activity.finish();
+				}
+			}
+			Intent intent = new Intent(BaseActivity.this,LoginActivity.class);
+			startActivity(intent);
+		}
+		
 	}
 
 	@Override
@@ -265,5 +352,27 @@ public abstract class BaseActivity extends FragmentActivity implements StatusCha
 	 * 
 	 * }
 	 */
+	/**
+	 * 身份验证过期对话框
+	 */
+	private void initIdPastDialog()
+	{
+		Builder tempIdPastDialog = new AlertDialog.Builder(BaseActivity.this);
+		tempIdPastDialog.setTitle(R.string.common_dialog_title);
+		tempIdPastDialog.setMessage(R.string.common_id_past_msg);
+		tempIdPastDialog.setCancelable(false);
+		tempIdPastDialog.setPositiveButton("确定",new android.content.DialogInterface.OnClickListener() {
 
+			@Override
+			public void onClick(android.content.DialogInterface dialog, int which)
+			{
+				logOutAndCloseApp(false);
+			}
+		});
+		mIdPastDialog = tempIdPastDialog.create();
+	}
+	/**
+	 * 身份验证过期对话框
+	 */
+	public AlertDialog mIdPastDialog;
 }

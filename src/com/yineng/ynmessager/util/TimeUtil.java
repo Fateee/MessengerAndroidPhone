@@ -243,6 +243,8 @@ public class TimeUtil
 	/**
 	 * 判断Date的时间关系字符串（传入的Date对象与当前时间的关系）
 	 * 
+	 * @param context
+	 *            你懂的
 	 * @param date
 	 *            想要判断的Date对象
 	 * @return 返回时间关系字符串，比如：
@@ -253,10 +255,13 @@ public class TimeUtil
 	 *         <li>超出前一周范围，返回其日期，比如“2015-5-8”</li>
 	 *         </ul>
 	 */
-	public static String getTimeRelativeFromNow(Date date)
+	public static String getTimeRelationFromNow(Context context, Date date)
 	{
-		Context context = AppController.getInstance().getApplicationContext();
 		String relative = "";
+		if(date == null)
+		{
+			return relative;
+		}
 		long today = date.getTime();
 		long weekFromToday[] = {today, today + DateUtils.DAY_IN_MILLIS, today + DateUtils.DAY_IN_MILLIS * 2,
 				today + DateUtils.DAY_IN_MILLIS * 3, today + DateUtils.DAY_IN_MILLIS * 4,
@@ -299,7 +304,7 @@ public class TimeUtil
 					relative += context.getString(R.string.common_wednesday);
 					break;
 				case 5:
-					relative += context.getString(R.string.common_tuesday);
+					relative += context.getString(R.string.common_thursday);
 					break;
 				case 6:
 					relative += context.getString(R.string.common_friday);
@@ -311,10 +316,97 @@ public class TimeUtil
 					relative = "";
 					break;
 			}
-		}else  // 超出一周以外的
+		}else
+		// 超出一周以外的
 		{
 			relative = calendar.get(Calendar.YEAR) + "-" + (calendar.get(Calendar.MONTH) + 1) + "-"
 					+ calendar.get(Calendar.DAY_OF_MONTH);
+		}
+		return relative;
+	}
+
+	/**
+	 * 判断Date的时间关系字符串【版本二】（传入的Date对象与当前时间的关系）
+	 * 
+	 * @param context
+	 *            你懂的
+	 * 
+	 * @param date
+	 *            想要判断的Date对象
+	 * @return 返回时间关系字符串，比如：
+	 *         <ul>
+	 *         <li>当天，会直接返回具体时间，比如“19:48”</li>
+	 *         <li>昨天，会返回“昨天”加具体时间，比如“昨天 19:48”</li>
+	 *         <li>前天到前一周内，会返回其所在的星期加具体时间，比如“星期三 19:48”</li>
+	 *         <li>超出前一周范围，返回其日期加具体时间，比如“2015-5-8 19:48”</li>
+	 *         </ul>
+	 */
+	public static String getTimeRelationFromNow2(Context context, Date date)
+	{
+		String relative = "";
+		if(date == null)
+		{
+			return relative;
+		}
+		long today = date.getTime();
+		long weekFromToday[] = {today, today + DateUtils.DAY_IN_MILLIS, today + DateUtils.DAY_IN_MILLIS * 2,
+				today + DateUtils.DAY_IN_MILLIS * 3, today + DateUtils.DAY_IN_MILLIS * 4,
+				today + DateUtils.DAY_IN_MILLIS * 5, today + DateUtils.DAY_IN_MILLIS * 6,
+				today + DateUtils.DAY_IN_MILLIS * 7};
+
+		Calendar calendar = Calendar.getInstance();
+		calendar.setTime(date);
+
+		String timeDisplay[] = betterTimeDisplay(calendar.get(Calendar.HOUR_OF_DAY),calendar.get(Calendar.MINUTE));
+		if(DateUtils.isToday(weekFromToday[0])) // 判断是否为今天
+		{
+			relative = timeDisplay[0] + ":" + timeDisplay[1];
+		}else if(DateUtils.isToday(weekFromToday[1])) // 是否为昨天
+		{
+			relative = context.getString(R.string.session_yesterday);
+			relative += " " + timeDisplay[0] + ":" + timeDisplay[1];
+		}else if(DateUtils.isToday(weekFromToday[2]) || DateUtils.isToday(weekFromToday[3])
+				|| DateUtils.isToday(weekFromToday[4]) || DateUtils.isToday(weekFromToday[5])
+				|| DateUtils.isToday(weekFromToday[6]) || DateUtils.isToday(weekFromToday[7])) // 是否为前天到上一周内的时间范围
+		{
+			// 这里判断周是上周的还是这周的
+			// if(calendar.get(Calendar.WEEK_OF_YEAR) !=
+			// Calendar.getInstance().get(Calendar.WEEK_OF_YEAR))
+			// {
+			// relative += "上周";
+			// }
+			int dayOfWeek = calendar.get(Calendar.DAY_OF_WEEK);
+			switch(dayOfWeek)
+			{
+				case 1:
+					relative += context.getString(R.string.common_sunday);
+					break;
+				case 2:
+					relative += context.getString(R.string.common_monday);
+					break;
+				case 3:
+					relative += context.getString(R.string.common_tuesday);
+					break;
+				case 4:
+					relative += context.getString(R.string.common_wednesday);
+					break;
+				case 5:
+					relative += context.getString(R.string.common_thursday);
+					break;
+				case 6:
+					relative += context.getString(R.string.common_friday);
+					break;
+				case 7:
+					relative += context.getString(R.string.common_saturday);
+					break;
+			}
+			relative += " " + timeDisplay[0] + ":" + timeDisplay[1];
+		}else
+		// 超出一周以外的
+		{
+			relative = calendar.get(Calendar.YEAR) + "-" + (calendar.get(Calendar.MONTH) + 1) + "-"
+					+ calendar.get(Calendar.DAY_OF_MONTH);
+			relative += " " + timeDisplay[0] + ":" + timeDisplay[1];
 		}
 		return relative;
 	}

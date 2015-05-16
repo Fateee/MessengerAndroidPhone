@@ -266,6 +266,9 @@ public class ContactGroupOrgActivity extends BaseActivity implements
 
 	TranslateAnimation showAnimation = null;
 	TranslateAnimation cancelAnimation = null;
+	/**
+	 * 动画过程监听
+	 */
 	private AnimationListener showAnimationListener = new AnimationListener() {
 		@Override
 		public void onAnimationStart(Animation animation) {
@@ -279,12 +282,18 @@ public class ContactGroupOrgActivity extends BaseActivity implements
 
 		@Override
 		public void onAnimationEnd(Animation animation) {
-			mHandler.sendEmptyMessage(SHOW_SEARCH_VIEW);
+			if (isShowSearchEditText) {
+				mHandler.sendEmptyMessage(SHOW_SEARCH_VIEW);
+			} else {
+				mHandler.sendEmptyMessage(CANCEL_SEARCH_VIEW);
+			}
 		}
 	};
+	private boolean isShowSearchEditText;
 
 	public void showSearchContactAnimation() {
-		final RelativeLayout.LayoutParams etParamTest = (RelativeLayout.LayoutParams) mContactEditView
+		isShowSearchEditText = true;
+		RelativeLayout.LayoutParams etParamTest = (RelativeLayout.LayoutParams) mContactEditView
 				.getLayoutParams();
 		searchViewY = mContactEditView.getY() - etParamTest.topMargin;
 		showAnimation = new TranslateAnimation(0, 0, 0, -searchViewY);
@@ -295,10 +304,11 @@ public class ContactGroupOrgActivity extends BaseActivity implements
 
 	@Override
 	public void cancelSearchContactAnimation() {
+		isShowSearchEditText = false;
 		mSearchContactEditText.dismiss();
-		mHandler.sendEmptyMessage(CANCEL_SEARCH_VIEW);
-		cancelAnimation = new TranslateAnimation(0, 0, -searchViewY, 0);
+		cancelAnimation = new TranslateAnimation(0, 0, 0, searchViewY);
 		cancelAnimation.setDuration(200);
+		cancelAnimation.setAnimationListener(showAnimationListener);
 		mContactRelativeLayout.startAnimation(cancelAnimation);
 	}
 

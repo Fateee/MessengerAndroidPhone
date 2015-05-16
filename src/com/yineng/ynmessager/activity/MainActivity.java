@@ -1,5 +1,6 @@
 package com.yineng.ynmessager.activity;
 
+import android.content.IntentFilter;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
@@ -15,10 +16,13 @@ import android.widget.PopupWindow;
 import com.yineng.ynmessager.R;
 import com.yineng.ynmessager.activity.slidingmenu.SlidingFragmentActivity;
 import com.yineng.ynmessager.app.AppController;
+import com.yineng.ynmessager.app.Const;
 import com.yineng.ynmessager.db.ContactOrgDao;
 import com.yineng.ynmessager.db.SettingsTb;
 import com.yineng.ynmessager.db.dao.LoginUserDao;
 import com.yineng.ynmessager.db.dao.SettingsTbDao;
+import com.yineng.ynmessager.receiver.CommonReceiver;
+import com.yineng.ynmessager.receiver.CommonReceiver.IdPastListener;
 import com.yineng.ynmessager.sharedpreference.LastLoginUserSP;
 import com.yineng.ynmessager.util.L;
 import com.yineng.ynmessager.util.ToastUtil;
@@ -38,6 +42,10 @@ public class MainActivity extends SlidingFragmentActivity
 	 */
 	private long mBackKeyTouchTime = 0;
 	private PopupWindow mMenuWindow;
+	/**
+	 * 身份验证过期的广播
+	 */
+	private CommonReceiver mIdPastedReceiver;
 
 	public MainActivity()
 	{
@@ -62,8 +70,9 @@ public class MainActivity extends SlidingFragmentActivity
 	@Override
 	public void onCreate(Bundle savedInstanceState)
 	{
+		//注册身份过期的广播
+		initIdPastDueBroadcast();
 		super.onCreate(savedInstanceState);
-
 		// 获取最后登录的用户名
 		String loginUserAccount = LastLoginUserSP.getInstance(getApplicationContext()).getUserAccount();
 		if(AppController.getInstance().mLoginUser == null)
@@ -110,6 +119,25 @@ public class MainActivity extends SlidingFragmentActivity
 		// sm.setBackgroundColor(Color.GRAY);
 		sm.setBackgroundImage(R.drawable.img_frame_background);
 
+	}
+
+	/**
+	 * 注册身份过期的广播
+	 */
+	private void initIdPastDueBroadcast() {
+		CommonReceiver.mNetWorkTypeStr = "";
+		mIdPastedReceiver = new CommonReceiver();
+		IntentFilter mIdPastedFilter = new IntentFilter(Const.BROADCAST_ACTION_ID_PAST);
+		mIdPastedReceiver.setIdPastListener(new IdPastListener() {
+			
+			@Override
+			public void idPasted() {
+				if (!mIdPastDialog.isShowing()) {
+					mIdPastDialog.show();
+				}
+			}
+		});
+		registerReceiver(mIdPastedReceiver, mIdPastedFilter);		
 	}
 
 	/**
@@ -233,4 +261,13 @@ public class MainActivity extends SlidingFragmentActivity
 		mMenuWindow.dismiss();
 	}
 
+	@Override
+	protected void onDestroy() {
+		super.onDestroy();
+		if (mIdPastDialog.isShowing()) {
+			mIdPastDialog.dismiss();
+		}
+		unregisterReceiver(mIdPastedReceiver);
+	}
+	
 }

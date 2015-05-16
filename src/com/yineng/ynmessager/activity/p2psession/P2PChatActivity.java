@@ -10,7 +10,6 @@ import org.jivesoftware.smack.packet.Message;
 import org.jivesoftware.smack.packet.Message.Type;
 
 import android.annotation.SuppressLint;
-import android.annotation.TargetApi;
 import android.app.AlarmManager;
 import android.app.PendingIntent;
 import android.content.BroadcastReceiver;
@@ -19,18 +18,17 @@ import android.content.ClipboardManager;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
-import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.text.SpannableString;
 import android.text.TextUtils;
 import android.util.Log;
 import android.view.ContextMenu;
+import android.view.ContextMenu.ContextMenuInfo;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.View;
-import android.view.ContextMenu.ContextMenuInfo;
 import android.view.View.OnClickListener;
 import android.view.View.OnTouchListener;
 import android.view.WindowManager;
@@ -77,8 +75,9 @@ import com.yineng.ynmessager.view.face.gif.AnimatedImageSpan;
  * @author YINENG
  * 
  */
-public class P2PChatActivity extends BaseActivity implements OnClickListener,
-		ReceiveMessageCallBack, ReceiveReqIQCallBack {
+public class P2PChatActivity extends BaseActivity implements OnClickListener, ReceiveMessageCallBack,
+		ReceiveReqIQCallBack
+{
 	public static final String ACCOUNT = "Account";
 	public static final String CHOOSE_IMAGE_PATHS = "choose_image_paths";// 选择图片的路径列表
 	public final int CONFIRM_RESULT_OK = 1;// 选择了图片
@@ -92,7 +91,7 @@ public class P2PChatActivity extends BaseActivity implements OnClickListener,
 	private final int BROADCAST = 3;// 收到广播的处理
 	private final int RECEIVE_MSG = 4;// 收到别人发送的消息
 	private final int REFRESH_UI = 5;// 刷新UI
-	private final int REFRESH_FACE_UI = 6;//刷新表情UI
+	private final int REFRESH_FACE_UI = 6;// 刷新表情UI
 
 	private final int PAGE_SIZE = 20;// 分页查询的信息数量
 	private final long TIME_INTERVAL = 60 * 5 * 1000;// 时间在5分钟内的消息不显示时间
@@ -103,7 +102,7 @@ public class P2PChatActivity extends BaseActivity implements OnClickListener,
 	private ReceipMessageQueue mReceipMessageQueue = new ReceipMessageQueue();// 回执消息处理队列
 	private LinkedList<P2PChatMsgEntity> mMessageList = new LinkedList<P2PChatMsgEntity>();
 	private List<String> mImagePathList = new CopyOnWriteArrayList<String>();
-	
+
 	private TextView mUnReadTV;
 	private Button mSendBtn;
 	private XmppConnectionManager mXmppConnManager;
@@ -131,54 +130,58 @@ public class P2PChatActivity extends BaseActivity implements OnClickListener,
 	private boolean isNeedBroadcast = false;
 	private Handler mHandler = new Handler() {
 		@Override
-		public void handleMessage(android.os.Message msg) {
+		public void handleMessage(android.os.Message msg)
+		{
 			super.handleMessage(msg);
-			switch (msg.what) {
-			case GET_RECEIPT:// 获得回执
-				P2PChatMsgEntity entity = getEntityOfList(mMessageList,
-						(String) msg.obj);
-				if (entity != null
-						&& entity.getIsSuccess() == P2PChatMsgEntity.SEND_ING) {
-					entity.setIsSuccess(P2PChatMsgEntity.SEND_SUCCESS);
-					// updateMessageList(entity);
-					mP2PChatMsgDao.saveOrUpdate(entity);
-				}
-				notifyAdapterDataSetChanged();
-				break;
-			case REFRESH_UI:// 刷新UI
-				addToLastOrupdateMessageList((P2PChatMsgEntity) msg.obj);
-				notifyAdapterDataSetChanged();
-				break;
-			case BROADCAST:// 回执超时处理广播
-				notifyAdapterDataSetChanged();
-				break;
-			case RECEIVE_MSG:// 收到消息
-				addToLastOrupdateMessageList((P2PChatMsgEntity) msg.obj);
-				notifyAdapterDataSetChanged();
-				break;
-			case REFRESH_FACE_UI:
-//				List<P2PChatMsgEntity> mAdapterList = (List<P2PChatMsgEntity>) msg.obj;
-//				int firstVisiblePos = msg.arg1;
-//				int lastVisiblePos = msg.arg2;
-//				for (int i = 0; i < mAdapterList.size(); i++) {
-//					P2PChatMsgEntity p2pChatMsgEntity = mAdapterList.get(i);
-//					SpannableString tempSpan = p2pChatMsgEntity.getSpannableString();
-//					if (tempSpan != null) {
-//						AnimatedImageSpan[] tem = tempSpan.getSpans(0, tempSpan.length()-1, AnimatedImageSpan.class);
-//						if (i >= firstVisiblePos && i <= lastVisiblePos) {
-//							for (AnimatedImageSpan animatedImageSpan : tem) {
-//								animatedImageSpan.runGifImg();
-//							}
-//						} else {
-//							for (AnimatedImageSpan animatedImageSpan : tem) {
-//								animatedImageSpan.pauseGifImg();
-//							}
-//						}
-//					}
-//				}
-				break;
-			default:
-				break;
+			switch(msg.what)
+			{
+				case GET_RECEIPT:// 获得回执
+					P2PChatMsgEntity entity = getEntityOfList(mMessageList,(String)msg.obj);
+					if(entity != null && entity.getIsSuccess() == P2PChatMsgEntity.SEND_ING)
+					{
+						entity.setIsSuccess(P2PChatMsgEntity.SEND_SUCCESS);
+						// updateMessageList(entity);
+						mP2PChatMsgDao.saveOrUpdate(entity);
+					}
+					notifyAdapterDataSetChanged();
+					break;
+				case REFRESH_UI:// 刷新UI
+					addToLastOrupdateMessageList((P2PChatMsgEntity)msg.obj);
+					notifyAdapterDataSetChanged();
+					break;
+				case BROADCAST:// 回执超时处理广播
+					notifyAdapterDataSetChanged();
+					break;
+				case RECEIVE_MSG:// 收到消息
+					addToLastOrupdateMessageList((P2PChatMsgEntity)msg.obj);
+					notifyAdapterDataSetChanged();
+					break;
+				case REFRESH_FACE_UI:
+					// List<P2PChatMsgEntity> mAdapterList =
+					// (List<P2PChatMsgEntity>) msg.obj;
+					// int firstVisiblePos = msg.arg1;
+					// int lastVisiblePos = msg.arg2;
+					// for (int i = 0; i < mAdapterList.size(); i++) {
+					// P2PChatMsgEntity p2pChatMsgEntity = mAdapterList.get(i);
+					// SpannableString tempSpan =
+					// p2pChatMsgEntity.getSpannableString();
+					// if (tempSpan != null) {
+					// AnimatedImageSpan[] tem = tempSpan.getSpans(0,
+					// tempSpan.length()-1, AnimatedImageSpan.class);
+					// if (i >= firstVisiblePos && i <= lastVisiblePos) {
+					// for (AnimatedImageSpan animatedImageSpan : tem) {
+					// animatedImageSpan.runGifImg();
+					// }
+					// } else {
+					// for (AnimatedImageSpan animatedImageSpan : tem) {
+					// animatedImageSpan.pauseGifImg();
+					// }
+					// }
+					// }
+					// }
+					break;
+				default:
+					break;
 			}
 		}
 
@@ -193,12 +196,15 @@ public class P2PChatActivity extends BaseActivity implements OnClickListener,
 	/**
 	 * 刷新未读消息提示数
 	 */
-	private void refreshUnreadNumUI() {
-		if (!isBottom) {
+	private void refreshUnreadNumUI()
+	{
+		if(!isBottom)
+		{
 			mUnreadNum++;
 			mUnReadTV.setVisibility(View.VISIBLE);
 			mUnReadTV.setText(mUnreadNum + "");
-		} else {
+		}else
+		{
 			mUnReadTV.setVisibility(View.GONE);
 			mUnreadNum = 0;
 			mListView.setSelection(mAdapter.getCount());
@@ -206,12 +212,14 @@ public class P2PChatActivity extends BaseActivity implements OnClickListener,
 	}
 
 	@Override
-	protected void onActivityResult(int requestCode, int resultCode,
-			final Intent data) {
-		super.onActivityResult(requestCode, resultCode, data);
-		if (resultCode == CONFIRM_RESULT_OK) {
+	protected void onActivityResult(int requestCode, int resultCode, final Intent data)
+	{
+		super.onActivityResult(requestCode,resultCode,data);
+		if(resultCode == CONFIRM_RESULT_OK)
+		{
 			mImagePathList = data.getStringArrayListExtra(CHOOSE_IMAGE_PATHS);
-			for (String path : mImagePathList) {
+			for(String path : mImagePathList)
+			{
 				Message msg = new Message();
 				//
 				// mSendMessageQueue.putEntity(entity);
@@ -220,22 +228,22 @@ public class P2PChatActivity extends BaseActivity implements OnClickListener,
 	}
 
 	@Override
-	protected void onCreate(Bundle savedInstanceState) {
+	protected void onCreate(Bundle savedInstanceState)
+	{
 		super.onCreate(savedInstanceState);
-		
+
 		initUserObjectData();
 		setContentView(R.layout.activity_p2p_chat_layout);
-		getWindow().setSoftInputMode(
-				WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_HIDDEN);
+		getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_HIDDEN);
 		initialize();
 		updateUnreadCount();// 更新未读记录条数为0
-		
-		//加载草稿
+
+		// 加载草稿
 		String draft = mRecentChatDao.queryDraftByUserNo(mChatUserNum);
 		SpannableString spannableDraft = FaceConversionUtil.getInstace().getExpressionString(this,draft);
 		mEditContentET.setText(spannableDraft);
 		mEditContentET.setSelection(spannableDraft.length());
-		
+
 	}
 
 	@Override
@@ -243,41 +251,51 @@ public class P2PChatActivity extends BaseActivity implements OnClickListener,
 	{
 		menu.setHeaderTitle(R.string.p2pChatActivity_contextMenuTitle);
 		menu.add(Menu.NONE,0,Menu.NONE,R.string.p2pChatActivity_copyChatMsg);
-		menu.add(Menu.NONE,1,Menu.NONE,R.string.p2pChatActivity_RetrySendMsg);
-		menu.add(Menu.NONE,2,Menu.NONE,R.string.p2pChatActivity_deleteChatMsg);
+		menu.add(Menu.NONE,1,Menu.NONE,R.string.p2pChatActivity_deleteChatMsg);
 	}
-	
+
 	@SuppressLint("NewApi")
 	@Override
 	public boolean onContextItemSelected(MenuItem item)
 	{
 		AdapterContextMenuInfo menuInfo = (AdapterContextMenuInfo)item.getMenuInfo();
-		P2PChatMsgEntity viewItem = mAdapter.getItem(menuInfo.position - 1);  //-1是因为这里position是从1开始的
-		
+		P2PChatMsgEntity viewItem = mAdapter.getItem(menuInfo.position - 1); // -1是因为这里position是从1开始的
+
 		int itemId = item.getItemId();
 		switch(itemId)
 		{
-			case 0:  //复制文本
+			case 0: // 复制文本
 				mClipboard.setPrimaryClip(ClipData.newPlainText(TAG,viewItem.getSpannableString().toString()));
 				showToast(R.string.common_copyToClipboard);
 				break;
-			case 1:  //重发
-				break;
-			case 2:  //删除
-				mP2PChatMsgDao.deleteByPacketId(viewItem.getPacketId());
-				refreshUIByPageIndex();
+			case 1: // 删除
+				int deletedRows = mP2PChatMsgDao.deleteByPacketId(viewItem.getPacketId());
+				L.i(TAG,"删除了" + deletedRows + "条会话消息");
+				refreshUIByPageIndex(viewItem);
+				// 得到最后一条消息的内容，设置到最近会话消息列表中更新显示
+				P2PChatMsgEntity lastest = mP2PChatMsgDao.queryLastestChatMsg(mChatUserNum);
+				String content;
+				if(lastest != null)
+				{
+					content = lastest.getSpannableString().toString();
+				}else{
+					content = "";
+				}
+				updateRecentChatList(content);
 				break;
 		}
 		return true;
 	}
-	
+
 	/**
 	 * 初始化聊天对象数据
 	 */
-	private void initUserObjectData() {
+	private void initUserObjectData()
+	{
 		ContactOrgDao mContactOrgDao = new ContactOrgDao(getApplicationContext());
-		mChatUserInfo = (User) getIntent().getParcelableExtra(Const.INTENT_USER_EXTRA_NAME);
-		if (mChatUserInfo == null) {
+		mChatUserInfo = (User)getIntent().getParcelableExtra(Const.INTENT_USER_EXTRA_NAME);
+		if(mChatUserInfo == null)
+		{
 			mChatUserNum = getIntent().getStringExtra(ACCOUNT);
 			mChatUserInfo = mContactOrgDao.queryUserInfoByUserNo(mChatUserNum);
 		}
@@ -286,26 +304,27 @@ public class P2PChatActivity extends BaseActivity implements OnClickListener,
 		mChatUserNum = mChatUserInfo.getUserNo();
 	}
 
-	public void initialize() {
+	public void initialize()
+	{
 		initTitleView();
-		mUnReadTV = (TextView) findViewById(R.id.tv_p2p_chat_tips);
-		mSendBtn = (Button) findViewById(R.id.btn_send);
-		mEditContentET = (EditText) findViewById(R.id.et_sendmessage);
-		mPullToRefreshListView = (PullToRefreshListView) findViewById(R.id.pl_p2p_chat_pull_refresh_list);
+		mUnReadTV = (TextView)findViewById(R.id.tv_p2p_chat_tips);
+		mSendBtn = (Button)findViewById(R.id.btn_send);
+		mEditContentET = (EditText)findViewById(R.id.et_sendmessage);
+		mPullToRefreshListView = (PullToRefreshListView)findViewById(R.id.pl_p2p_chat_pull_refresh_list);
 		mListView = mPullToRefreshListView.getRefreshableView();
 		mListView.setOnCreateContextMenuListener(this);
-		
+
 		mXmppConnManager = XmppConnectionManager.getInstance();
-		mAlarmManager = (AlarmManager) getSystemService(ALARM_SERVICE);
+		mAlarmManager = (AlarmManager)getSystemService(ALARM_SERVICE);
 		Intent intent = new Intent(RECEIPT_BROADCAST);
-		mReceiptPendingIntent = PendingIntent.getBroadcast(this, 1, intent, 1);
+		mReceiptPendingIntent = PendingIntent.getBroadcast(this,1,intent,1);
 		mReceiptBroadcastReceiver = new ReceiptBroadcastReceiver();
 		IntentFilter filter = new IntentFilter(RECEIPT_BROADCAST);
-		registerReceiver(mReceiptBroadcastReceiver, filter);
+		registerReceiver(mReceiptBroadcastReceiver,filter);
 		mP2PChatMsgDao = new P2PChatMsgDao(this);
 		mRecentChatDao = new RecentChatDao(this);
 		mClipboard = (ClipboardManager)getSystemService(Context.CLIPBOARD_SERVICE);
-		
+
 		mAdapter = new P2PChatMsgAdapter(this);
 		mListView.setAdapter(mAdapter);
 
@@ -316,112 +335,123 @@ public class P2PChatActivity extends BaseActivity implements OnClickListener,
 		// mSendThread.start();
 
 		// 初始状态，从本地获得20条数据，刷新UI
-		refreshUIByPageIndex();
-		mXmppConnManager.addReceiveMessageCallBack(mChatUserNum, this);
-		mXmppConnManager.addReceiveReqIQCallBack("com:yineng:receipt", this);
+		refreshUIByPageIndex(null);
+		mXmppConnManager.addReceiveMessageCallBack(mChatUserNum,this);
+		mXmppConnManager.addReceiveReqIQCallBack("com:yineng:receipt",this);
 		// 回执处理广播
-		mAlarmManager.setRepeating(AlarmManager.RTC_WAKEUP,
-				RECEIPT_TIME_INTERVAL, RECEIPT_TIME_INTERVAL,
+		mAlarmManager.setRepeating(AlarmManager.RTC_WAKEUP,RECEIPT_TIME_INTERVAL,RECEIPT_TIME_INTERVAL,
 				mReceiptPendingIntent);
 
 		initEvent();
 
 	}
 
-	private void initTitleView() {
+	private void initTitleView()
+	{
 		View mCommonTitleView = findViewById(R.id.group_chat_title_layout);
-		mChatUserNameTV = (TextView) mCommonTitleView.findViewById(R.id.chat_common_title_view_name);
+		mChatUserNameTV = (TextView)mCommonTitleView.findViewById(R.id.chat_common_title_view_name);
 		mChatUserNameTV.setText(mChatUserInfo.getUserName());
 	}
 
-	private void initEvent() {
+	private void initEvent()
+	{
 		mSendBtn.setOnClickListener(this);
 
-		mPullToRefreshListView
-				.setOnRefreshListener(new OnRefreshListener<ListView>() {
+		mPullToRefreshListView.setOnRefreshListener(new OnRefreshListener<ListView>() {
 
+			@Override
+			public void onRefresh(PullToRefreshBase<ListView> refreshView)
+			{
+				mHandler.postDelayed(new Runnable() {
 					@Override
-					public void onRefresh(
-							PullToRefreshBase<ListView> refreshView) {
-						mHandler.postDelayed(new Runnable() {
-							@Override
-							public void run() {
-								refreshUIByPageIndex();
-								mHandler.sendEmptyMessage(0);
-								mPullToRefreshListView.onRefreshComplete();
-							}
-						}, 3000);
+					public void run()
+					{
+						refreshUIByPageIndex(null);
+						mHandler.sendEmptyMessage(0);
+						mPullToRefreshListView.onRefreshComplete();
 					}
-				});
+				},3000);
+			}
+		});
 		mListView.setOnScrollListener(new OnScrollListener() {
 
 			@Override
-			public void onScrollStateChanged(AbsListView view, int scrollState) {
-				switch (scrollState) {
-				case OnScrollListener.SCROLL_STATE_IDLE: //
-					L.e("child count "+view.getChildCount()+" "+view.getCount());
-					
-					int firstVisiblePos = view.getFirstVisiblePosition();
-					int lastVisiblePos = view.getLastVisiblePosition();
-//					List<P2PChatMsgEntity> mAdapterList = mAdapter.getData();
-//					if (mAdapterList != null) {
-//						if (firstVisiblePos > 0) {
-//							firstVisiblePos = firstVisiblePos -1;
-//						}
-//						if (lastVisiblePos <= mAdapterList.size()) {
-//							lastVisiblePos = lastVisiblePos -1;
-//						} else {
-//							lastVisiblePos = mAdapterList.size()-1;
-//						}
-//
-//						android.os.Message msg = mHandler.obtainMessage();
-//						msg.what = REFRESH_FACE_UI;
-//						msg.arg1 = firstVisiblePos;
-//						msg.arg2 = lastVisiblePos;
-//						msg.obj = mAdapterList;
-//						mHandler.sendMessage(msg);
-//					}
-					
-					// 停止...
-					if (lastVisiblePos == (view.getCount() - 1)) {
-						isBottom = true;
-						mUnreadNum = 0;
-						refreshUnreadNumUI();
-					} else {
-						isBottom = false;
-					}
-					break;
-				case OnScrollListener.SCROLL_STATE_TOUCH_SCROLL:
-					// 正在滑动...
-					break;
-				case OnScrollListener.SCROLL_STATE_FLING:
-					// 开始滚动...
-					break;
-				default:
-					break;
+			public void onScrollStateChanged(AbsListView view, int scrollState)
+			{
+				switch(scrollState)
+				{
+					case OnScrollListener.SCROLL_STATE_IDLE: //
+						L.e("child count " + view.getChildCount() + " " + view.getCount());
+
+						int firstVisiblePos = view.getFirstVisiblePosition();
+						int lastVisiblePos = view.getLastVisiblePosition();
+						// List<P2PChatMsgEntity> mAdapterList =
+						// mAdapter.getData();
+						// if (mAdapterList != null) {
+						// if (firstVisiblePos > 0) {
+						// firstVisiblePos = firstVisiblePos -1;
+						// }
+						// if (lastVisiblePos <= mAdapterList.size()) {
+						// lastVisiblePos = lastVisiblePos -1;
+						// } else {
+						// lastVisiblePos = mAdapterList.size()-1;
+						// }
+						//
+						// android.os.Message msg = mHandler.obtainMessage();
+						// msg.what = REFRESH_FACE_UI;
+						// msg.arg1 = firstVisiblePos;
+						// msg.arg2 = lastVisiblePos;
+						// msg.obj = mAdapterList;
+						// mHandler.sendMessage(msg);
+						// }
+
+						// 停止...
+						if(lastVisiblePos == (view.getCount() - 1))
+						{
+							isBottom = true;
+							mUnreadNum = 0;
+							refreshUnreadNumUI();
+						}else
+						{
+							isBottom = false;
+						}
+						break;
+					case OnScrollListener.SCROLL_STATE_TOUCH_SCROLL:
+						// 正在滑动...
+						break;
+					case OnScrollListener.SCROLL_STATE_FLING:
+						// 开始滚动...
+						break;
+					default:
+						break;
 				}
 			}
 
 			@Override
-			public void onScroll(AbsListView view, int firstVisibleItem,
-					int visibleItemCount, int totalItemCount) {
-//				L.e("onScroll");
-//				TextView tempView = (TextView) view.findViewById(R.id.tv_sendtime);
-//				if (tempView != null) {
-//					L.e("tag -- "+tempView.getTag());
-//					SpannableString spannableString = (SpannableString) tempView.getTag();
-//					if (spannableString != null) {
-//						spannableString.setSpan(null, 0, spannableString.length(), Spannable.SPAN_INCLUSIVE_EXCLUSIVE);
-//					}
-//				}
+			public void onScroll(AbsListView view, int firstVisibleItem, int visibleItemCount, int totalItemCount)
+			{
+				// L.e("onScroll");
+				// TextView tempView = (TextView)
+				// view.findViewById(R.id.tv_sendtime);
+				// if (tempView != null) {
+				// L.e("tag -- "+tempView.getTag());
+				// SpannableString spannableString = (SpannableString)
+				// tempView.getTag();
+				// if (spannableString != null) {
+				// spannableString.setSpan(null, 0, spannableString.length(),
+				// Spannable.SPAN_INCLUSIVE_EXCLUSIVE);
+				// }
+				// }
 			}
 		});
-		
+
 		mListView.setOnTouchListener(new OnTouchListener() {
 			@Override
-			public boolean onTouch(View arg0, MotionEvent arg1) {
-				if(arg1.getAction()==MotionEvent.ACTION_DOWN){
-					((FaceRelativeLayout) findViewById(R.id.FaceRelativeLayout)).hideFaceView();
+			public boolean onTouch(View arg0, MotionEvent arg1)
+			{
+				if(arg1.getAction() == MotionEvent.ACTION_DOWN)
+				{
+					((FaceRelativeLayout)findViewById(R.id.FaceRelativeLayout)).hideFaceView();
 				}
 				return false;
 			}
@@ -431,20 +461,26 @@ public class P2PChatActivity extends BaseActivity implements OnClickListener,
 	/**
 	 * 修改数据的isShowTime字段（第一条消息显示时间，5分钟内的消息不显示时间），然后刷新UI
 	 */
-	private void notifyAdapterDataSetChanged() {
+	private void notifyAdapterDataSetChanged()
+	{
 		List<P2PChatMsgEntity> list = new ArrayList<P2PChatMsgEntity>();
 		long preShowTime = 0;
-		for (int i = 0; i < mMessageList.size(); i++) {
+		for(int i = 0; i < mMessageList.size(); i++)
+		{
 			P2PChatMsgEntity entity = mMessageList.get(i);
-			if (i == 0) {
-				Log.i(TAG, "时间：  " + entity.getmTime());
+			if(i == 0)
+			{
+				Log.i(TAG,"时间：  " + entity.getmTime());
 				entity.setShowTime(true);
 				preShowTime = Long.valueOf(entity.getmTime().trim());
-			} else {
-				if (compareTime(preShowTime, Long.valueOf(entity.getmTime()))) {
+			}else
+			{
+				if(compareTime(preShowTime,Long.valueOf(entity.getmTime())))
+				{
 					preShowTime = Long.valueOf(entity.getmTime());
 					entity.setShowTime(true);
-				} else {
+				}else
+				{
 					entity.setShowTime(false);
 				}
 			}
@@ -461,13 +497,22 @@ public class P2PChatActivity extends BaseActivity implements OnClickListener,
 
 	/**
 	 * 本地分页查询数据，刷新UI
+	 * 
+	 * @param deletedChatMsg
+	 *            之前删除的某条消息记录，用来更新数据源（可选的，不是删除消息操作调用，可以传null）
 	 */
-	public void refreshUIByPageIndex() {
+	public void refreshUIByPageIndex(P2PChatMsgEntity deletedChatMsg)
+	{
 		isBottom = true;
-		LinkedList<P2PChatMsgEntity> list = mP2PChatMsgDao
-				.getChatMsgEntitiesByPage(mChatUserNum, mPage, PAGE_SIZE);
-		if (list != null && !list.isEmpty()) {
-			for (P2PChatMsgEntity mP2PChatMsgEntity : list) {
+		LinkedList<P2PChatMsgEntity> list = mP2PChatMsgDao.getChatMsgEntitiesByPage(mChatUserNum,mPage,PAGE_SIZE);
+		if(mMessageList.contains(deletedChatMsg))
+		{
+			mMessageList.remove(deletedChatMsg);
+		}
+		if(list != null && !list.isEmpty())
+		{
+			for(P2PChatMsgEntity mP2PChatMsgEntity : list)
+			{
 				mMessageList.addFirst(mP2PChatMsgEntity);
 			}
 			mPage++;
@@ -476,39 +521,44 @@ public class P2PChatActivity extends BaseActivity implements OnClickListener,
 	}
 
 	@Override
-	public void onBackPressed() {
-		if (((FaceRelativeLayout) findViewById(R.id.FaceRelativeLayout))
-				.hideFaceView()) {
+	public void onBackPressed()
+	{
+		if(((FaceRelativeLayout)findViewById(R.id.FaceRelativeLayout)).hideFaceView())
+		{
 			return;
 		}
 		super.onBackPressed();
 	}
-	
-	public void onTitleViewClickListener(View v) {
-		switch (v.getId()) {
-		case R.id.chat_common_title_view_back:
-			((FaceRelativeLayout) findViewById(R.id.FaceRelativeLayout)).hideFaceView();
-			finish();
-			break;
-		case R.id.chat_common_title_view_infomation:
-			Intent intent = new Intent(this, P2PChatInfoActivity.class);
-			intent.putExtra(GroupChatActivity.CHAT_ID_KEY, mChatUserNum);
-			startActivity(intent);
-			break;
-		default:
-			break;
+
+	public void onTitleViewClickListener(View v)
+	{
+		switch(v.getId())
+		{
+			case R.id.chat_common_title_view_back:
+				((FaceRelativeLayout)findViewById(R.id.FaceRelativeLayout)).hideFaceView();
+				finish();
+				break;
+			case R.id.chat_common_title_view_infomation:
+				Intent intent = new Intent(this,P2PChatInfoActivity.class);
+				intent.putExtra(GroupChatActivity.CHAT_ID_KEY,mChatUserNum);
+				startActivity(intent);
+				break;
+			default:
+				break;
 		}
 	}
 
 	/**
 	 * 发送消息
 	 */
-	private void clickSend() {
+	private void clickSend()
+	{
 		isBottom = true;
 		mUnreadNum = 0;
 		String contString = mEditContentET.getText().toString();
-		//如果没有输入消息，不能发送
-		if (contString.isEmpty()) {
+		// 如果没有输入消息，不能发送
+		if(contString.isEmpty())
+		{
 			return;
 		}
 		updateRecentChatList(contString);// 更新最近会话列表显示内容
@@ -517,7 +567,7 @@ public class P2PChatActivity extends BaseActivity implements OnClickListener,
 		// 封装body
 		MessageBodyEntity body = new MessageBodyEntity();
 		body.setContent(contString);
-//		body.setSendName(System.currentTimeMillis() + "");
+		// body.setSendName(System.currentTimeMillis() + "");
 		body.setSendName(myUserInfo.getUserName());
 		body.setMsgType(Const.CHAT_TYPE_P2P);
 		String jsonString = JSON.toJSONString(body);
@@ -536,55 +586,64 @@ public class P2PChatActivity extends BaseActivity implements OnClickListener,
 		mEditContentET.setText("");
 	}
 
-	public void send(P2PChatMsgEntity mP2PChatMsgEntity) {
+	public void send(P2PChatMsgEntity mP2PChatMsgEntity)
+	{
 		Message msg = new Message();
 		android.os.Message message = mHandler.obtainMessage();
 		message.obj = mP2PChatMsgEntity;
 		message.what = REFRESH_UI;
 		mHandler.sendMessage(message);
-		switch (mP2PChatMsgEntity.getMessageType()) {
-		case P2PChatMsgEntity.MESSAGE:
-//			msg.setBody(GZIPUtil.compress(mP2PChatMsgEntity.getMessage()));
-			msg.setBody(mP2PChatMsgEntity.getMessage());
-			msg.setFrom(JIDUtil.getJIDByAccount(myUserInfo.getUserNo()));
-			msg.setTo(JIDUtil.getSendToMsgAccount(mChatUserNum));
-//			msg.setTo(JIDUtil.getJIDByAccount(mChatUserNum));
-			msg.setType(Type.chat);
-			msg.setPacketID(mP2PChatMsgEntity.getPacketId());
-			// msg.setPacketID(entity.getPacketId());
-			try {
-				mXmppConnManager.sendPacket(msg);
-			} catch (IOException e) {
-				e.printStackTrace();
-			} finally {
-				mP2PChatMsgDao.saveOrUpdate(mP2PChatMsgEntity);
-			}
-			break;
-		case P2PChatMsgEntity.IMAGE:
+		switch(mP2PChatMsgEntity.getMessageType())
+		{
+			case P2PChatMsgEntity.MESSAGE:
+				// msg.setBody(GZIPUtil.compress(mP2PChatMsgEntity.getMessage()));
+				msg.setBody(mP2PChatMsgEntity.getMessage());
+				msg.setFrom(JIDUtil.getJIDByAccount(myUserInfo.getUserNo()));
+				msg.setTo(JIDUtil.getSendToMsgAccount(mChatUserNum));
+				// msg.setTo(JIDUtil.getJIDByAccount(mChatUserNum));
+				msg.setType(Type.chat);
+				msg.setPacketID(mP2PChatMsgEntity.getPacketId());
+				// msg.setPacketID(entity.getPacketId());
+				try
+				{
+					mXmppConnManager.sendPacket(msg);
+				}catch(IOException e)
+				{
+					e.printStackTrace();
+				}finally
+				{
+					mP2PChatMsgDao.saveOrUpdate(mP2PChatMsgEntity);
+				}
+				break;
+			case P2PChatMsgEntity.IMAGE:
 
-			break;
-		case P2PChatMsgEntity.FILE:
+				break;
+			case P2PChatMsgEntity.FILE:
 
-			break;
+				break;
 
-		default:
-			break;
+			default:
+				break;
 		}
 	}
 
 	/**
-	 *
+	 * 
 	 * 添加或更新消息列表
-	 *
+	 * 
 	 * @param entity
 	 */
-	private void addToLastOrupdateMessageList(P2PChatMsgEntity entity) {
-		if (entity == null || mMessageList == null) {
+	private void addToLastOrupdateMessageList(P2PChatMsgEntity entity)
+	{
+		if(entity == null || mMessageList == null)
+		{
 			return;
 		}
-		for (int i = (mMessageList.size() - 1); i >= 0; i--) {
-			if (entity.getPacketId().equals(mMessageList.get(i).getPacketId())) {
-				mMessageList.set(i, entity);
+		for(int i = (mMessageList.size() - 1); i >= 0; i--)
+		{
+			if(entity.getPacketId().equals(mMessageList.get(i).getPacketId()))
+			{
+				mMessageList.set(i,entity);
 				return;
 			}
 		}
@@ -592,11 +651,13 @@ public class P2PChatActivity extends BaseActivity implements OnClickListener,
 	}
 
 	@Override
-	public void onClick(View v) {
-		switch (v.getId()) {
-		case R.id.btn_send:
-			clickSend();
-			break;
+	public void onClick(View v)
+	{
+		switch(v.getId())
+		{
+			case R.id.btn_send:
+				clickSend();
+				break;
 
 		}
 	}
@@ -609,19 +670,22 @@ public class P2PChatActivity extends BaseActivity implements OnClickListener,
 	 * @param lastTime
 	 * @return
 	 */
-	public boolean compareTime(long preTime, long nextTime) {
-		if ((nextTime - preTime) >= TIME_INTERVAL) {
+	public boolean compareTime(long preTime, long nextTime)
+	{
+		if((nextTime - preTime) >= TIME_INTERVAL)
+		{
 			return true;
 		}
 		return false;
 	}
 
 	@Override
-	protected void onDestroy() {
+	protected void onDestroy()
+	{
 		super.onDestroy();
-		/**销毁gif引用**/
+		/** 销毁gif引用 **/
 		destroyGifValue();
-		
+
 		notBreak = false;
 
 		mXmppConnManager.removeReceiveMessageCallBack(mChatUserNum);
@@ -631,14 +695,13 @@ public class P2PChatActivity extends BaseActivity implements OnClickListener,
 
 		// 销毁回执线程
 		mReceipMessageQueue.putEntity(BREAK_THREAD_TAG);
-		NoticesManager.getInstance(this).updateRecentChatList(mChatUserNum,
-				Const.CHAT_TYPE_P2P);// 更新最近会话列表
-		
+		NoticesManager.getInstance(this).updateRecentChatList(mChatUserNum,Const.CHAT_TYPE_P2P);// 更新最近会话列表
+
 		handleDraft();
-		
+
 		System.gc();
 	}
-	
+
 	/**
 	 * 草稿的处理
 	 */
@@ -646,22 +709,24 @@ public class P2PChatActivity extends BaseActivity implements OnClickListener,
 	{
 		CharSequence draft = mEditContentET.getText();
 		RecentChat thisChat = mRecentChatDao.isChatExist(mChatUserNum,Const.CHAT_TYPE_P2P);
-		if(!TextUtils.isEmpty(draft) && thisChat == null)  //最近会话列表中没有存在，但已经输入草稿，需保存草稿的情况
+		if(!TextUtils.isEmpty(draft) && thisChat == null) // 最近会话列表中没有存在，但已经输入草稿，需保存草稿的情况
 		{
 			updateRecentChatList("",draft.toString());
-		}else if(TextUtils.isEmpty(draft) && thisChat !=null && TextUtils.isEmpty(thisChat.getContent()))  //存在于最近会话里面，但没有任何聊天记录，也没有草稿的情况
+		}else if(TextUtils.isEmpty(draft) && thisChat != null && TextUtils.isEmpty(thisChat.getContent())) // 存在于最近会话里面，但没有任何聊天记录，也没有草稿的情况
 		{
-			mRecentChatDao.deleteRecentChatById(thisChat.getId());  //从最近会话列表里面删除
-		}else  //适用于一般情况，直接更新草稿
+			mRecentChatDao.deleteRecentChatById(thisChat.getId()); // 从最近会话列表里面删除
+		}else
+		// 适用于一般情况，直接更新草稿
 		{
 			mRecentChatDao.updateDraft(mChatUserNum,draft.toString());
 		}
 	}
 
 	@Override
-	public void receivedMessage(P2PChatMsgEntity message) {
+	public void receivedMessage(P2PChatMsgEntity message)
+	{
 		// 此方法被线程调用，不能刷新UI
-		Log.i(TAG, "收到消息");
+		Log.i(TAG,"收到消息");
 		message.setIsReaded(P2PChatMsgEntity.IS_READED);
 		message.setIsSend(P2PChatMsgEntity.COM_MSG);
 		message.setIsReaded(P2PChatMsgEntity.IS_READED);
@@ -674,7 +739,8 @@ public class P2PChatActivity extends BaseActivity implements OnClickListener,
 	}
 
 	@Override
-	public void receivedReqIQResult(ReqIQResult packet) {
+	public void receivedReqIQResult(ReqIQResult packet)
+	{
 		mReceipMessageQueue.putEntity(packet.getId());
 	}
 
@@ -685,24 +751,29 @@ public class P2PChatActivity extends BaseActivity implements OnClickListener,
 	 * @author YINENG
 	 * 
 	 */
-	class ReceiptBroadcastReceiver extends BroadcastReceiver {
+	class ReceiptBroadcastReceiver extends BroadcastReceiver
+	{
 		@Override
-		public void onReceive(Context context, Intent intent) {
+		public void onReceive(Context context, Intent intent)
+		{
 			boolean flag = false;
-			Log.i(TAG, "广播接收，处理回执");
-			for (P2PChatMsgEntity entity : mMessageList) {
-				if (entity.getIsSuccess() == P2PChatMsgEntity.SEND_ING
-						&& System.currentTimeMillis()
-								- Long.valueOf(entity.getmTime()) > RECEIPT_TIME_INTERVAL) {
+			Log.i(TAG,"广播接收，处理回执");
+			for(P2PChatMsgEntity entity : mMessageList)
+			{
+				if(entity.getIsSuccess() == P2PChatMsgEntity.SEND_ING
+						&& System.currentTimeMillis() - Long.valueOf(entity.getmTime()) > RECEIPT_TIME_INTERVAL)
+				{
 					entity.setIsSuccess(P2PChatMsgEntity.SEND_FAILED);
 					mP2PChatMsgDao.saveOrUpdate(entity);
 					flag = true;
 				}
 			}
 			// UI数据有更新，则添加刷新UI的操作到主线程消息队列中
-			if (flag) {
+			if(flag)
+			{
 				mHandler.sendEmptyMessage(BROADCAST);
-			} else {
+			}else
+			{
 
 			}
 		}
@@ -715,12 +786,13 @@ public class P2PChatActivity extends BaseActivity implements OnClickListener,
 	 * @param packetId
 	 * @return
 	 */
-	private P2PChatMsgEntity getEntityOfList(final List<P2PChatMsgEntity> list,
-			final String packetId) {
-		for (int i = (list.size() - 1); i >= 0; i--) {
+	private P2PChatMsgEntity getEntityOfList(final List<P2PChatMsgEntity> list, final String packetId)
+	{
+		for(int i = (list.size() - 1); i >= 0; i--)
+		{
 			P2PChatMsgEntity entity = list.get(i);
-			if (packetId != null
-					&& packetId.trim().equals(entity.getPacketId().trim())) {
+			if(packetId != null && packetId.trim().equals(entity.getPacketId().trim()))
+			{
 				return entity;
 			}
 		}
@@ -734,16 +806,21 @@ public class P2PChatActivity extends BaseActivity implements OnClickListener,
 	 * @author YINENG
 	 * 
 	 */
-	class ReceiptThread extends Thread {
+	class ReceiptThread extends Thread
+	{
 		@Override
-		public void run() {
+		public void run()
+		{
 			super.run();
-			while (true) {
+			while(true)
+			{
 				String packetId = mReceipMessageQueue.getEntity();
-				if (!notBreak && packetId.equals(BREAK_THREAD_TAG)) {
-					Log.i(TAG, "退出线程ReceiptThread");
+				if(!notBreak && packetId.equals(BREAK_THREAD_TAG))
+				{
+					Log.i(TAG,"退出线程ReceiptThread");
 					break;
-				} else {
+				}else
+				{
 					android.os.Message message = mHandler.obtainMessage();
 					message.obj = packetId;
 					message.what = GET_RECEIPT;
@@ -760,21 +837,27 @@ public class P2PChatActivity extends BaseActivity implements OnClickListener,
 	 * @author YINENG
 	 * 
 	 */
-	class ReceipMessageQueue {
+	class ReceipMessageQueue
+	{
 		private final LinkedList<String> queue = new LinkedList<String>();
 
-		public synchronized String getEntity() {
-			while (queue.size() <= 0) {
-				try {
+		public synchronized String getEntity()
+		{
+			while(queue.size() <= 0)
+			{
+				try
+				{
 					wait();
-				} catch (InterruptedException e) {
+				}catch(InterruptedException e)
+				{
 					e.printStackTrace();
 				}
 			}
 			return queue.removeFirst();
 		}
 
-		public synchronized void putEntity(String entity) {
+		public synchronized void putEntity(String entity)
+		{
 
 			queue.addLast(entity);
 			notifyAll();
@@ -784,8 +867,9 @@ public class P2PChatActivity extends BaseActivity implements OnClickListener,
 	/**
 	 * 更新未读记录
 	 */
-	private void updateUnreadCount() {
-		mRecentChatDao.updateUnreadCount(mChatUserNum, Const.CHAT_TYPE_P2P, 0);// 设置未读记录为0
+	private void updateUnreadCount()
+	{
+		mRecentChatDao.updateUnreadCount(mChatUserNum,Const.CHAT_TYPE_P2P,0);// 设置未读记录为0
 		Intent intent = new Intent();
 		intent.setAction(Const.ACTION_UPDATE_UNREAD_COUNT);
 		this.sendBroadcast(intent);
@@ -794,41 +878,46 @@ public class P2PChatActivity extends BaseActivity implements OnClickListener,
 	/**
 	 * 把消息内容更新到最近会话列表
 	 */
-	private void updateRecentChatList(String content) {
+	private void updateRecentChatList(String content)
+	{
 		updateRecentChatList(content,"");
 	}
-	
-	private void updateRecentChatList(String content,String draft)
+
+	private void updateRecentChatList(String content, String draft)
 	{
 		RecentChat recentChat = new RecentChat();
 		recentChat.setChatType(Const.CHAT_TYPE_P2P);
 		recentChat.setUserNo(mChatUserNum);
-		recentChat.setTitle(mRecentChatDao.getUserNameByUserId(
-				mChatUserNum, Const.CHAT_TYPE_P2P));
+		recentChat.setTitle(mRecentChatDao.getUserNameByUserId(mChatUserNum,Const.CHAT_TYPE_P2P));
 		recentChat.setContent(content);
-		recentChat.setDateTime(TimeUtil
-				.getCurrenDateTime(TimeUtil.FORMAT_DATETIME_24_mic));
+		recentChat.setDateTime(TimeUtil.getCurrenDateTime(TimeUtil.FORMAT_DATETIME_24_mic));
 		recentChat.setUnReadCount(0);
 		recentChat.setDraft(draft);
 		mRecentChatDao.saveRecentChat(recentChat);
 	}
 
 	@Override
-	public void receivedMessage(GroupChatMsgEntity msg) {
+	public void receivedMessage(GroupChatMsgEntity msg)
+	{
 
 	}
-	
+
 	/**
 	 * 回收bitmap暂用的内存空间
 	 */
-	private void destroyGifValue() {
+	private void destroyGifValue()
+	{
 		List<P2PChatMsgEntity> mAdapterList = mAdapter.getData();
-		if (mAdapterList != null) {
-			for (P2PChatMsgEntity p2pChatMsgEntity : mAdapterList) {
+		if(mAdapterList != null)
+		{
+			for(P2PChatMsgEntity p2pChatMsgEntity : mAdapterList)
+			{
 				SpannableString tempSpan = p2pChatMsgEntity.getSpannableString();
-				if (tempSpan != null) {
-					AnimatedImageSpan[] tem = tempSpan.getSpans(0, tempSpan.length()-1, AnimatedImageSpan.class);
-					for (AnimatedImageSpan animatedImageSpan : tem) {
+				if(tempSpan != null)
+				{
+					AnimatedImageSpan[] tem = tempSpan.getSpans(0,tempSpan.length() - 1,AnimatedImageSpan.class);
+					for(AnimatedImageSpan animatedImageSpan : tem)
+					{
 						animatedImageSpan.recycleBitmaps();
 					}
 					tempSpan.removeSpan(tem);

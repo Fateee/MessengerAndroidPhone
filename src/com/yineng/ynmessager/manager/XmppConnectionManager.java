@@ -67,6 +67,15 @@ public class XmppConnectionManager {
 	}
 
 	/**
+	 * 如果密码与之前密码不同，则恢复默认状态，重新初始化
+	 */
+	public void setXmppConnectionConfigNull() {
+		mConnectionConfig = null;
+		mIsInit = false;
+		mConnection = null;
+	}
+	
+	/**
 	 * init ConnectionConfiguration and XMPPConnection listener
 	 * 
 	 * @param host

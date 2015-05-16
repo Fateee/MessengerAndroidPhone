@@ -29,6 +29,7 @@ import com.yineng.ynmessager.R;
 import com.yineng.ynmessager.activity.BaseActivity;
 import com.yineng.ynmessager.bean.contact.ContactGroup;
 import com.yineng.ynmessager.db.ContactOrgDao;
+import com.yineng.ynmessager.util.ViewHolder;
 
 /**
  * 群讨论组消息提醒 设置界面
@@ -40,7 +41,7 @@ public class GroupMsgNotifySettingActivity extends BaseActivity implements OnCli
 {
 	private ImageButton mImgb_previous; // 左上角返回按钮
 	private ListView mLst_content; // 内容列表（群、讨论组）
-	private List<HashMap<String, Object>> mData;
+	private List<HashMap<String, Object>> mData = new ArrayList<HashMap<String, Object>>();
 	private ContactOrgDao mDao = null;
 
 	@Override
@@ -71,8 +72,7 @@ public class GroupMsgNotifySettingActivity extends BaseActivity implements OnCli
 	 */
 	private void loadData()
 	{
-		// 先初始化ArrayList
-		mData = new ArrayList<HashMap<String, Object>>();
+		mData.clear();
 		// 查询出所有的群和讨论组
 		List<ContactGroup> groupList = new ArrayList<ContactGroup>(mDao.queryGroupAndDiscussList("notifyMode"));
 		// 整理mData
@@ -212,60 +212,34 @@ public class GroupMsgNotifySettingActivity extends BaseActivity implements OnCli
 			switch(viewType)
 			{
 				case VIEW_TYPE_TITLE: // 如果是标题行
-					TitleViewHolder titleViewHolder;
 					if(convertView == null)
 					{
 						convertView = inflater.inflate(R.layout.group_notify_setting_listitem_title,parent,false);
-						titleViewHolder = new TitleViewHolder(convertView);
-						convertView.setTag(titleViewHolder);
-					}else
-					{
-						titleViewHolder = (TitleViewHolder)convertView.getTag();
 					}
+					
+					TextView txt_title = ViewHolder.get(convertView,R.id.groupMsgNotifySetting_txt_listItem_title);
+					
 					HashMap<String, Object> titleItem = getItem(position);
 					String title = (String)titleItem.get("data");
-					titleViewHolder.title.setText(title);
+					txt_title.setText(title);
 					break;
 				case VIEW_TYPE_NOT_TITLE: // 如果不是标题行
-					ViewHolder holder;
 					if(convertView == null)
 					{
 						convertView = inflater.inflate(R.layout.group_notify_setting_listitem,parent,false);
-						holder = new ViewHolder(convertView);
-						convertView.setTag(holder);
-					}else
-					{
-						holder = (ViewHolder)convertView.getTag();
 					}
+					
+					TextView txt_groupName = ViewHolder.get(convertView,R.id.groupMsgNotifySetting_txt_listItem_groupName);
+					
 					HashMap<String, Object> item = getItem(position);
 					ContactGroup group = (ContactGroup)item.get("data");
 					//因为有些群、讨论组有或者没有subject，如果有subject就优先显示，否则显示NaturalName
 					String groupName = TextUtils.isEmpty(group.getSubject()) ? group.getNaturalName() : group
 							.getSubject();
-					holder.groupName.setText(groupName);
+					txt_groupName.setText(groupName);
 					break;
 			}
 			return convertView;
-		}
-
-		private class TitleViewHolder
-		{
-			TextView title;
-
-			TitleViewHolder(View base)
-			{
-				title = (TextView)base.findViewById(R.id.groupMsgNotifySetting_txt_listItem_title);
-			}
-		}
-
-		private class ViewHolder
-		{
-			TextView groupName;
-
-			ViewHolder(View base)
-			{
-				groupName = (TextView)base.findViewById(R.id.groupMsgNotifySetting_txt_listItem_groupName);
-			}
 		}
 
 	}

@@ -369,17 +369,23 @@ public class FindChatRecordActivity extends BaseActivity {
 
 		@Override
 		public void onAnimationEnd(Animation animation) {
-			mHandler.sendEmptyMessage(SHOW_SEARCH_VIEW);
+			if (isShowSearchEditText) {
+				mHandler.sendEmptyMessage(SHOW_SEARCH_VIEW);
+			} else {
+				mHandler.sendEmptyMessage(CANCEL_SEARCH_VIEW);
+			}
 		}
 	};
 
+	private boolean isShowSearchEditText = false;
+	
 	/**
 	 * 显示/关闭搜素框的动画
 	 * 
 	 * @param isShow
 	 */
-	@SuppressLint("NewApi")
 	public void showDismissSearchView(boolean isShow) {
+		isShowSearchEditText = isShow;
 		if (isShow) {
 			LinearLayout.LayoutParams etParamTest = (LinearLayout.LayoutParams) mChatRecordEditView
 					.getLayoutParams();
@@ -392,10 +398,10 @@ public class FindChatRecordActivity extends BaseActivity {
 			mChatRecordLayout.startAnimation(showAnimation);
 		} else {
 			mSearchChatRecordEditText.dismiss();
-			mHandler.sendEmptyMessage(CANCEL_SEARCH_VIEW);
 			cancelAnimation = new TranslateAnimation(0, 0,
-					-mChatEditTextDefaultViewY, 0);
+					0,mChatEditTextDefaultViewY);
 			cancelAnimation.setDuration(ANIMATION_DURATION);
+			cancelAnimation.setAnimationListener(showAnimationListener);
 			mChatRecordLayout.startAnimation(cancelAnimation);
 		}
 	}

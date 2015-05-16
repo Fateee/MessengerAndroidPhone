@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/ll_create_disgroup_layout"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@color/common_background_color"
@@ -30,15 +31,29 @@
             android:scaleType="center"
             android:src="@drawable/face_del_ico_dafeult" />
     </RelativeLayout>
-
+<!-- 
     <EditText
         android:id="@+id/et_create_disgroup_search"
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
         android:ems="10"
         android:hint="搜索" >
-    </EditText>
-
+    </EditText> -->
+    <EditText
+        android:id="@+id/et_create_disgroup_search"
+        android:layout_width="fill_parent"
+        android:layout_height="35dp"
+        android:layout_marginBottom="5dip"
+        android:layout_marginLeft="15dp"
+        android:layout_marginRight="30dp"
+        android:layout_marginTop="5dip"
+        android:background="@drawable/acm_inputbox"
+        android:drawableLeft="@drawable/search"
+        android:focusable="false"
+        android:hint="@string/org_search"
+        android:paddingLeft="5dp"
+        android:singleLine="true"
+        android:textSize="15.0dip" />
     <View
         android:layout_width="wrap_content"
         android:layout_height="1px"

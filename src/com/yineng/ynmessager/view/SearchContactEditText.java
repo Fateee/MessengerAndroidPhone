@@ -42,6 +42,11 @@ import android.widget.AdapterView.OnItemClickListener;
 import android.widget.ListView;
 import android.widget.TextView;
 
+/**
+ * 主页消息，联系人，组织机构，群，讨论组搜索框
+ * @author 胡毅
+ *
+ */
 public class SearchContactEditText extends Dialog implements
 		OnFocusChangeListener, TextWatcher {
 
@@ -49,11 +54,11 @@ public class SearchContactEditText extends Dialog implements
 	/**
 	 * 搜索结果列表
 	 */
-	private ListView mContactSearchListView;
+	public ListView mContactSearchListView;
 	/**
 	 * 搜索框
 	 */
-	private EditText mSearchEditText;
+	public EditText mSearchEditText;
 	private ContactOrgDao mContactOrgDao;
 	private InputMethodManager inputMM;
 	/**
@@ -70,10 +75,19 @@ public class SearchContactEditText extends Dialog implements
 	 * 是否是消息列表的搜索框
 	 */
 	private boolean isSessionFragment = false;
-	private TextView mContactSearchResultEmptyTV;
+	/**
+	 * 是否是主界面的搜索框
+	 */
+	private boolean isMainActivity = false;
+	public TextView mContactSearchResultEmptyTV;
 
-	public void setSessionFragment(boolean isSessionFragment) {
+	/**
+	 * @param isSessionFragment 是否是主页的消息页面
+	 * @param isMainActivity 是否是主页
+	 */
+	public void setSessionFragment(boolean isSessionFragment,boolean isMainActivity) {
 		this.isSessionFragment = isSessionFragment;
+		this.isMainActivity = isMainActivity;
 	}
 
 	public SearchContactEditText(Context context) {
@@ -292,7 +306,13 @@ public class SearchContactEditText extends Dialog implements
 		}
 		
 		mContext.startActivity(childOrgIntent);
-		((Activity) mContext).finish();
+		//如果是从主界面搜索，不能关闭主activity
+		if (!isMainActivity) {
+			((Activity) mContext).finish();
+		} else {
+			mOnCancelSearchAnimationListener
+			.cancelSearchContactAnimation();
+		}
 		if (i == 0) {
 			mContactSearchAdapter.enterMenuAnimation();
 		} else {
@@ -359,21 +379,25 @@ public class SearchContactEditText extends Dialog implements
 	}
 
 	public void showPopupWindow(List<Object> mSearchResultObjects) {
-		if (mContactSearchAdapter == null) {
-			mContactSearchAdapter = new ContactCommonAdapter(mContext,
-					mSearchResultObjects);
-			mContactSearchListView.setAdapter(mContactSearchAdapter);
+		if (isGroupSearch) {
+			mOnResultSearchedListener.onResultSearched(mSearchResultObjects);
 		} else {
-			mContactSearchAdapter.setnListObjects(mSearchResultObjects);
-			mContactSearchAdapter.resetViewTag();
-			mContactSearchAdapter.notifyDataSetChanged();
-		}
-		//判断是否显示空数据界面
-		if (mSearchEditText.getText().length()>0 && mContactSearchAdapter.getCount() <= 0) {
-			mContactSearchListView.setEmptyView(mContactSearchResultEmptyTV);
-		} else {
-			mContactSearchResultEmptyTV.setVisibility(View.GONE);
-			mContactSearchListView.setEmptyView(null);
+			if (mContactSearchAdapter == null) {
+				mContactSearchAdapter = new ContactCommonAdapter(mContext,
+						mSearchResultObjects);
+				mContactSearchListView.setAdapter(mContactSearchAdapter);
+			} else {
+				mContactSearchAdapter.setnListObjects(mSearchResultObjects);
+				mContactSearchAdapter.resetViewTag();
+				mContactSearchAdapter.notifyDataSetChanged();
+			}
+			//判断是否显示空数据界面
+			if (mSearchEditText.getText().length()>0 && mContactSearchAdapter.getCount() <= 0) {
+				mContactSearchListView.setEmptyView(mContactSearchResultEmptyTV);
+			} else {
+				mContactSearchResultEmptyTV.setVisibility(View.GONE);
+				mContactSearchListView.setEmptyView(null);
+			}
 		}
 	}
 
@@ -406,4 +430,18 @@ public class SearchContactEditText extends Dialog implements
 		super.onBackPressed();
 	}
 
+	private onResultSearchedListener mOnResultSearchedListener;
+	/**
+	 * 是否是群、讨论组添加成员中的搜索框
+	 */
+	private boolean isGroupSearch = false;
+	
+	public interface onResultSearchedListener {
+		void onResultSearched(List<Object> mSearchResultObjects);
+	}
+	
+	public void setOnResultSearchedListener(boolean mGroupSearch,onResultSearchedListener tempListener){
+		isGroupSearch = mGroupSearch;
+		mOnResultSearchedListener = tempListener;
+	}
 }

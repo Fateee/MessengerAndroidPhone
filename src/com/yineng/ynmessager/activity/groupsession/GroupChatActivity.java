@@ -2,6 +2,7 @@ package com.yineng.ynmessager.activity.groupsession;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -23,13 +24,12 @@ import android.text.SpannableString;
 import android.text.TextUtils;
 import android.util.Log;
 import android.view.ContextMenu;
-import android.view.ContextThemeWrapper;
+import android.view.ContextMenu.ContextMenuInfo;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.View;
-import android.view.ContextMenu.ContextMenuInfo;
 import android.view.View.OnClickListener;
 import android.view.View.OnTouchListener;
 import android.view.ViewGroup;
@@ -179,8 +179,7 @@ public class GroupChatActivity extends BaseActivity implements OnClickListener, 
 	{
 		menu.setHeaderTitle(R.string.p2pChatActivity_contextMenuTitle);
 		menu.add(Menu.NONE,0,Menu.NONE,R.string.p2pChatActivity_copyChatMsg);
-		menu.add(Menu.NONE,1,Menu.NONE,R.string.p2pChatActivity_RetrySendMsg);
-		menu.add(Menu.NONE,2,Menu.NONE,R.string.p2pChatActivity_deleteChatMsg);
+		menu.add(Menu.NONE,1,Menu.NONE,R.string.p2pChatActivity_deleteChatMsg);
 	}
 	
 	@SuppressLint("NewApi")
@@ -197,9 +196,20 @@ public class GroupChatActivity extends BaseActivity implements OnClickListener, 
 				mClipboard.setPrimaryClip(ClipData.newPlainText(TAG,viewItem.getSpannableString().toString()));
 				showToast(R.string.common_copyToClipboard);
 				break;
-			case 1:  //重发
-				break;
-			case 2:  //删除
+			case 1:  //删除
+				int deletedRows = mGroupChatDao.deleteByPacketId(viewItem.getPacketId());
+				L.i(TAG,"删除了" + deletedRows + "条会话消息");
+				refreshUIByPageIndex(viewItem);
+				// 得到最后一条消息的内容，设置到最近会话消息列表中更新显示
+				GroupChatMsgEntity lastest = mGroupChatDao.queryLastestChatMsg(mChatUserNum);
+				String content;
+				if(lastest != null)
+				{
+					content = lastest.getSpannableString().toString();
+				}else{
+					content = "";
+				}
+				updateRecentChatList(content);
 				break;
 		}
 		return true;
@@ -249,7 +259,7 @@ public class GroupChatActivity extends BaseActivity implements OnClickListener, 
 		mReceiptThread.start();
 
 		// 初始状态，从本地获得20条数据，刷新UI
-		refreshUIByPageIndex();
+		refreshUIByPageIndex(null);
 		mXmppConnManager.addReceiveMessageCallBack(mChatUserNum, this);
 		mXmppConnManager.addReceiveReqIQCallBack("com:yineng:receipt", this);
 		// 回执处理广播
@@ -306,7 +316,7 @@ public class GroupChatActivity extends BaseActivity implements OnClickListener, 
 						mHandler.postDelayed(new Runnable() {
 							@Override
 							public void run() {
-								refreshUIByPageIndex();
+								refreshUIByPageIndex(null);
 								mHandler.sendEmptyMessage(0);
 								mPullToRefreshListView.onRefreshComplete();
 							}
@@ -570,10 +580,15 @@ public class GroupChatActivity extends BaseActivity implements OnClickListener, 
 	
 	/**
 	 * 本地分页查询数据，刷新UI
+	 * @param deletedChatMsg 之前删除的某条消息记录，用来更新数据源（可选的，不是删除消息操作调用，可以传null）
 	 */
-	public void refreshUIByPageIndex() {
+	public void refreshUIByPageIndex(GroupChatMsgEntity deletedChatMsg) {
 		isBottom = true;
 		LinkedList<GroupChatMsgEntity> list = mGroupChatDao.getChatMsgEntitiesByPage(mChatUserNum, mPage, PAGE_SIZE);
+		if(mMessageList.contains(deletedChatMsg))
+		{
+			mMessageList.remove(deletedChatMsg);
+		}
 		if (list != null && !list.isEmpty()) {
 			for (GroupChatMsgEntity mGroupChatMsgEntity : list) {
 				mMessageList.addFirst(mGroupChatMsgEntity);
@@ -917,8 +932,10 @@ public class GroupChatActivity extends BaseActivity implements OnClickListener, 
 			viewHolder.tvSendTime.setVisibility(View.INVISIBLE);
 			if (entity.isShowTime()) {
 				viewHolder.tvSendTime.setVisibility(View.VISIBLE);
-				viewHolder.tvSendTime.setText(TimeUtil.getDateByMillisecond(
-						entity.getmTime(), TimeUtil.FORMAT_DATETIME_24));
+				Date sendTime = new Date(Long.valueOf(entity.getmTime()));
+				viewHolder.tvSendTime.setText(TimeUtil.getTimeRelationFromNow2(mContext,sendTime));
+//				viewHolder.tvSendTime.setText(TimeUtil.getDateByMillisecond(
+//						entity.getmTime(), TimeUtil.FORMAT_DATETIME_24));
 			}
 
 			viewHolder.tvContent.setTag(entity);
